@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Sandboxed Google Play</string>
+    <string name="persistent_fg_service_notif">Sandboxed Google Play is running</string>
+
+    <string name="usage_guide">Usage guide</string>
+    <string name="play_services">Play services</string>
+    <string name="play_store">Play Store</string>
+<!--    <string name="google_settings">Google services &amp; preferences</string>-->
+    <string name="google_settings">Google settings</string>
+    <string name="component_system_settings">%s system settings</string>
+
+    <string name="persistent_process">:persistent</string>
+
+    <string name="gms_network_location_opt_in">Google Location Accuracy</string>
+</resources>
