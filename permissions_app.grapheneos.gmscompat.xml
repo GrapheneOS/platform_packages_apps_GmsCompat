@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<permissions>
-    <privapp-permissions package="app.grapheneos.gmscompat">
-        <permission name="android.permission.START_FOREGROUND_SERVICES_FROM_BACKGROUND"/>
-    </privapp-permissions>
-</permissions>
