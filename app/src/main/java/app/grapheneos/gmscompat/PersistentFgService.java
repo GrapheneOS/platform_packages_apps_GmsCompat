@@ -28,18 +28,18 @@ public class PersistentFgService extends Service {
     int boundPkgs;
 
     static void start(Context ctx, String pkg) {
-        var i = new Intent(pkg);
+        Intent i = new Intent(pkg);
         i.setClass(ctx, PersistentFgService.class);
         ctx.getApplicationContext().startForegroundService(i);
     }
 
     public void onCreate() {
-        var title = getString(R.string.persistent_fg_service_notif);
-        var nc = new NotificationChannel(App.NotificationChannels.PERSISTENT_FG_SERVICE, title, NotificationManager.IMPORTANCE_LOW);
+        String title = getString(R.string.persistent_fg_service_notif);
+        NotificationChannel nc = new NotificationChannel(App.NotificationChannels.PERSISTENT_FG_SERVICE, title, NotificationManager.IMPORTANCE_LOW);
         nc.setShowBadge(false);
         getSystemService(NotificationManager.class).createNotificationChannel(nc);
 
-        var nb = new Notification.Builder(this, App.NotificationChannels.PERSISTENT_FG_SERVICE);
+        Notification.Builder nb = new Notification.Builder(this, App.NotificationChannels.PERSISTENT_FG_SERVICE);
         nb.setSmallIcon(android.R.drawable.ic_dialog_dialer);
         nb.setContentTitle(title);
         nb.setContentIntent(PendingIntent.getActivity(this, 0,
@@ -88,7 +88,7 @@ public class PersistentFgService extends Service {
             Log.d(TAG, pkg + " is already bound");
             return true;
         }
-        var i = new Intent();
+        Intent i = new Intent();
         i.setClassName(pkg, cls);
 
         // BIND_INCLUDE_CAPABILITIES isn't needed, at least for now
