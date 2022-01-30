@@ -41,7 +41,7 @@ android {
 }
 
 dependencies {
-    implementation("androidx.preference:preference:1.1.1")
+    implementation("androidx.preference:preference:1.2.0")
 
     testImplementation("junit:junit:4.+")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
