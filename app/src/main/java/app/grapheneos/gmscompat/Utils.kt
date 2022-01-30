@@ -5,36 +5,38 @@ import android.util.Log
 import java.lang.StringBuilder
 import java.lang.reflect.Modifier
 
+const val DEBUG = false
+
 fun logd() {
-    if (!BuildConfig.DEV) {
+    if (!DEBUG) {
         return
     }
     logInternal("<>", Log.DEBUG, 4)
 }
 
 fun logds(msg: String) {
-    if (!BuildConfig.DEV) {
+    if (!DEBUG) {
         return
     }
     logInternal(msg, Log.DEBUG, 4)
 }
 
 inline fun logd(msg: () -> Any?) {
-    if (!BuildConfig.DEV) {
+    if (!DEBUG) {
         return
     }
     logInternal(msg(), Log.DEBUG, 3)
 }
 
 inline fun log(msg: () -> Any?, level: Int) {
-    if (!BuildConfig.DEV) {
+    if (!DEBUG) {
         return
     }
     logInternal(msg(), level, 3)
 }
 
 fun logInternal(o: Any?, level: Int, depth: Int) {
-    if (!BuildConfig.DEV) {
+    if (!DEBUG) {
         return
     }
     val e = Thread.currentThread().stackTrace[depth]
