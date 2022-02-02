@@ -37,6 +37,7 @@
             android:launchMode="singleInstance"
             android:theme="@style/AppTheme"
             android:permission="app.grapheneos.gmscompat.SHOW_UI"
+            android:label="@string/activity_name"
         >
             <intent-filter>
                 <action android:name="${applicationId}.SETTINGS_LINK" />
