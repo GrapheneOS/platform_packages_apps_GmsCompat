@@ -13,6 +13,14 @@ public class App extends Application {
         super.onCreate();
         ctx = getApplicationContext();
         mainThread = Thread.currentThread();
+
+        if (Const.PKG_NAME.equals(Application.getProcessName())) {
+            // main process
+            preferences = ctx
+                .createDeviceProtectedStorageContext()
+                .getSharedPreferences(MAIN_PROCESS_PREFS_FILE, MODE_PRIVATE);
+            Redirections.init(preferences);
+        }
     }
 
     public static Context ctx() {
@@ -34,5 +42,12 @@ public class App extends Application {
 
     public interface NotificationIds {
         int PERSISTENT_FG_SERVICE = 1;
+    }
+
+    private static final String MAIN_PROCESS_PREFS_FILE = "prefs";
+
+    public interface MainProcessPrefs {
+        String ENABLED_REDIRECTIONS = "enabled_redirections";
+        String INITED_REDIRECTIONS = "inited_redirections";
     }
 }
