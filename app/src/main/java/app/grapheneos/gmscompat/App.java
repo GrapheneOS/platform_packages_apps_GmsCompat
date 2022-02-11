@@ -7,10 +7,12 @@ import android.content.SharedPreferences;
 public class App extends Application {
     private static Context ctx;
     private static SharedPreferences preferences;
+    private static Thread mainThread;
 
     public void onCreate() {
         super.onCreate();
         ctx = getApplicationContext();
+        mainThread = Thread.currentThread();
     }
 
     public static Context ctx() {
@@ -18,7 +20,12 @@ public class App extends Application {
     }
 
     public static SharedPreferences preferences() {
+        UtilsKt.mainProcess();
         return preferences;
+    }
+
+    public static Thread mainThread() {
+        return mainThread;
     }
 
     public interface NotificationChannels {

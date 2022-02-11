@@ -14,13 +14,14 @@ class BinderProvider : AbsContentProvider() {
         logd{"callingPkg " + pkg + " callingPid " + Binder.getCallingPid()}
 
         val binder = extras!!.getBinder(KEY_BINDER)!!
+        val deathRecipient = DeathRecipient(binder)
         try {
             // important to add before linkToDeath() to avoid race with binderDied() callback
             addBoundProcess(binder)
-            binder.linkToDeath(DeathRecipient(binder), 0)
+            binder.linkToDeath(deathRecipient, 0)
         } catch (e: RemoteException) {
-            removeBoundProcess(binder)
             logd{"binder already died: " + e}
+            deathRecipient.binderDied()
             return null
         }
         PersistentFgService.start(context, pkg)
