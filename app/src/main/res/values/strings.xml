@@ -10,7 +10,7 @@
     <string name="google_settings">Google settings</string>
     <string name="component_system_settings">%s system settings</string>
 
-    <string name="persistent_process">:persistent</string>
-
     <string name="gms_network_location_opt_in">Google Location Accuracy</string>
+
+    <string name="ui_process">:ui</string>
 </resources>

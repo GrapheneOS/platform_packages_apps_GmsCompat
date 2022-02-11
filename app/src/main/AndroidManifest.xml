@@ -18,7 +18,6 @@
             android:name=".PersistentFgService"
             android:exported="false"
             android:directBootAware="true"
-            android:process="@string/persistent_process"
         />
 
         <provider
@@ -26,7 +25,6 @@
             android:authorities="${applicationId}.BinderProvider"
             android:exported="true"
             android:directBootAware="true"
-            android:process="@string/persistent_process"
             android:permission="com.google.android.providers.gsf.permission.WRITE_GSERVICES"
         />
         <!-- WRITE_GSERVICES is a signature-protected permission held by GSF, Play Services and Play Store -->
@@ -36,6 +34,7 @@
             android:exported="true"
             android:launchMode="singleInstance"
             android:theme="@style/AppTheme"
+            android:process="@string/ui_process"
             android:permission="app.grapheneos.gmscompat.SHOW_UI"
             android:label="@string/activity_name"
         >

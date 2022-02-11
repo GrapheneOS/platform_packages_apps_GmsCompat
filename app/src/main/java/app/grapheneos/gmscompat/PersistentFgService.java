@@ -14,11 +14,11 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import static app.grapheneos.gmscompat.Constants.GSF_PKG;
-import static app.grapheneos.gmscompat.Constants.PLAY_SERVICES_PKG;
-import static app.grapheneos.gmscompat.Constants.PLAY_STORE_PKG;
+import static app.grapheneos.gmscompat.Const.GSF_PKG;
+import static app.grapheneos.gmscompat.Const.PLAY_SERVICES_PKG;
+import static app.grapheneos.gmscompat.Const.PLAY_STORE_PKG;
 
-// raises priority of Play Services and Play Store, thereby allowing them to start services when they need to
+// raises priority of Play services and Play Store, thereby allowing them to start services when they need to
 public class PersistentFgService extends Service {
     private static final String TAG = "PersistentFgService";
 
@@ -82,6 +82,8 @@ public class PersistentFgService extends Service {
     private boolean bindPlayStore() {
         return bind(PLAY_STORE, PLAY_STORE_PKG, "com.google.android.finsky.ipcservers.main.MainGrpcServerAndroidService");
     }
+    // it's important that both of these services are directBootAware,
+    // keep that in mind if they become unavailable and need to be replaced
 
     private boolean bind(int pkgId, String pkg, String cls) {
         if ((boundPkgs & pkgId) != 0) {
