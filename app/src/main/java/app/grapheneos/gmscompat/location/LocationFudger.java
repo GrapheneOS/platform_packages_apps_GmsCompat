@@ -14,25 +14,24 @@
  * limitations under the License.
  */
 
-package com.android.server.location.fudger;
+// copied from AOSP frameworks/base/services/core/java/com/android/server/location/fudger/LocationFudger.java
+package app.grapheneos.gmscompat.location;
 
-import android.annotation.Nullable;
 import android.location.Location;
-import android.location.LocationResult;
 import android.os.SystemClock;
 
-import com.android.internal.annotations.GuardedBy;
-import com.android.internal.annotations.VisibleForTesting;
-
 import java.security.SecureRandom;
-import java.time.Clock;
 import java.util.Random;
+
+import androidx.annotation.GuardedBy;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 
 /**
  * Contains the logic to obfuscate (fudge) locations for coarse applications. The goal is just to
  * prevent applications with only the coarse location permission from receiving a fine location.
  */
-public class LocationFudger {
+class LocationFudger {
 
     // minimum accuracy a coarsened location can have
     private static final float MIN_ACCURACY_M = 200.0f;
@@ -63,7 +62,6 @@ public class LocationFudger {
             90.0 - (1.0 / APPROXIMATE_METERS_PER_DEGREE_AT_EQUATOR);
 
     private final float mAccuracyM;
-    private final Clock mClock;
     private final Random mRandom;
 
     @GuardedBy("this")
@@ -78,18 +76,17 @@ public class LocationFudger {
     @GuardedBy("this")
     @Nullable private Location mCachedCoarseLocation;
 
-    @GuardedBy("this")
-    @Nullable private LocationResult mCachedFineLocationResult;
-    @GuardedBy("this")
-    @Nullable private LocationResult mCachedCoarseLocationResult;
+    public LocationFudger() {
+        // copied from com.android.server.location.injector.SystemSettingsHelper.DEFAULT_COARSE_LOCATION_ACCURACY_M
+        this(2000.0f);
+    }
 
     public LocationFudger(float accuracyM) {
-        this(accuracyM, SystemClock.elapsedRealtimeClock(), new SecureRandom());
+        this(accuracyM, new SecureRandom());
     }
 
     @VisibleForTesting
-    LocationFudger(float accuracyM, Clock clock, Random random) {
-        mClock = clock;
+    LocationFudger(float accuracyM, Random random) {
         mRandom = random;
         mAccuracyM = Math.max(accuracyM, MIN_ACCURACY_M);
 
@@ -102,29 +99,11 @@ public class LocationFudger {
     public void resetOffsets() {
         mLatitudeOffsetM = nextRandomOffset();
         mLongitudeOffsetM = nextRandomOffset();
-        mNextUpdateRealtimeMs = mClock.millis() + OFFSET_UPDATE_INTERVAL_MS;
+        mNextUpdateRealtimeMs = getClockMillis() + OFFSET_UPDATE_INTERVAL_MS;
     }
 
-    /**
-     * Coarsens a LocationResult by coarsening every location within the location result with
-     * {@link #createCoarse(Location)}.
-     */
-    public LocationResult createCoarse(LocationResult fineLocationResult) {
-        synchronized (this) {
-            if (fineLocationResult == mCachedFineLocationResult
-                    || fineLocationResult == mCachedCoarseLocationResult) {
-                return mCachedCoarseLocationResult;
-            }
-        }
-
-        LocationResult coarseLocationResult = fineLocationResult.map(this::createCoarse);
-
-        synchronized (this) {
-            mCachedFineLocationResult = fineLocationResult;
-            mCachedCoarseLocationResult = coarseLocationResult;
-        }
-
-        return coarseLocationResult;
+    private static long getClockMillis() {
+        return SystemClock.elapsedRealtime();
     }
 
     /**
@@ -137,6 +116,7 @@ public class LocationFudger {
      * property of producing stable results, and mitigating against taking many samples to average
      * out a random offset.
      */
+    @SuppressWarnings("deprecation")
     public Location createCoarse(Location fine) {
         synchronized (this) {
             if (fine == mCachedFineLocation || fine == mCachedCoarseLocation) {
@@ -150,7 +130,9 @@ public class LocationFudger {
         Location coarse = new Location(fine);
 
         // clear any fields that could leak more detailed location information
+
         coarse.removeBearing();
+        //noinspection deprecation
         coarse.removeSpeed();
         coarse.removeAltitude();
         coarse.setExtras(null);
@@ -198,7 +180,7 @@ public class LocationFudger {
      * boundaries.
      */
     private synchronized void updateOffsets() {
-        long now = mClock.millis();
+        long now = getClockMillis();
         if (now < mNextUpdateRealtimeMs) {
             return;
         }
