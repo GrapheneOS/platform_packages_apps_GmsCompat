@@ -1,6 +1,10 @@
 android_app {
     name: "GmsCompat",
+    aidl: {
+        local_include_dirs: ["app/src/main/aidl"],
+    },
     srcs: [
+        "app/src/main/aidl/**/*.aidl",
         "app/src/main/java/**/*.kt",
         "app/src/main/java/**/*.java",
     ],
