@@ -11,7 +11,14 @@ public class App extends Application {
 
     public void onCreate() {
         super.onCreate();
-        ctx = getApplicationContext();
+        maybeInit(this);
+    }
+
+    static void maybeInit(Context componentContext) {
+        if (ctx != null) {
+            return;
+        }
+        ctx = componentContext.getApplicationContext();
         mainThread = Thread.currentThread();
 
         if (Const.PKG_NAME.equals(Application.getProcessName())) {
