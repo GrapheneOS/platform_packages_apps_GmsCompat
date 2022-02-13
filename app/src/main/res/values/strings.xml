@@ -13,7 +13,10 @@
     <string name="google_settings">Google settings</string>
     <string name="component_system_settings">%s system settings</string>
     <string name="gms_network_location_opt_in">Google Location Accuracy</string>
-
+    <string name="no_gms_network_location">
+"Google\'s location service is disabled. Tap \"%s\" to learn more.
+If you decide to keep it disabled, consider enabling \"%s\" option to improve app compatibility (a lot of apps won\'t function properly when this service is disabled)."
+    </string>
     <string name="revoke_location_permission">Revoke location permission from Play services.</string>
 
     <string name="play_services_settings">Play services settings</string>
@@ -25,7 +28,7 @@
     <string name="location_access_is_off_for_all_apps">Location access is off for all apps.</string>
     <string name="location_settings">Location settings</string>
     <string name="location_redirection_extra_permissions">
-"Location requests are redirected to the OS APIs, but Play services still has Location permission."
+"Location requests are rerouted to the OS APIs, but Play services still has Location permission."
     </string>
     <string name="play_services_no_location_permission">
 "Play services needs Location permission to be set to \"%s\" and \"Use precise location\"."
