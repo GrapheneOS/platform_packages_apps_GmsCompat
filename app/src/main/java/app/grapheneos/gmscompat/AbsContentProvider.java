@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 public abstract class AbsContentProvider extends ContentProvider {
 
     public boolean onCreate() {
+        App.maybeInit(getContext());
         return true;
     }
 
