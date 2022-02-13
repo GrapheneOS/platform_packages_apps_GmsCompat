@@ -169,6 +169,25 @@ class MainFragment : PreferenceFragmentCompat() {
                 sb.append(getString(R.string.play_services_no_location_permission, ctx.packageManager.backgroundPermissionOptionLabel))
                 addPsSettingsButton = true
             }
+
+            val cursor = ctx.contentResolver.query(Uri.parse("content://com.google.settings/partner/network_location_opt_in"),
+                arrayOf("value"), null, null)
+            if (cursor != null) {
+                cursor.use {
+                    val columnCnt = cursor.columnCount
+                    if (columnCnt != 0) {
+                        check(columnCnt == 1)
+                        cursor.moveToPosition(0)
+                        val enabled = intToBool(cursor.getInt(0))
+                        if (!enabled) {
+                            sb.separator()
+                            sb.append(getString(R.string.no_gms_network_location,
+                                getString(R.string.gms_network_location_opt_in),
+                                getString(R.string.reroute_location_requests_to_os_apis)))
+                        }
+                    }
+                }
+            }
             val psHasBtScanPerm = playServicesHasPermission(permission.BLUETOOTH_SCAN)
             if (!psHasBtScanPerm) {
                 sb.separator()
