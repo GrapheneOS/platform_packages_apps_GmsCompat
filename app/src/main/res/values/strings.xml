@@ -14,8 +14,8 @@
     <string name="component_system_settings">%s system settings</string>
     <string name="gms_network_location_opt_in">Google Location Accuracy</string>
     <string name="no_gms_network_location">
-"Google\'s location service is disabled. Tap \"%s\" to learn more.
-If you decide to keep it disabled, consider enabling \"%s\" option to improve app compatibility (a lot of apps won\'t function properly when this service is disabled)."
+"Google\'s location service is disabled. Tap \"%1$s\" to learn more.
+If you decide to keep it disabled, consider enabling \"%2$s\" option to improve app compatibility (a lot of apps won\'t function properly when this service is disabled)."
     </string>
     <string name="revoke_location_permission">Revoke location permission from Play services.</string>
 
