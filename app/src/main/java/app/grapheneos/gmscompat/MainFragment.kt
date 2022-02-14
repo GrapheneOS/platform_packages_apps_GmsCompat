@@ -18,6 +18,7 @@ import androidx.preference.PreferenceGroup
 import androidx.preference.SwitchPreferenceCompat
 import app.grapheneos.gmscompat.Const.PLAY_SERVICES_PKG
 import app.grapheneos.gmscompat.Const.PLAY_STORE_PKG
+import java.lang.Exception
 import java.lang.StringBuilder
 
 class MainFragment : PreferenceFragmentCompat() {
@@ -169,14 +170,12 @@ class MainFragment : PreferenceFragmentCompat() {
                 sb.append(getString(R.string.play_services_no_location_permission, ctx.packageManager.backgroundPermissionOptionLabel))
                 addPsSettingsButton = true
             }
-
-            val cursor = ctx.contentResolver.query(Uri.parse("content://com.google.settings/partner/network_location_opt_in"),
-                arrayOf("value"), null, null)
-            if (cursor != null) {
-                cursor.use {
-                    val columnCnt = cursor.columnCount
-                    if (columnCnt != 0) {
-                        check(columnCnt == 1)
+            try {
+                val uri = Uri.parse("content://com.google.settings/partner/network_location_opt_in")
+                val proj = arrayOf("value")
+                val cursor = ctx.contentResolver.query(uri, proj, null, null)
+                cursor?.use {
+                    if (cursor.count == 1 && cursor.columnCount == 1) {
                         cursor.moveToPosition(0)
                         val enabled = intToBool(cursor.getInt(0))
                         if (!enabled) {
@@ -187,6 +186,8 @@ class MainFragment : PreferenceFragmentCompat() {
                         }
                     }
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
             val psHasBtScanPerm = playServicesHasPermission(permission.BLUETOOTH_SCAN)
             if (!psHasBtScanPerm) {
@@ -342,10 +343,12 @@ fun playServicesHasFullLocationPermission(): Boolean {
             && playServicesHasPermission(permission.ACCESS_FINE_LOCATION)
 }
 
-fun intToBool(v: Int) =
+private fun intToBool(v: Int) =
     if (v == 1) {
         true
     } else {
-        require(v == 0)
+        if (Const.DEV) {
+            require(v == 0)
+        }
         false
     }
