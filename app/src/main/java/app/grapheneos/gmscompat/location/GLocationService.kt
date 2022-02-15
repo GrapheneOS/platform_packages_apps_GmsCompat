@@ -30,6 +30,7 @@ import app.grapheneos.gmscompat.App
 import app.grapheneos.gmscompat.Const
 import app.grapheneos.gmscompat.logd
 import app.grapheneos.gmscompat.opModeToString
+import com.google.android.gms.common.api.CommonStatusCodes
 import java.lang.ref.WeakReference
 import java.util.Arrays
 import java.util.concurrent.Executors
@@ -48,7 +49,13 @@ object GLocationService : IGoogleLocationManagerService.Stub() {
     override fun updateLocationRequest(data: LocationRequestUpdateData) {
 //        logd{data}
         val pendingIntent = data.pendingIntent
-        val client = Client(this, pendingIntent?.creatorPackage, data.request?.contextAttributionTag, data.appOpsReasonMessage)
+        val client = try {
+            Client(this, pendingIntent?.creatorPackage, data.request?.contextAttributionTag, data.appOpsReasonMessage)
+        } catch (e: SecurityException) {
+            data.fusedLocationProviderCallback?.onFusedLocationProviderResult(
+                FusedLocationProviderResult(Status(CommonStatusCodes.INTERNAL_ERROR)))
+            return
+        }
 
         val listeners: Listeners =
         synchronized(mapOfListeners) {
@@ -102,7 +109,7 @@ object GLocationService : IGoogleLocationManagerService.Stub() {
             }
             listeners.remove(client, key)
         }
-        data.fusedLocationProviderCallback.onFusedLocationProviderResult(FusedLocationProviderResult.SUCCESS)
+        data.fusedLocationProviderCallback?.onFusedLocationProviderResult(FusedLocationProviderResult.SUCCESS)
     }
 
     fun gcMapOfListeners() {
@@ -142,11 +149,18 @@ object GLocationService : IGoogleLocationManagerService.Stub() {
     // https://developers.google.com/android/reference/com/google/android/gms/location/FusedLocationProviderClient#getLastLocation()
     override fun getLastLocation3(contextAttributionTag: String?): Location? {
         logd{contextAttributionTag}
-        val client = Client(this, attributionTag = contextAttributionTag)
+        val client = try {
+            Client(this, attributionTag = contextAttributionTag)
+        } catch (e: SecurityException) {
+            return null
+        }
 
         val opMode = client.noteProxyAppOp()
         if (opMode != MODE_ALLOWED) {
-            throw SecurityException("noteProxyAppOp returned ${opModeToString(opMode)}")
+            if (Const.DEV) {
+                throw SecurityException("noteProxyAppOp returned ${opModeToString(opMode)}")
+            }
+            return null
         }
         val criteria = Criteria()
         criteria.accuracy =
@@ -183,7 +197,11 @@ object GLocationService : IGoogleLocationManagerService.Stub() {
     // https://developers.google.com/android/reference/com/google/android/gms/location/FusedLocationProviderClient#getLocationAvailability()
     override fun getLocationAvailability(packageName: String?): LocationAvailability {
         logd{packageName}
-        val client = Client(this)
+        val client = try {
+            Client(this)
+        } catch (e: SecurityException) {
+            return LocationAvailability.get(false)
+        }
         return LocationAvailability.get(client.locationManager.isLocationEnabled())
     }
 
