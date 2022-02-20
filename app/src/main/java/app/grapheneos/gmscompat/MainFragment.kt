@@ -1,6 +1,7 @@
 package app.grapheneos.gmscompat
 
 import android.Manifest.permission
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -10,12 +11,11 @@ import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
 import android.view.View
-import androidx.appcompat.app.AlertDialog
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceGroup
-import androidx.preference.SwitchPreferenceCompat
+import androidx.preference.SwitchPreference
 import com.android.internal.gmscompat.GmsCompatApp
 import com.android.internal.gmscompat.GmsInfo.PACKAGE_GMS_CORE
 import com.android.internal.gmscompat.GmsInfo.PACKAGE_PLAY_STORE
@@ -37,7 +37,7 @@ class MainFragment : PreferenceFragmentCompat() {
             title = getString(R.string.component_system_settings, getString(R.string.play_services))
             intent = appSettingsIntent(PACKAGE_GMS_CORE)
         }
-        SwitchPreferenceCompat(ctx).apply {
+        SwitchPreference(ctx).apply {
             title = getString(R.string.reroute_location_requests_to_os_apis)
             isSingleLineTitle = false
             isChecked = PrefsProvider.isRedirectionEnabled(Redirections.ID_GoogleLocationManagerService)

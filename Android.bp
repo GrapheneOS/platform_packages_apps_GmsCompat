@@ -15,6 +15,9 @@ android_app {
     static_libs: [
         "androidx.preference_preference",
     ],
+    defaults: [
+        "SettingsLibDefaults",
+    ],
     manifest: "app/src/main/AndroidManifest.xml",
 
     required: [
