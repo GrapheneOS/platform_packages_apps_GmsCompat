@@ -1,5 +1,6 @@
 android_app {
     name: "GmsCompat",
+    system_ext_specific: true,
     aidl: {
         local_include_dirs: ["app/src/main/aidl"],
     },
@@ -25,6 +26,7 @@ android_app {
 
 prebuilt_etc {
     name: "whitelist_app.grapheneos.gmscompat.xml",
+    system_ext_specific: true,
     sub_dir: "sysconfig",
     src: "whitelist_app.grapheneos.gmscompat.xml",
     filename_from_src: true,
