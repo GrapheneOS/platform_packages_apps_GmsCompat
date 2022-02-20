@@ -22,7 +22,9 @@ If you want to keep it disabled, consider enabling “%2$s” option to improve 
     <string name="play_services_settings">Play services settings</string>
     <string name="play_store_settings">Play Store settings</string>
 
-    <string name="potential_issues">Potential issues</string>
+    <string name="category_potential_issues">Potential issues</string>
+    <string name="category_settings">Settings</string>
+    <string name="category_location">Location</string>
 
     <string name="geolocation">Geolocation</string>
     <string name="location_access_is_off_for_all_apps">Location access is off for all apps.</string>

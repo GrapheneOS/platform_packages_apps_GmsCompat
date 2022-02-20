@@ -32,70 +32,84 @@ class MainFragment : PreferenceFragmentCompat() {
             title = getString(R.string.usage_guide)
             intent = Intent(Intent.ACTION_VIEW, Uri.parse(USAGE_GUIDE_URL))
         }
-        screen.addPref().apply {
-            title = getString(R.string.component_system_settings, getString(R.string.play_services))
-            intent = appSettingsIntent(PLAY_SERVICES_PKG)
-        }
-        SwitchPreference(ctx).apply {
-            title = getString(R.string.reroute_location_requests_to_os_apis)
-            isSingleLineTitle = false
-            isChecked = PrefsProvider.isRedirectionEnabled(Redirections.ID_GoogleLocationManagerService)
-            setOnPreferenceChangeListener { _, value ->
-                val redirectionEnabled = value as Boolean
-                PrefsProvider.setRedirectionState(
-                    Redirections.ID_GoogleLocationManagerService,
-                    redirectionEnabled
-                )
 
-                var msg: String? = null
-                if (redirectionEnabled) {
-                    // other location modes imply this one
-                    if (playServicesHasPermission(permission.ACCESS_COARSE_LOCATION)) {
-                        msg = getString(R.string.revoke_location_permission)
-                    }
-                } else {
-                    if (!playServicesHasFullLocationPermission()) {
-                        msg = getString(R.string.play_services_no_location_permission, ctx.packageManager.backgroundPermissionOptionLabel)
-                    }
+        PreferenceCategory(ctx).apply {
+            title = getString(R.string.category_settings)
+            screen.addPreference(this)
+
+            addPref().apply {
+                title = getString(R.string.component_system_settings, getString(R.string.play_services))
+                intent = appSettingsIntent(PLAY_SERVICES_PKG)
+            }
+            if (isPkgInstalled(PLAY_STORE_PKG)) {
+                val playStore = getString(R.string.play_store)
+                addPref().apply {
+                    title = getString(R.string.component_system_settings, playStore)
+                    intent = appSettingsIntent(PLAY_STORE_PKG)
                 }
-                if (msg != null) {
-                    AlertDialog.Builder(ctx).apply {
-                        setMessage(msg)
-                        setPositiveButton(R.string.play_services_settings) { _, _ ->
-                            startFreshActivity(appSettingsIntent(PLAY_SERVICES_PKG))
+            }
+            addPref().apply {
+                title = getString(R.string.google_settings)
+                intent = freshActivity(Intent().setClassName(PLAY_SERVICES_PKG, PLAY_SERVICES_PKG +
+                    ".app.settings.GoogleSettingsLink"))
+    //                ".app.settings.GoogleSettingsIALink")
+    //                ".app.settings.GoogleSettingsActivity")
+            }
+        }
+
+        PreferenceCategory(ctx).apply {
+            title = getString(R.string.category_location)
+            screen.addPreference(this)
+
+            SwitchPreference(ctx).apply {
+                title = getString(R.string.reroute_location_requests_to_os_apis)
+                isSingleLineTitle = false
+                isChecked = PrefsProvider.isRedirectionEnabled(Redirections.ID_GoogleLocationManagerService)
+                setOnPreferenceChangeListener { _, value ->
+                    val redirectionEnabled = value as Boolean
+                    PrefsProvider.setRedirectionState(
+                        Redirections.ID_GoogleLocationManagerService,
+                        redirectionEnabled
+                    )
+
+                    var msg: String? = null
+                    if (redirectionEnabled) {
+                        // other location modes imply this one
+                        if (playServicesHasPermission(permission.ACCESS_COARSE_LOCATION)) {
+                            msg = getString(R.string.revoke_location_permission)
                         }
-                        show()
+                    } else {
+                        if (!playServicesHasFullLocationPermission()) {
+                            msg = getString(R.string.play_services_no_location_permission, ctx.packageManager.backgroundPermissionOptionLabel)
+                        }
                     }
+                    if (msg != null) {
+                        AlertDialog.Builder(ctx).apply {
+                            setMessage(msg)
+                            setPositiveButton(R.string.play_services_settings) { _, _ ->
+                                startFreshActivity(appSettingsIntent(PLAY_SERVICES_PKG))
+                            }
+                            show()
+                        }
+                    }
+                    updatePotentialIssues()
+                    true
                 }
-                updatePotentialIssues()
-                true
+                addPreference(this)
             }
-            screen.addPreference(this)
-        }
-        screen.addPref().apply {
-            title = getString(R.string.gms_network_location_opt_in)
-            val i = Intent("com.google.android.gms.location.settings.LOCATION_ACCURACY")
-            i.setClassName(PLAY_SERVICES_PKG, "com.google.android.gms.location.settings.LocationAccuracyActivity")
-            intent = freshActivity(i)
-        }
-        if (isPkgInstalled(PLAY_STORE_PKG)) {
-            val playStore = getString(R.string.play_store)
-            screen.addPref().apply {
-                title = getString(R.string.component_system_settings, playStore)
-                intent = appSettingsIntent(PLAY_STORE_PKG)
+            addPref().apply {
+                title = getString(R.string.gms_network_location_opt_in)
+                val i = Intent("com.google.android.gms.location.settings.LOCATION_ACCURACY")
+                i.setClassName(PLAY_SERVICES_PKG, "com.google.android.gms.location.settings.LocationAccuracyActivity")
+                intent = freshActivity(i)
             }
         }
-        screen.addPref().apply {
-            title = getString(R.string.google_settings)
-            intent = freshActivity(Intent().setClassName(PLAY_SERVICES_PKG, PLAY_SERVICES_PKG +
-                ".app.settings.GoogleSettingsLink"))
-//                ".app.settings.GoogleSettingsIALink")
-//                ".app.settings.GoogleSettingsActivity")
-        }
+
         potentialIssuesCategory = PreferenceCategory(ctx).apply {
-            title = getString(R.string.potential_issues)
+            title = getString(R.string.category_potential_issues)
             screen.addPreference(this)
         }
+
         preferenceScreen = screen
     }
 
