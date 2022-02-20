@@ -1,5 +1,6 @@
 package app.grapheneos.gmscompat
 
+import android.app.compat.gms.GmsCompat
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -14,7 +15,7 @@ class MainActivity : CollapsingToolbarBaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
 
-        if (!isPkgInstalled(PLAY_SERVICES_PKG)) {
+        if (!GmsCompat.isDynamiteClient()) {
             val uri = Uri.parse(USAGE_GUIDE_URL)
             startActivity(Intent(Intent.ACTION_VIEW, uri))
             finishAndRemoveTask()
