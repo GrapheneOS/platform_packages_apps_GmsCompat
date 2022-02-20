@@ -7,7 +7,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.android.settingslib.collapsingtoolbar.CollapsingToolbarBaseActivity
 
-val USAGE_GUIDE_URL = "https://grapheneos.org/usage#sandboxed-google-play"
+const val USAGE_GUIDE_URL = "https://grapheneos.org/usage#sandboxed-google-play"
 
 class MainActivity : CollapsingToolbarBaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
