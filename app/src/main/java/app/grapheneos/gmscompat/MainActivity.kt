@@ -5,12 +5,14 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.android.settingslib.collapsingtoolbar.CollapsingToolbarBaseActivity
 
 val USAGE_GUIDE_URL = "https://grapheneos.org/usage#sandboxed-google-play"
 
-class MainActivity : AppCompatActivity(R.layout.main_activity) {
+class MainActivity : CollapsingToolbarBaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.main_activity)
 
         if (!GmsCompat.isClientOfGmsCore()) {
             val uri = Uri.parse(USAGE_GUIDE_URL)
