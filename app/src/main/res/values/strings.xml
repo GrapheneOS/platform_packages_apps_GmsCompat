@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Sandboxed Google Play companion</string>
     <string name="activity_name">Sandboxed Google Play</string>
-    <string name="reroute_location_requests_to_os_apis">Use system for location</string>
+    <string name="reroute_location_requests_to_os_apis">Route location requests to system</string>
     <string name="missing_location_permission">Location permission needs to be set to “%s”.</string>
     <string name="open_settings">Open settings</string>
     <string name="persistent_fg_service_notif">Sandboxed Google Play is running</string>
@@ -15,7 +15,7 @@
     <string name="gms_network_location_opt_in">Google Location Accuracy</string>
     <string name="no_gms_network_location">
 "Google’s location service is disabled. Tap “%1$s” to learn more.
-If you want to keep it disabled, consider enabling “%2$s” option to improve app compatibility."
+If you want to keep it disabled, consider enabling “%2$s” to avoid breaking apps."
     </string>
     <string name="revoke_location_permission">Deny the Location permission for Play services.</string>
 
@@ -57,7 +57,7 @@ If you want to keep it disabled, consider enabling “%2$s” option to improve 
     <string name="push_notifications">Push notifications</string>
     <string name="play_services_no_battery_exemption">
 "When device is idle, push notifications will be delayed to improve battery life.
-To receive them immediately, set “Battery usage” to “Unrestricted” in Play services app info."
+To receive them quicker, set “Battery usage” to “Unrestricted” in Play services app info."
     </string>
 
     <string name="ui_process">:ui</string>
