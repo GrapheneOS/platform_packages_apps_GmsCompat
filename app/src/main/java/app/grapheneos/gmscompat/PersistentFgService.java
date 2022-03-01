@@ -66,7 +66,7 @@ public class PersistentFgService extends Service {
                 res = true;
             } else {
                 // this service is protected by the signature-level permission
-                throw new SecurityException("unathourized intent " + intent);
+                throw new SecurityException("unauthorized intent " + intent);
             }
             if (!res) {
                 Log.w(TAG, "unable to bind to " + pkg);
