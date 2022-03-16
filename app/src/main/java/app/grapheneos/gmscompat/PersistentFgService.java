@@ -83,6 +83,8 @@ public class PersistentFgService extends Service {
     }
 
     private boolean bindPlayServices() {
+        // GmsDynamiteClientHooks expects "persistent" Play services process to be always running, take this into account
+        // if this service becomes unavailable and needs to be replaced
         return bind(PLAY_SERVICES, PLAY_SERVICES_PKG, "com.google.android.gms.chimera.PersistentDirectBootAwareApiService");
     }
 

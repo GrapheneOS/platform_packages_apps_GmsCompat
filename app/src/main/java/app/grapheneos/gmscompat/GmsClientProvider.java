@@ -6,6 +6,7 @@ public class GmsClientProvider extends AbsContentProvider {
     static final String KEY_RESULT = "result";
     private static final int METHOD_GET_REDIRECTABLE_INTERFACES = 0;
     private static final int METHOD_GET_REDIRECTOR = 1;
+    private static final int METHOD_GET_DynamiteFileProxyService = 2;
 
     static final String KEY_BINDER = "binder";
     static final String KEY_BINDER_TRANSACTION_CODES = "binder_txn_codes";
@@ -17,6 +18,11 @@ public class GmsClientProvider extends AbsContentProvider {
                 return Redirections.getInterfaces();
             case METHOD_GET_REDIRECTOR:
                 return Redirections.getRedirector(Integer.parseInt(arg));
+            case METHOD_GET_DynamiteFileProxyService: {
+                Bundle res = new Bundle(1);
+                res.putBinder(KEY_BINDER, BinderProvider.dynamiteFileProxyService);
+                return res;
+            }
         }
         return null;
     }
