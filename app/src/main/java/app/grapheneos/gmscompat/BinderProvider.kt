@@ -8,6 +8,7 @@ import android.os.RemoteException
 import android.util.ArraySet
 
 private const val KEY_BINDER = "binder"
+private const val KEY_DynamiteFileProxyService = "DynamiteFileProxyService"
 
 class BinderProvider : AbsContentProvider() {
     override fun call(pkg: String, arg: String?, extras: Bundle?): Bundle? {
@@ -26,6 +27,10 @@ class BinderProvider : AbsContentProvider() {
         }
         PersistentFgService.start(context, pkg)
 
+        if (extras.containsKey(KEY_DynamiteFileProxyService)) {
+            dynamiteFileProxyService = extras.getBinder(KEY_DynamiteFileProxyService)
+        }
+
         val res = Bundle()
         res.putBinder(KEY_BINDER, dummyBinder)
         return res
@@ -33,6 +38,8 @@ class BinderProvider : AbsContentProvider() {
 
     companion object {
         private val dummyBinder = Binder()
+        @Volatile @JvmField
+        var dynamiteFileProxyService: IBinder? = null
         private val boundProcesses = ArraySet<IBinder>(10)
 
         fun addBoundProcess(binder: IBinder) {
