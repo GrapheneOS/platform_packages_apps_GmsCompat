@@ -18,8 +18,11 @@ android_app {
 
     sdk_version: "current",
 
+    privileged: true,
+
     required: [
         "whitelist_app.grapheneos.gmscompat.xml",
+        "privapp_permissions_app.grapheneos.gmscompat.xml",
     ]
 }
 
@@ -27,5 +30,12 @@ prebuilt_etc {
     name: "whitelist_app.grapheneos.gmscompat.xml",
     sub_dir: "sysconfig",
     src: "whitelist_app.grapheneos.gmscompat.xml",
+    filename_from_src: true,
+}
+
+prebuilt_etc {
+    name: "privapp_permissions_app.grapheneos.gmscompat.xml",
+    sub_dir: "permissions",
+    src: "privapp_permissions_app.grapheneos.gmscompat.xml",
     filename_from_src: true,
 }
