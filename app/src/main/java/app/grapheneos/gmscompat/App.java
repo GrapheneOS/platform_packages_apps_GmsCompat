@@ -3,7 +3,10 @@ package app.grapheneos.gmscompat;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-
+import android.content.IntentFilter;
+import android.content.Intent;
+import android.content.BroadcastReceiver;
+ 
 public class App extends Application {
     private static Context ctx;
     private static SharedPreferences preferences;
@@ -12,7 +15,32 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         maybeInit(this);
+
+        // Needed to handle scenario where the user adds or removes GMS or GSF
+        AppStateControl.enableOrDisableEsim(this);
+        IntentFilter appsChangesFilter = new IntentFilter();
+        appsChangesFilter.addAction(Intent.ACTION_PACKAGE_ADDED);
+        appsChangesFilter.addAction(Intent.ACTION_PACKAGE_REPLACED);
+        appsChangesFilter.addAction(Intent.ACTION_PACKAGE_FULLY_REMOVED);
+        appsChangesFilter.addAction(Intent.ACTION_PACKAGE_REMOVED);
+        appsChangesFilter.addDataScheme("package");
+        registerReceiver(appChangesReceiver, appsChangesFilter);
     }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        unregisterReceiver(appChangesReceiver);
+    }
+
+    private final BroadcastReceiver appChangesReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (context != null){
+                AppStateControl.enableOrDisableEsim(context);
+            }
+        }
+    };
 
     static void maybeInit(Context componentContext) {
         if (ctx != null) {
