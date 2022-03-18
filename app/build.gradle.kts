@@ -32,7 +32,7 @@ android {
     }
 
     lint {
-        disable += arrayOf("StaticFieldLeak", "MissingPermission") // false positives
+        disable += arrayOf("StaticFieldLeak", "MissingPermission", "ProtectedPermissions") // false positives
     }
 
     compileOptions {
