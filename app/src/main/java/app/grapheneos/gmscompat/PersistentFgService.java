@@ -9,6 +9,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -27,12 +28,6 @@ public class PersistentFgService extends Service {
 
     int boundPkgs;
 
-    static void start(Context ctx, String pkg) {
-        Intent i = new Intent(pkg);
-        i.setClass(ctx, PersistentFgService.class);
-        ctx.getApplicationContext().startForegroundService(i);
-    }
-
     public void onCreate() {
         String title = getString(R.string.persistent_fg_service_notif);
         NotificationChannel nc = new NotificationChannel(App.NotificationChannels.PERSISTENT_FG_SERVICE, title, NotificationManager.IMPORTANCE_LOW);
@@ -46,6 +41,18 @@ public class PersistentFgService extends Service {
             new Intent(this, MainActivity.class), PendingIntent.FLAG_IMMUTABLE));
         nb.setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE);
         startForeground(App.NotificationIds.PERSISTENT_FG_SERVICE, nb.build());
+    }
+
+    static void start(Context componentCtx, String callerPackage) {
+        Context ctx = componentCtx.getApplicationContext();
+
+        // call startForegroundService() from the main thread, not the binder thread
+        // (this method is called from ContentProvider.call())
+        new Handler(ctx.getMainLooper()).post(() -> {
+            Intent i = new Intent(callerPackage);
+            i.setClass(ctx, PersistentFgService.class);
+            ctx.startForegroundService(i);
+        });
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
