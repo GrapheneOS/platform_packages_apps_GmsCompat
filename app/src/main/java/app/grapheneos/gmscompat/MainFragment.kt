@@ -199,26 +199,25 @@ class MainFragment : PreferenceFragmentCompat() {
                 addPsSettingsButton = true
             }
             val cr = ctx.contentResolver
-            sb.separator()
             if (intToBool(Settings.Global.getInt(cr, "wifi_scan_always_enabled", -1))) {
-                if (psHasAnyLocationPerm) {
-                    sb.resString(R.string.always_on_wifi_scanning_allowed)
-                } else {
+                if (!psHasAnyLocationPerm) {
+                    sb.separator()
                     sb.resString(R.string.always_on_wifi_scanning_enabled_but_disallowed)
                     addPsSettingsButton = true
                 }
             } else {
+                sb.separator()
                 sb.resString(R.string.always_on_wifi_scanning_not_allowed)
             }
-            sb.separator()
+
             if (intToBool(Settings.Global.getInt(cr, "ble_scan_always_enabled", -1))) {
-                if (psHasBtScanPerm) {
-                    sb.resString(R.string.always_on_bluetooth_scanning_allowed)
-                } else {
+                if (!psHasBtScanPerm) {
+                    sb.separator()
                     sb.resString(R.string.always_on_bluetooth_scanning_enabled_but_disallowed)
                     addPsSettingsButton = true
                 }
             } else {
+                sb.separator()
                 sb.resString(R.string.always_on_bluetooth_scanning_disabled)
             }
             addAlwaysOnScanningSettingsButton = true
