@@ -171,6 +171,7 @@ class MainFragment : PreferenceFragmentCompat() {
                 sb.append(getString(R.string.play_services_no_location_permission, ctx.packageManager.backgroundPermissionOptionLabel))
                 addPsSettingsButton = true
             }
+            var gmsNetworkLocationEnabled = false
             try {
                 val uri = Uri.parse("content://com.google.settings/partner/network_location_opt_in")
                 val proj = arrayOf("value")
@@ -178,18 +179,19 @@ class MainFragment : PreferenceFragmentCompat() {
                 cursor?.use {
                     if (cursor.count == 1 && cursor.columnCount == 1) {
                         cursor.moveToPosition(0)
-                        val enabled = intToBool(cursor.getInt(0))
-                        if (!enabled) {
-                            sb.separator()
-                            sb.append(getString(R.string.no_gms_network_location,
-                                getString(R.string.gms_network_location_opt_in),
-                                getString(R.string.reroute_location_requests_to_os_apis)))
-                        }
+                        gmsNetworkLocationEnabled = intToBool(cursor.getInt(0))
                     }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
             }
+            if (!gmsNetworkLocationEnabled) {
+                sb.separator()
+                sb.append(getString(R.string.no_gms_network_location,
+                    getString(R.string.gms_network_location_opt_in),
+                    getString(R.string.reroute_location_requests_to_os_apis)))
+            }
+
             val psHasBtScanPerm = gmsCoreHasPermission(permission.BLUETOOTH_SCAN)
             if (!psHasBtScanPerm) {
                 sb.separator()
