@@ -60,5 +60,4 @@ After this permission is granted, Play Store needs to be fully restarted with \"
 To receive them promptly, set \"Battery usage\" to \"Unrestricted\" in Play services settings."
     </string>
 
-    <string name="ui_process">:ui</string>
 </resources>
