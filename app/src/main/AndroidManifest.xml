@@ -58,7 +58,7 @@
             android:exported="true"
             android:launchMode="singleInstance"
             android:theme="@style/AppTheme"
-            android:process="@string/ui_process"
+            android:process=":ui"
             android:permission="app.grapheneos.gmscompat.SHOW_UI"
             android:label="@string/activity_name"
         >
