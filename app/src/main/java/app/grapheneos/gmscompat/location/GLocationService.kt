@@ -118,7 +118,7 @@ object GLocationService : IGoogleLocationManagerService.Stub() {
             var i = 0
             while (i < map.size()) {
                 if (map.valueAt(i).get() == null) {
-                    map.delete(i)
+                    map.removeAt(i)
                 } else {
                     ++i
                 }
