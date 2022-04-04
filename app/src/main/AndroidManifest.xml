@@ -34,15 +34,6 @@
             android:authorities="${applicationId}.BinderProvider"
             android:exported="true"
             android:directBootAware="true"
-            android:permission="com.google.android.providers.gsf.permission.WRITE_GSERVICES"
-        />
-        <!-- WRITE_GSERVICES is a signature-protected permission held by GSF, Play services and Play Store -->
-
-        <provider
-            android:name=".GmsClientProvider"
-            android:authorities="${applicationId}.GmsClientProvider"
-            android:exported="true"
-            android:directBootAware="true"
             tools:ignore="ExportedContentProvider"
         />
 
