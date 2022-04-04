@@ -7,64 +7,24 @@ import android.os.IBinder
 import android.os.RemoteException
 import android.util.ArraySet
 
-private const val KEY_BINDER = "binder"
-private const val KEY_DynamiteFileProxyService = "DynamiteFileProxyService"
+import com.android.internal.gmscompat.GmsCompatApp
 
 class BinderProvider : AbsContentProvider() {
-    override fun call(pkg: String, arg: String?, extras: Bundle?): Bundle? {
-        logd{"callingPkg " + pkg + " callingPid " + Binder.getCallingPid()}
-
-        val binder = extras!!.getBinder(KEY_BINDER)!!
-        val deathRecipient = DeathRecipient(binder)
-        try {
-            // important to add before linkToDeath() to avoid race with binderDied() callback
-            addBoundProcess(binder)
-            binder.linkToDeath(deathRecipient, 0)
-        } catch (e: RemoteException) {
-            logd{"binder already died: " + e}
-            deathRecipient.binderDied()
-            return null
-        }
-        PersistentFgService.start(context, pkg)
-
-        if (extras.containsKey(KEY_DynamiteFileProxyService)) {
-            dynamiteFileProxyService = extras.getBinder(KEY_DynamiteFileProxyService)
-        }
-
-        val res = Bundle()
-        res.putBinder(KEY_BINDER, dummyBinder)
-        return res
-    }
-
-    companion object {
-        private val dummyBinder = Binder()
-        @Volatile @JvmField
-        var dynamiteFileProxyService: IBinder? = null
-        private val boundProcesses = ArraySet<IBinder>(10)
-
-        fun addBoundProcess(binder: IBinder) {
-            synchronized(boundProcesses) {
-                boundProcesses.add(binder)
+    override fun call(whichStr: String, arg: String?, extras: Bundle?): Bundle? {
+        val binder: Binder = when (Integer.parseInt(whichStr)) {
+            GmsCompatApp.BINDER_IGms2Gca -> {
+                // WRITE_GSERVICES is a signature-protected permission held by GSF, GMS Core and Play Store
+                context.enforceCallingPermission("com.google.android.providers.gsf.permission.WRITE_GSERVICES", null)
+                BinderGms2Gca
             }
-        }
-
-        fun removeBoundProcess(binder: IBinder) {
-            synchronized(boundProcesses) {
-                boundProcesses.remove(binder)
-                if (boundProcesses.size == 0) {
-                    val ctx = App.ctx()
-                    val i = Intent(ctx, PersistentFgService::class.java)
-                    if (ctx.stopService(i)) {
-                        logd{"no bound processes, stopping PersistentFgService"}
-                    }
-                }
+            GmsCompatApp.BINDER_IClientOfGmsCore2Gca -> {
+                // any client of GMS Core is allowed to access this binder
+                BinderClientOfGmsCore2Gca
             }
+            else -> throw IllegalArgumentException(whichStr)
         }
-    }
-
-    class DeathRecipient(val binder: IBinder) : IBinder.DeathRecipient {
-        override fun binderDied() {
-            removeBoundProcess(binder)
-        }
+        val bundle = Bundle(1)
+        bundle.putBinder(GmsCompatApp.KEY_BINDER, binder)
+        return bundle
     }
 }
