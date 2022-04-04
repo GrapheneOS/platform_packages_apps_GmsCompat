@@ -7,13 +7,14 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import android.os.RemoteException
+import android.util.ArrayMap
 import android.util.ArraySet
 import com.android.internal.gmscompat.GmsInfo
 import com.android.internal.gmscompat.IGms2Gca
 import com.android.internal.gmscompat.dynamite.server.IFileProxyService
 
 object BinderGms2Gca : IGms2Gca.Stub() {
-    private val boundProcesses = ArraySet<IBinder>(10)
+    private val boundProcesses = ArrayMap<IBinder, String>(10)
 
     fun connect(pkg: String, processName: String, callerBinder: IBinder) {
         logd{"callingPkg $pkg processName $processName callingPid ${Binder.getCallingPid()}"}
@@ -21,7 +22,7 @@ object BinderGms2Gca : IGms2Gca.Stub() {
         val deathRecipient = DeathRecipient(callerBinder)
         try {
             // important to add before linkToDeath() to avoid race with binderDied() callback
-            addBoundProcess(callerBinder)
+            addBoundProcess(callerBinder, processName)
             callerBinder.linkToDeath(deathRecipient, 0)
         } catch (e: RemoteException) {
             logd{"binder already died: " + e}
@@ -37,21 +38,26 @@ object BinderGms2Gca : IGms2Gca.Stub() {
         }
     }
 
-    fun addBoundProcess(binder: IBinder) {
+    fun addBoundProcess(binder: IBinder, processName: String) {
         synchronized(boundProcesses) {
-            boundProcesses.add(binder)
+            boundProcesses.put(binder, processName)
         }
     }
 
     fun removeBoundProcess(binder: IBinder) {
         synchronized(boundProcesses) {
-            boundProcesses.remove(binder)
+            val processName = boundProcesses.remove(binder)
+
             if (boundProcesses.size == 0) {
                 val ctx = App.ctx()
                 val i = Intent(ctx, PersistentFgService::class.java)
                 if (ctx.stopService(i)) {
                     logd{"no bound processes, stopping PersistentFgService"}
                 }
+            }
+
+            if (GmsInfo.PACKAGE_PLAY_STORE.equals(processName)) {
+                dismissPlayStorePendingUserActionNotification()
             }
         }
     }
@@ -72,5 +78,23 @@ object BinderGms2Gca : IGms2Gca.Stub() {
 
     override fun connectPlayStore(processName: String, callerBinder: IBinder) {
         connect(GmsInfo.PACKAGE_PLAY_STORE, processName, callerBinder)
+    }
+
+    override fun showPlayStorePendingUserActionNotification() {
+        val ctx = App.ctx()
+        val intent = ctx.packageManager.getLaunchIntentForPackage(GmsInfo.PACKAGE_PLAY_STORE)
+        val pendingIntent = PendingIntent.getActivity(ctx, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+        val notif = Notification.Builder(ctx, App.NotificationChannels.PLAY_STORE_PENDING_USER_ACTION)
+                .setSmallIcon(R.drawable.ic_pending_action)
+                .setContentTitle(ctx.getText(R.string.play_store_pending_user_action_notif))
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+                .build()
+
+        App.notificationManager().notify(App.NotificationIds.PLAY_STORE_PENDING_USER_ACTION, notif)
+    }
+
+    override fun dismissPlayStorePendingUserActionNotification() {
+        App.notificationManager().cancel(App.NotificationIds.PLAY_STORE_PENDING_USER_ACTION)
     }
 }
