@@ -2,10 +2,11 @@ package app.grapheneos.gmscompat
 
 import android.app.AppOpsManager
 import android.app.Application
-import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
 import app.grapheneos.gmscompat.Const.DEV
+import com.android.internal.gmscompat.GmsCompatApp
+import com.android.internal.gmscompat.GmsInfo
 import java.lang.StringBuilder
 import java.lang.reflect.Modifier
 
@@ -15,7 +16,7 @@ fun mainThread() {
     }
 }
 
-private fun isMainProcess() = Application.getProcessName() == Const.PKG_NAME
+private fun isMainProcess() = Application.getProcessName() == GmsCompatApp.PKG_NAME
 
 fun mainProcess() {
     if (DEV) {
@@ -102,12 +103,12 @@ fun opModeToString(mode: Int): String =
         else -> error(mode)
     }
 
-fun playServicesHasPermission(perm: String): Boolean {
-    return appHasPermission(Const.PLAY_SERVICES_PKG, perm)
+fun gmsCoreHasPermission(perm: String): Boolean {
+    return appHasPermission(GmsInfo.PACKAGE_GMS_CORE, perm)
 }
 
 fun playStoreHasPermission(perm: String): Boolean {
-    return appHasPermission(Const.PLAY_STORE_PKG, perm)
+    return appHasPermission(GmsInfo.PACKAGE_PLAY_STORE, perm)
 }
 
 fun appHasPermission(pkg: String, perm: String): Boolean {

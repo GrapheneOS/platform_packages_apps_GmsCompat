@@ -15,39 +15,31 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import static app.grapheneos.gmscompat.Const.GSF_PKG;
-import static app.grapheneos.gmscompat.Const.PLAY_SERVICES_PKG;
-import static app.grapheneos.gmscompat.Const.PLAY_STORE_PKG;
+import com.android.internal.gmscompat.GmsInfo;
 
-// raises priority of Play services and Play Store, thereby allowing them to start services when they need to
+// raises priority of GMS Core and Play Store, thereby allowing them to start services when they need to
 public class PersistentFgService extends Service {
     private static final String TAG = "PersistentFgService";
 
-    private static final int PLAY_SERVICES = 1;
+    private static final int GMS_CORE = 1;
     private static final int PLAY_STORE = 1 << 1;
 
     int boundPkgs;
 
     public void onCreate() {
-        String title = getString(R.string.persistent_fg_service_notif);
-        NotificationChannel nc = new NotificationChannel(App.NotificationChannels.PERSISTENT_FG_SERVICE, title, NotificationManager.IMPORTANCE_LOW);
-        nc.setShowBadge(false);
-        getSystemService(NotificationManager.class).createNotificationChannel(nc);
-
         Notification.Builder nb = new Notification.Builder(this, App.NotificationChannels.PERSISTENT_FG_SERVICE);
         nb.setSmallIcon(android.R.drawable.ic_dialog_dialer);
-        nb.setContentTitle(title);
+        nb.setContentTitle(getText(R.string.persistent_fg_service_notif));
         nb.setContentIntent(PendingIntent.getActivity(this, 0,
             new Intent(this, MainActivity.class), PendingIntent.FLAG_IMMUTABLE));
         nb.setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE);
         startForeground(App.NotificationIds.PERSISTENT_FG_SERVICE, nb.build());
     }
 
-    static void start(Context componentCtx, String callerPackage) {
-        Context ctx = componentCtx.getApplicationContext();
+    static void start(String callerPackage) {
+        Context ctx = App.ctx();
 
         // call startForegroundService() from the main thread, not the binder thread
-        // (this method is called from ContentProvider.call())
         new Handler(ctx.getMainLooper()).post(() -> {
             Intent i = new Intent(callerPackage);
             i.setClass(ctx, PersistentFgService.class);
@@ -58,17 +50,17 @@ public class PersistentFgService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null) {
             Log.d(TAG, "received null intent, rebinding services");
-            bindPlayServices();
+            bindGmsCore();
             bindPlayStore();
         } else {
             String pkg = intent.getAction();
             boolean res;
-            if (PLAY_SERVICES_PKG.equals(pkg)) {
-                res = bindPlayServices();
-            } else if (PLAY_STORE_PKG.equals(pkg)) {
+            if (GmsInfo.PACKAGE_GMS_CORE.equals(pkg)) {
+                res = bindGmsCore();
+            } else if (GmsInfo.PACKAGE_PLAY_STORE.equals(pkg)) {
                 res = bindPlayStore();
-            } else if (GSF_PKG.equals(pkg)) {
-                // GSF doesn't need to be bound, but needs :persistent process to remain running to
+            } else if (GmsInfo.PACKAGE_GSF.equals(pkg)) {
+                // GSF doesn't need to be bound, but needs GmsCompatApp process to remain running to
                 // be able to use its exported binder
                 res = true;
             } else {
@@ -82,14 +74,14 @@ public class PersistentFgService extends Service {
         return START_STICKY;
     }
 
-    private boolean bindPlayServices() {
-        // GmsDynamiteClientHooks expects "persistent" Play services process to be always running, take this into account
+    private boolean bindGmsCore() {
+        // GmsDynamiteClientHooks expects "persistent" GMS Core process to be always running, take this into account
         // if this service becomes unavailable and needs to be replaced
-        return bind(PLAY_SERVICES, PLAY_SERVICES_PKG, "com.google.android.gms.chimera.PersistentDirectBootAwareApiService");
+        return bind(GMS_CORE, GmsInfo.PACKAGE_GMS_CORE, "com.google.android.gms.chimera.PersistentDirectBootAwareApiService");
     }
 
     private boolean bindPlayStore() {
-        return bind(PLAY_STORE, PLAY_STORE_PKG, "com.google.android.finsky.ipcservers.main.MainGrpcServerAndroidService");
+        return bind(PLAY_STORE, GmsInfo.PACKAGE_PLAY_STORE, "com.google.android.finsky.ipcservers.main.MainGrpcServerAndroidService");
     }
     // it's important that both of these services are directBootAware,
     // keep that in mind if they become unavailable and need to be replaced

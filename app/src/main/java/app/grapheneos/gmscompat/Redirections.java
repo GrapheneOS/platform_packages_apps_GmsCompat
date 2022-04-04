@@ -3,8 +3,10 @@ package app.grapheneos.gmscompat;
 import android.Manifest.permission;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Bundle;
 import android.os.IBinder;
+
+import com.android.internal.gmscompat.BinderRedirector;
+import com.android.internal.gmscompat.BinderRedirector.RedirectionStateListener;
 
 import java.util.Arrays;
 
@@ -59,7 +61,7 @@ public class Redirections {
     private static boolean isRedirectionEnabledByDefault(int id) {
         switch (id) {
             case ID_GoogleLocationManagerService:
-                return !UtilsKt.playServicesHasPermission(permission.ACCESS_BACKGROUND_LOCATION);
+                return !UtilsKt.gmsCoreHasPermission(permission.ACCESS_BACKGROUND_LOCATION);
             default:
                 return false;
         }
@@ -83,22 +85,20 @@ public class Redirections {
             ed.apply();
         }
 
-        Intent broadcast = new Intent(Const.PKG_NAME + ".ACTION_REDIRECTION_STATE_CHANGED");
-        final String KEY_REDIRECTION_ID = "id";
-        broadcast.putExtra(KEY_REDIRECTION_ID, id);
+        Intent broadcast = new Intent(RedirectionStateListener.INTENT_ACTION);
+        broadcast.putExtra(RedirectionStateListener.KEY_REDIRECTION_ID, id);
         App.ctx().sendBroadcast(broadcast);
     }
 
-    static Bundle getInterfaces() {
-        Bundle res = new Bundle(1);
-        res.putStringArray(GmsClientProvider.KEY_RESULT, redirectableInterfaces);
-        return res;
+    static String[] getInterfaces() {
+        return redirectableInterfaces;
     }
 
-    static Bundle getRedirector(int id) {
+    static BinderRedirector getRedirector(int id) {
         if (!isEnabled(id)) {
-            return null;
+            return new BinderRedirector(null, null);
         }
+
         IBinder binder;
         int[] txnCodes;
         switch (id) {
@@ -109,9 +109,6 @@ public class Redirections {
             default:
                 throw new IllegalStateException("unknown id " + id);
         }
-        Bundle res = new Bundle(2);
-        res.putBinder(GmsClientProvider.KEY_BINDER, binder);
-        res.putIntArray(GmsClientProvider.KEY_BINDER_TRANSACTION_CODES, txnCodes);
-        return res;
+        return new BinderRedirector(binder, txnCodes);
     }
 }
