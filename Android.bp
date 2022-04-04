@@ -1,5 +1,6 @@
 android_app {
     name: "GmsCompat",
+    platform_apis: true,
     aidl: {
         local_include_dirs: ["app/src/main/aidl"],
     },
@@ -15,8 +16,6 @@ android_app {
         "androidx.preference_preference",
     ],
     manifest: "app/src/main/AndroidManifest.xml",
-
-    sdk_version: "current",
 
     required: [
         "whitelist_app.grapheneos.gmscompat.xml",

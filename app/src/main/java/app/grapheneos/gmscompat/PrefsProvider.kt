@@ -1,6 +1,7 @@
 package app.grapheneos.gmscompat
 
 import android.os.Bundle
+import com.android.internal.gmscompat.GmsCompatApp
 
 private const val GET_RD_STATE = 0
 private const val SET_RD_STATE = 1
@@ -8,9 +9,9 @@ private const val SET_RD_STATE = 1
 private const val KEY_RESULT = "res"
 private const val KEY_ENABLED = "enabled"
 
-private const val AUTHORITY = Const.PKG_NAME + ".PrefsProvider"
+private const val AUTHORITY = GmsCompatApp.PKG_NAME + ".PrefsProvider"
 
-// needed to acccess main process prefs from the UI process
+// needed to access main process prefs from the UI process
 class PrefsProvider : AbsContentProvider() {
 
     override fun call(method: String, arg: String?, extras: Bundle?): Bundle? {

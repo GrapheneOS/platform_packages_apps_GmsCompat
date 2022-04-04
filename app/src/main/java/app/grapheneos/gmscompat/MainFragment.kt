@@ -16,8 +16,9 @@ import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceGroup
 import androidx.preference.SwitchPreferenceCompat
-import app.grapheneos.gmscompat.Const.PLAY_SERVICES_PKG
-import app.grapheneos.gmscompat.Const.PLAY_STORE_PKG
+import com.android.internal.gmscompat.GmsCompatApp
+import com.android.internal.gmscompat.GmsInfo.PACKAGE_GMS_CORE
+import com.android.internal.gmscompat.GmsInfo.PACKAGE_PLAY_STORE
 import java.lang.Exception
 import java.lang.StringBuilder
 
@@ -34,7 +35,7 @@ class MainFragment : PreferenceFragmentCompat() {
         }
         screen.addPref().apply {
             title = getString(R.string.component_system_settings, getString(R.string.play_services))
-            intent = appSettingsIntent(PLAY_SERVICES_PKG)
+            intent = appSettingsIntent(PACKAGE_GMS_CORE)
         }
         SwitchPreferenceCompat(ctx).apply {
             title = getString(R.string.reroute_location_requests_to_os_apis)
@@ -50,11 +51,11 @@ class MainFragment : PreferenceFragmentCompat() {
                 var msg: String? = null
                 if (redirectionEnabled) {
                     // other location modes imply this one
-                    if (playServicesHasPermission(permission.ACCESS_COARSE_LOCATION)) {
+                    if (gmsCoreHasPermission(permission.ACCESS_COARSE_LOCATION)) {
                         msg = getString(R.string.revoke_location_permission)
                     }
                 } else {
-                    if (!playServicesHasFullLocationPermission()) {
+                    if (!gmsCoreHasFullLocationPermission()) {
                         msg = getString(R.string.play_services_no_location_permission, ctx.packageManager.backgroundPermissionOptionLabel)
                     }
                 }
@@ -62,7 +63,7 @@ class MainFragment : PreferenceFragmentCompat() {
                     AlertDialog.Builder(ctx).apply {
                         setMessage(msg)
                         setPositiveButton(R.string.play_services_settings) { _, _ ->
-                            startFreshActivity(appSettingsIntent(PLAY_SERVICES_PKG))
+                            startFreshActivity(appSettingsIntent(PACKAGE_GMS_CORE))
                         }
                         show()
                     }
@@ -75,19 +76,19 @@ class MainFragment : PreferenceFragmentCompat() {
         screen.addPref().apply {
             title = getString(R.string.gms_network_location_opt_in)
             val i = Intent("com.google.android.gms.location.settings.LOCATION_ACCURACY")
-            i.setClassName(PLAY_SERVICES_PKG, "com.google.android.gms.location.settings.LocationAccuracyActivity")
+            i.setClassName(PACKAGE_GMS_CORE, "com.google.android.gms.location.settings.LocationAccuracyActivity")
             intent = freshActivity(i)
         }
-        if (isPkgInstalled(PLAY_STORE_PKG)) {
+        if (isPkgInstalled(PACKAGE_PLAY_STORE)) {
             val playStore = getString(R.string.play_store)
             screen.addPref().apply {
                 title = getString(R.string.component_system_settings, playStore)
-                intent = appSettingsIntent(PLAY_STORE_PKG)
+                intent = appSettingsIntent(PACKAGE_PLAY_STORE)
             }
         }
         screen.addPref().apply {
             title = getString(R.string.google_settings)
-            intent = freshActivity(Intent().setClassName(PLAY_SERVICES_PKG, PLAY_SERVICES_PKG +
+            intent = freshActivity(Intent().setClassName(PACKAGE_GMS_CORE, PACKAGE_GMS_CORE +
                 ".app.settings.GoogleSettingsLink"))
 //                ".app.settings.GoogleSettingsIALink")
 //                ".app.settings.GoogleSettingsActivity")
@@ -110,11 +111,11 @@ class MainFragment : PreferenceFragmentCompat() {
                 title = getString(R.string.geolocation)
             }
         }
-        if (!ctx.getSystemService(PowerManager::class.java).isIgnoringBatteryOptimizations(PLAY_SERVICES_PKG)) {
+        if (!ctx.getSystemService(PowerManager::class.java).isIgnoringBatteryOptimizations(PACKAGE_GMS_CORE)) {
             val d = AlertDialog.Builder(ctx).apply {
                 setMessage(R.string.play_services_no_battery_exemption)
                 setPositiveButton(R.string.play_services_settings) { _, _ ->
-                    startFreshActivity(playServicesSettings())
+                    startFreshActivity(gmsCoreSettings())
                 }
             }
             cat.addDialogPref(d).apply {
@@ -147,7 +148,7 @@ class MainFragment : PreferenceFragmentCompat() {
             sb.resString(R.string.location_access_is_off_for_all_apps)
             addEnableLocationButton = true
         }
-        val psHasAnyLocationPerm = playServicesHasPermission(permission.ACCESS_COARSE_LOCATION)
+        val psHasAnyLocationPerm = gmsCoreHasPermission(permission.ACCESS_COARSE_LOCATION)
 
         var addPsSettingsButton = false
         var addAlwaysOnScanningSettingsButton = false
@@ -165,7 +166,7 @@ class MainFragment : PreferenceFragmentCompat() {
                 addPsSettingsButton = true
             }
         } else {
-            if (!playServicesHasFullLocationPermission()) {
+            if (!gmsCoreHasFullLocationPermission()) {
                 sb.separator()
                 sb.append(getString(R.string.play_services_no_location_permission, ctx.packageManager.backgroundPermissionOptionLabel))
                 addPsSettingsButton = true
@@ -189,7 +190,7 @@ class MainFragment : PreferenceFragmentCompat() {
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-            val psHasBtScanPerm = playServicesHasPermission(permission.BLUETOOTH_SCAN)
+            val psHasBtScanPerm = gmsCoreHasPermission(permission.BLUETOOTH_SCAN)
             if (!psHasBtScanPerm) {
                 sb.separator()
                 sb.resString(R.string.play_services_no_ble_location)
@@ -227,7 +228,7 @@ class MainFragment : PreferenceFragmentCompat() {
             setMessage(sb.toString())
             if (addPsSettingsButton) {
                 setPositiveButton(R.string.play_services_settings) { _, _ ->
-                    startFreshActivity(playServicesSettings())
+                    startFreshActivity(gmsCoreSettings())
                 }
             }
             if (addAlwaysOnScanningSettingsButton) {
@@ -236,7 +237,7 @@ class MainFragment : PreferenceFragmentCompat() {
                 }
             } else if (addSelfSettingsButton) {
                 setNeutralButton(R.string.open_settings) { _, _ ->
-                    startFreshActivity(appSettingsIntent(Const.PKG_NAME))
+                    startFreshActivity(appSettingsIntent(GmsCompatApp.PKG_NAME))
                 }
             }
             if (addEnableLocationButton) {
@@ -248,7 +249,7 @@ class MainFragment : PreferenceFragmentCompat() {
     }
 
     private fun playStoreIssues(ctx: Context): AlertDialog.Builder? {
-        if (!isPkgInstalled(PLAY_STORE_PKG)) {
+        if (!isPkgInstalled(PACKAGE_PLAY_STORE)) {
             return null
         }
         var addSettingsLink = false
@@ -275,14 +276,14 @@ class MainFragment : PreferenceFragmentCompat() {
             setMessage(sb.toString())
             if (addSettingsLink) {
                 setPositiveButton(R.string.play_store_settings) { _, _ ->
-                    startFreshActivity(appSettingsIntent(PLAY_STORE_PKG))
+                    startFreshActivity(appSettingsIntent(PACKAGE_PLAY_STORE))
                 }
             }
             if (addPlayGamesLink) {
                 setNegativeButton(R.string.install_play_games) {_, _ ->
                     val uri = Uri.parse("market://details?id=$playGames")
                     val i = Intent(Intent.ACTION_VIEW, uri)
-                    i.setPackage(PLAY_STORE_PKG)
+                    i.setPackage(PACKAGE_PLAY_STORE)
                     startFreshActivity(i)
                 }
             }
@@ -330,17 +331,17 @@ private fun freshActivity(intent: Intent): Intent {
     return intent
 }
 
-fun playServicesSettings() = appSettingsIntent(PLAY_SERVICES_PKG)
+fun gmsCoreSettings() = appSettingsIntent(PACKAGE_GMS_CORE)
 
 fun appSettingsIntent(pkg: String): Intent {
     val uri = Uri.fromParts("package", pkg, null)
     return freshActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, uri))
 }
 
-fun playServicesHasFullLocationPermission(): Boolean {
-    return playServicesHasPermission(permission.ACCESS_BACKGROUND_LOCATION)
+fun gmsCoreHasFullLocationPermission(): Boolean {
+    return gmsCoreHasPermission(permission.ACCESS_BACKGROUND_LOCATION)
             // will crash with COARSE permission when trying to access cell network IDs, see TelephonyManager.requestCellInfoUpdate()
-            && playServicesHasPermission(permission.ACCESS_FINE_LOCATION)
+            && gmsCoreHasPermission(permission.ACCESS_FINE_LOCATION)
 }
 
 private fun intToBool(v: Int) =
