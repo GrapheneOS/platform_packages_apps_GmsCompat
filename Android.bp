@@ -1,16 +1,16 @@
 android_app {
     name: "GmsCompat",
     platform_apis: true,
-    aidl: {
-        local_include_dirs: ["app/src/main/aidl"],
-    },
     srcs: [
-        "app/src/main/aidl/**/*.aidl",
-        "app/src/main/java/**/*.kt",
-        "app/src/main/java/**/*.java",
+        "src/**/*.java",
+        "src/**/*.kt",
+        "src/**/*.aidl",
     ],
+    aidl: {
+        local_include_dirs: ["src"],
+    },
     resource_dirs: [
-        "app/src/main/res",
+        "res",
     ],
     static_libs: [
         "androidx.preference_preference",
@@ -18,7 +18,7 @@ android_app {
     defaults: [
         "SettingsLibDefaults",
     ],
-    manifest: "app/src/main/AndroidManifest.xml",
+    manifest: "AndroidManifest.xml",
 
     required: [
         "whitelist_app.grapheneos.gmscompat.xml",
