@@ -12,7 +12,7 @@ class MainActivity : AppCompatActivity(R.layout.main_activity) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (!GmsCompat.isClientOfGmsCore(this)) {
+        if (!GmsCompat.isClientOfGmsCore()) {
             val uri = Uri.parse(USAGE_GUIDE_URL)
             startActivity(Intent(Intent.ACTION_VIEW, uri))
             finishAndRemoveTask()
