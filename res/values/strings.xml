@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">GmsCompat</string>
-    <string name="activity_name">Sandboxed Google Play settings</string>
-    <string name="reroute_location_requests_to_os_apis">Reroute location requests to the OS APIs</string>
-    <string name="missing_location_permission">Location permission needs to be set to \"%s\".</string>
-    <string name="open_settings">Open settings</string>
+    <string name="activity_name">Sandboxed Google Play</string>
+    <string name="reroute_location_requests_to_os_apis">Reroute location requests to the OS</string>
+    <string name="missing_location_permission">Location permission needs to be set to “%s“.</string>
+    <string name="open_settings">Open app info</string>
     <string name="persistent_fg_service_notif">Sandboxed Google Play is running</string>
 
     <string name="usage_guide">Usage guide</string>
@@ -11,16 +11,16 @@
     <string name="play_store">Play Store</string>
 <!--    <string name="google_settings">Google services &amp; preferences</string>-->
     <string name="google_settings">Google settings</string>
-    <string name="component_system_settings">%s system settings</string>
+    <string name="component_system_settings">%s app info</string>
     <string name="gms_network_location_opt_in">Google Location Accuracy</string>
     <string name="no_gms_network_location">
-"Google\'s location service is disabled. Tap \"%1$s\" to learn more.
-If you decide to keep it disabled, consider enabling \"%2$s\" option to improve app compatibility (a lot of apps won\'t function properly when this service is disabled)."
+"Google’s location service is disabled. Tap “%1$s“ to learn more.
+If you decide to keep it disabled, consider enabling “%2$s“ option to improve app compatibility."
     </string>
-    <string name="revoke_location_permission">Revoke location permission from Play services.</string>
+    <string name="revoke_location_permission">Revoke the Location permission from Play services.</string>
 
-    <string name="play_services_settings">Play services settings</string>
-    <string name="play_store_settings">Play Store settings</string>
+    <string name="play_services_settings">Play services app info</string>
+    <string name="play_store_settings">Play Store app info</string>
 
     <string name="potential_issues">Potential issues</string>
 
@@ -28,38 +28,33 @@ If you decide to keep it disabled, consider enabling \"%2$s\" option to improve 
     <string name="location_access_is_off_for_all_apps">Location access is off for all apps.</string>
     <string name="location_settings">Location settings</string>
     <string name="location_redirection_extra_permissions">
-"Location requests are rerouted to the OS APIs, but Play services still has Location permission."
+"Location requests are rerouted to the OS, but Play services still has the Location permission."
     </string>
     <string name="play_services_no_location_permission">
-"Play services needs Location permission to be set to \"%s\" and \"Use precise location\"."
+"Play services needs Location permission to be set to “%s“, and “Use precise location“ needs to be enabled."
     </string>
     <string name="play_services_no_ble_location">
-"Location estimation by Bluetooth scanning requires \"Nearby devices\" permission."
+"Location service assisted by Bluetooth scanning requires the “Nearby devices“ permission."
     </string>
     <string name="always_on_scanning_settings">Always-on scanning settings</string>
     <string name="always_on_wifi_scanning_enabled_but_disallowed">Always-on Wi-Fi scanning is enabled, but not allowed (no Location permission).</string>
-    <string name="always_on_wifi_scanning_allowed">Always-on Wi-Fi scanning is allowed.</string>
-    <string name="always_on_wifi_scanning_not_allowed">Always-on Wi-Fi scanning is disabled.</string>
-    <string name="always_on_bluetooth_scanning_allowed">Always-on Bluetooth scanning is allowed.</string>
-    <string name="always_on_bluetooth_scanning_enabled_but_disallowed">Always-on Bluetooth scanning is enabled, but not allowed (no \"Nearby devices\" permission).</string>
+    <string name="always_on_wifi_scanning_disabled">Always-on Wi-Fi scanning is disabled.</string>
+    <string name="always_on_bluetooth_scanning_enabled_but_disallowed">Always-on Bluetooth scanning is enabled, but not allowed (no “Nearby devices“ permission).</string>
     <string name="always_on_bluetooth_scanning_disabled">Always-on Bluetooth scanning is disabled.</string>
 
     <string name="play_store_obb_permission">
-"To install apps that include OBB files (usually the ones that are over 100 MB in size), Play Store needs to have \"Files and media\" permission.
-
-After this permission is granted, Play Store needs to be fully restarted with \"Force stop\" button."
+"To install apps that include OBB files (usually the ones that are over 100 MB in size, such as games), grant Play Store the “Files and media“ and fully restart it with the “Force stop“ button."
     </string>
     <string name="no_play_games">
-"A lot of games won\'t function properly without Play Games app (they will show misleading \"Missing permissions\" prompt)."
+"Many games depend on the Play Games app for features such as progress saving. If it’s absent, they’ll show a misleading “Missing permissions” prompt."
     </string>
     <string name="install_play_games">Install Play Games</string>
 
     <string name="push_notifications">Push notifications</string>
     <string name="play_services_no_battery_exemption">
-"When device is idle, push notifications will be delayed to increase battery life.
-To receive them promptly, set \"Battery usage\" to \"Unrestricted\" in Play services settings."
+"When device is idle, push notifications will be delayed to improve battery life.
+To receive them quicker, set “Battery usage“ to “Unrestricted“ in Play services app info."
     </string>
 
     <string name="play_store_pending_user_action_notif">Action required in Play Store</string>
-
 </resources>

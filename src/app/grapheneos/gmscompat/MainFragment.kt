@@ -37,48 +37,7 @@ class MainFragment : PreferenceFragmentCompat() {
             title = getString(R.string.component_system_settings, getString(R.string.play_services))
             intent = appSettingsIntent(PACKAGE_GMS_CORE)
         }
-        SwitchPreference(ctx).apply {
-            title = getString(R.string.reroute_location_requests_to_os_apis)
-            isSingleLineTitle = false
-            isChecked = PrefsProvider.isRedirectionEnabled(Redirections.ID_GoogleLocationManagerService)
-            setOnPreferenceChangeListener { _, value ->
-                val redirectionEnabled = value as Boolean
-                PrefsProvider.setRedirectionState(
-                    Redirections.ID_GoogleLocationManagerService,
-                    redirectionEnabled
-                )
 
-                var msg: String? = null
-                if (redirectionEnabled) {
-                    // other location modes imply this one
-                    if (gmsCoreHasPermission(permission.ACCESS_COARSE_LOCATION)) {
-                        msg = getString(R.string.revoke_location_permission)
-                    }
-                } else {
-                    if (!gmsCoreHasFullLocationPermission()) {
-                        msg = getString(R.string.play_services_no_location_permission, ctx.packageManager.backgroundPermissionOptionLabel)
-                    }
-                }
-                if (msg != null) {
-                    AlertDialog.Builder(ctx).apply {
-                        setMessage(msg)
-                        setPositiveButton(R.string.play_services_settings) { _, _ ->
-                            startFreshActivity(appSettingsIntent(PACKAGE_GMS_CORE))
-                        }
-                        show()
-                    }
-                }
-                updatePotentialIssues()
-                true
-            }
-            screen.addPreference(this)
-        }
-        screen.addPref().apply {
-            title = getString(R.string.gms_network_location_opt_in)
-            val i = Intent("com.google.android.gms.location.settings.LOCATION_ACCURACY")
-            i.setClassName(PACKAGE_GMS_CORE, "com.google.android.gms.location.settings.LocationAccuracyActivity")
-            intent = freshActivity(i)
-        }
         if (isPkgInstalled(PACKAGE_PLAY_STORE)) {
             val playStore = getString(R.string.play_store)
             screen.addPref().apply {
@@ -93,6 +52,57 @@ class MainFragment : PreferenceFragmentCompat() {
 //                ".app.settings.GoogleSettingsIALink")
 //                ".app.settings.GoogleSettingsActivity")
         }
+        PreferenceCategory(ctx).apply {
+            title = getString(R.string.geolocation)
+            screen.addPreference(this)
+
+            SwitchPreference(ctx).apply {
+                title = getString(R.string.reroute_location_requests_to_os_apis)
+                isSingleLineTitle = false
+                isChecked = PrefsProvider.isRedirectionEnabled(Redirections.ID_GoogleLocationManagerService)
+                setOnPreferenceChangeListener { _, value ->
+                    val redirectionEnabled = value as Boolean
+                    PrefsProvider.setRedirectionState(
+                        Redirections.ID_GoogleLocationManagerService,
+                        redirectionEnabled
+                    )
+
+                    var msg: String? = null
+                    if (redirectionEnabled) {
+                        // other location modes imply this one
+                        if (gmsCoreHasPermission(permission.ACCESS_COARSE_LOCATION)) {
+                            msg = getString(R.string.revoke_location_permission)
+                        }
+                    } else {
+                        if (!gmsCoreHasFullLocationPermission()) {
+                            msg = getString(R.string.play_services_no_location_permission, ctx.packageManager.backgroundPermissionOptionLabel)
+                        }
+                    }
+                    if (msg != null) {
+                        AlertDialog.Builder(ctx).apply {
+                            setMessage(msg)
+                            setPositiveButton(R.string.play_services_settings) { _, _ ->
+                                startFreshActivity(appSettingsIntent(PACKAGE_GMS_CORE))
+                            }
+                            show()
+                        }
+                    }
+                    updatePotentialIssues()
+                    true
+                }
+                addPreference(this)
+            }
+
+            screen.addPref().apply {
+                title = getString(R.string.gms_network_location_opt_in)
+                val i = Intent("com.google.android.gms.location.settings.LOCATION_ACCURACY")
+                i.setClassName(PACKAGE_GMS_CORE, "com.google.android.gms.location.settings.LocationAccuracyActivity")
+                intent = freshActivity(i)
+            }
+
+            screen.addPreference(this)
+        }
+
         potentialIssuesCategory = PreferenceCategory(ctx).apply {
             title = getString(R.string.potential_issues)
             screen.addPreference(this)
@@ -207,7 +217,8 @@ class MainFragment : PreferenceFragmentCompat() {
                 }
             } else {
                 sb.separator()
-                sb.resString(R.string.always_on_wifi_scanning_not_allowed)
+                sb.resString(R.string.always_on_wifi_scanning_disabled)
+                addAlwaysOnScanningSettingsButton = true
             }
 
             if (intToBool(Settings.Global.getInt(cr, "ble_scan_always_enabled", -1))) {
@@ -219,8 +230,8 @@ class MainFragment : PreferenceFragmentCompat() {
             } else {
                 sb.separator()
                 sb.resString(R.string.always_on_bluetooth_scanning_disabled)
+                addAlwaysOnScanningSettingsButton = true
             }
-            addAlwaysOnScanningSettingsButton = true
         }
         if (sb.length == 0) {
             return null
