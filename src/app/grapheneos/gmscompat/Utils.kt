@@ -2,7 +2,10 @@ package app.grapheneos.gmscompat
 
 import android.app.AppOpsManager
 import android.app.Application
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.provider.Settings
 import android.util.Log
 import app.grapheneos.gmscompat.Const.DEV
 import com.android.internal.gmscompat.GmsCompatApp
@@ -123,3 +126,18 @@ fun isPkgInstalled(pkg: String): Boolean {
         return false
     }
 }
+
+fun freshActivity(intent: Intent): Intent {
+    // needed to ensure consistent behavior,
+    // otherwise existing instance that is in unknown state could be shown
+    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+    return intent
+}
+
+fun appSettingsIntent(pkg: String): Intent {
+    val uri = Uri.fromParts("package", pkg, null)
+    return freshActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, uri))
+}
+
+fun gmsCoreSettings() = appSettingsIntent(GmsInfo.PACKAGE_GMS_CORE)
+fun playStoreSettings() = appSettingsIntent(GmsInfo.PACKAGE_PLAY_STORE)

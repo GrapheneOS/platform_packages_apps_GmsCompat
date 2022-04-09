@@ -1,14 +1,11 @@
 package app.grapheneos.gmscompat
 
-import android.app.Notification
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import android.os.RemoteException
 import android.util.ArrayMap
-import android.util.ArraySet
 import com.android.internal.gmscompat.GmsInfo
 import com.android.internal.gmscompat.IGms2Gca
 import com.android.internal.gmscompat.dynamite.server.IFileProxyService
@@ -56,8 +53,14 @@ object BinderGms2Gca : IGms2Gca.Stub() {
                 }
             }
 
-            if (GmsInfo.PACKAGE_PLAY_STORE.equals(processName)) {
-                dismissPlayStorePendingUserActionNotification()
+            when (processName) {
+                GmsInfo.PACKAGE_PLAY_STORE -> {
+                    dismissPlayStorePendingUserActionNotification()
+                    Notifications.cancel(Notifications.ID_PLAY_STORE_MISSING_OBB_PERMISSION)
+                }
+                "com.google.android.gms.persistent" -> {
+                    Notifications.cancel(Notifications.ID_GMS_CORE_MISSING_NEARBY_DEVICES_PERMISSION)
+                }
             }
         }
     }
@@ -84,17 +87,27 @@ object BinderGms2Gca : IGms2Gca.Stub() {
         val ctx = App.ctx()
         val intent = ctx.packageManager.getLaunchIntentForPackage(GmsInfo.PACKAGE_PLAY_STORE)
         val pendingIntent = PendingIntent.getActivity(ctx, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-        val notif = Notification.Builder(ctx, App.NotificationChannels.PLAY_STORE_PENDING_USER_ACTION)
+        Notifications.Channel.PLAY_STORE_PENDING_USER_ACTION.notifBuilder()
                 .setSmallIcon(R.drawable.ic_pending_action)
                 .setContentTitle(ctx.getText(R.string.play_store_pending_user_action_notif))
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
-                .build()
-
-        App.notificationManager().notify(App.NotificationIds.PLAY_STORE_PENDING_USER_ACTION, notif)
+                .show(Notifications.ID_PLAY_STORE_PENDING_USER_ACTION)
     }
 
     override fun dismissPlayStorePendingUserActionNotification() {
-        App.notificationManager().cancel(App.NotificationIds.PLAY_STORE_PENDING_USER_ACTION)
+        Notifications.cancel(Notifications.ID_PLAY_STORE_PENDING_USER_ACTION)
+    }
+
+    override fun showPlayStoreMissingObbPermissionNotification() {
+        val ctx = App.ctx()
+
+        Notifications.configurationRequired(
+                Notifications.Channel.MISSING_PERMISSION,
+                ctx.getText(R.string.missing_permission),
+                ctx.getText(R.string.play_store_missing_obb_permission_notif),
+                ctx.getText(R.string.open_settings),
+                playStoreSettings()
+        ).show(Notifications.ID_PLAY_STORE_MISSING_OBB_PERMISSION)
     }
 }

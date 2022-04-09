@@ -54,7 +54,7 @@ object Notifications {
             .setContentTitle(title)
             .setContentText(text)
             .setAutoCancel(true)
-            .setTimeoutAfter(3 * 60_000)
+            .setTimeoutAfter(60_000)
             .setOnlyAlertOnce(true)
             .addAction(resolution)
     }

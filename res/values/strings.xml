@@ -3,7 +3,8 @@
     <string name="activity_name">Sandboxed Google Play</string>
     <string name="reroute_location_requests_to_os_apis">Reroute location requests to the OS</string>
     <string name="missing_location_permission">Location permission needs to be set to “%s“.</string>
-    <string name="open_settings">Open app info</string>
+    <string name="open_app_info">Open app info</string>
+    <string name="open_settings">Open settings</string>
     <string name="persistent_fg_service_notif">Sandboxed Google Play is running</string>
 
     <string name="usage_guide">Usage guide</string>
@@ -42,14 +43,6 @@ If you decide to keep it disabled, consider enabling “%2$s“ option to improv
     <string name="always_on_bluetooth_scanning_enabled_but_disallowed">Always-on Bluetooth scanning is enabled, but not allowed (no “Nearby devices“ permission).</string>
     <string name="always_on_bluetooth_scanning_disabled">Always-on Bluetooth scanning is disabled.</string>
 
-    <string name="play_store_obb_permission">
-"To install apps that include OBB files (usually the ones that are over 100 MB in size, such as games), grant Play Store the “Files and media“ and fully restart it with the “Force stop“ button."
-    </string>
-    <string name="no_play_games">
-"Many games depend on the Play Games app for features such as progress saving. If it’s absent, they’ll show a misleading “Missing permissions” prompt."
-    </string>
-    <string name="install_play_games">Install Play Games</string>
-
     <string name="push_notifications">Push notifications</string>
     <string name="play_services_no_battery_exemption">
 "When device is idle, push notifications will be delayed to improve battery life.
@@ -57,4 +50,14 @@ To receive them quicker, set “Battery usage“ to “Unrestricted“ in Play s
     </string>
 
     <string name="play_store_pending_user_action_notif">Action required in Play Store</string>
+    <string name="missing_permission">Missing permission</string>
+    <string name="missing_app">Missing app</string>
+    <string name="play_store_missing_obb_permission_notif">Play Store needs the “Files and media“ permission to install this app</string>
+
+    <string name="missing_permission_nearby_exposurenotifications">
+"Play services needs the “Nearby devices“ permission to enable Exposure Notifications"
+    </string>
+
+    <string name="missing_play_games_app">This game needs the Play Games app</string>
+    <string name="install">Install</string>
 </resources>
