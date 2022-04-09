@@ -132,12 +132,6 @@ class MainFragment : PreferenceFragmentCompat() {
                 title = getString(R.string.push_notifications)
             }
         }
-        val playStoreIssues = playStoreIssues(ctx)
-        if (playStoreIssues != null) {
-            cat.addDialogPref(playStoreIssues).apply {
-                title = getString(R.string.play_store)
-            }
-        }
         cat.isVisible = cat.preferenceCount != 0
     }
 
@@ -248,55 +242,13 @@ class MainFragment : PreferenceFragmentCompat() {
                     startFreshActivity(Intent("android.settings.LOCATION_SCANNING_SETTINGS"))
                 }
             } else if (addSelfSettingsButton) {
-                setNeutralButton(R.string.open_settings) { _, _ ->
+                setNeutralButton(R.string.open_app_info) { _, _ ->
                     startFreshActivity(appSettingsIntent(GmsCompatApp.PKG_NAME))
                 }
             }
             if (addEnableLocationButton) {
                 setNegativeButton(R.string.location_settings) {_, _ ->
                     startFreshActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-                }
-            }
-        }
-    }
-
-    private fun playStoreIssues(ctx: Context): AlertDialog.Builder? {
-        if (!isPkgInstalled(PACKAGE_PLAY_STORE)) {
-            return null
-        }
-        var addSettingsLink = false
-        var addPlayGamesLink = false
-
-        val sb = StringBuilder(1000)
-
-        if (!playStoreHasPermission(permission.WRITE_EXTERNAL_STORAGE)) {
-            sb.separator()
-            sb.resString(R.string.play_store_obb_permission)
-            addSettingsLink = true
-        }
-
-        val playGames = "com.google.android.play.games"
-        if (!isPkgInstalled(playGames)) {
-            sb.separator()
-            sb.resString(R.string.no_play_games)
-            addPlayGamesLink = true
-        }
-        if (sb.length == 0) {
-            return null
-        }
-        return AlertDialog.Builder(ctx).apply {
-            setMessage(sb.toString())
-            if (addSettingsLink) {
-                setPositiveButton(R.string.play_store_settings) { _, _ ->
-                    startFreshActivity(appSettingsIntent(PACKAGE_PLAY_STORE))
-                }
-            }
-            if (addPlayGamesLink) {
-                setNegativeButton(R.string.install_play_games) {_, _ ->
-                    val uri = Uri.parse("market://details?id=$playGames")
-                    val i = Intent(Intent.ACTION_VIEW, uri)
-                    i.setPackage(PACKAGE_PLAY_STORE)
-                    startFreshActivity(i)
                 }
             }
         }
@@ -334,20 +286,6 @@ class MainFragment : PreferenceFragmentCompat() {
     fun startFreshActivity(intent: Intent) {
         startActivity(freshActivity(intent))
     }
-}
-
-private fun freshActivity(intent: Intent): Intent {
-    // needed to ensure consistent behavior,
-    // otherwise existing instance that is in unknown state could be shown
-    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-    return intent
-}
-
-fun gmsCoreSettings() = appSettingsIntent(PACKAGE_GMS_CORE)
-
-fun appSettingsIntent(pkg: String): Intent {
-    val uri = Uri.fromParts("package", pkg, null)
-    return freshActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, uri))
 }
 
 fun gmsCoreHasFullLocationPermission(): Boolean {
