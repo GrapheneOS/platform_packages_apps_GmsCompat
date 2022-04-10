@@ -26,7 +26,7 @@ object BinderGms2Gca : IGms2Gca.Stub() {
             deathRecipient.binderDied()
             return
         }
-        PersistentFgService.start(pkg)
+        PersistentFgService.start(pkg, processName);
     }
 
     class DeathRecipient(val binder: IBinder) : IBinder.DeathRecipient {

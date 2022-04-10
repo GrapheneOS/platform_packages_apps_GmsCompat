@@ -9,15 +9,27 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.ParcelUuid;
+import android.util.ArrayMap;
+import android.util.ArraySet;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
 
 import com.android.internal.gmscompat.GmsInfo;
 
+import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 // raises priority of GMS Core and Play Store, thereby allowing them to start services when they need to
 public class PersistentFgService extends Service {
     private static final String TAG = "PersistentFgService";
+
+    private static final ArrayMap<ParcelUuid, CountDownLatch> pendingLatches = new ArrayMap<>(5);
+    private static final ArraySet<CountDownLatch> completedLatches = new ArraySet<>(5);
+
+    private static final String EXTRA_ID = "id";
 
     private static final int GMS_CORE = 1;
     private static final int PLAY_STORE = 1 << 1;
@@ -34,15 +46,43 @@ public class PersistentFgService extends Service {
         startForeground(Notifications.ID_PERSISTENT_FG_SERVICE, nb.build());
     }
 
-    static void start(String callerPackage) {
+    static void start(String callerPackage, String processName) {
         Context ctx = App.ctx();
+
+        ParcelUuid uuid = new ParcelUuid(UUID.randomUUID());
+
+        Intent intent = new Intent(callerPackage);
+        intent.setClass(ctx, PersistentFgService.class);
+        intent.putExtra(EXTRA_ID, uuid);
+
+        CountDownLatch latch = new CountDownLatch(1);
+        synchronized (pendingLatches) {
+            pendingLatches.put(uuid, latch);
+        }
 
         // call startForegroundService() from the main thread, not the binder thread
         new Handler(ctx.getMainLooper()).post(() -> {
-            Intent i = new Intent(callerPackage);
-            i.setClass(ctx, PersistentFgService.class);
-            ctx.startForegroundService(i);
+            ctx.startForegroundService(intent);
         });
+
+        Log.d(TAG, "caller " + callerPackage + ", processName " + processName +  ", UUID " + uuid);
+
+        try {
+            // make sure priority of the caller is raised by bindService() before returning, otherwise
+            // startService() by caller may throw BackgroundServiceStartNotAllowedException if it wins the race
+            // against startForegroundService() + bindService() in this process
+            if (latch.await(30, TimeUnit.SECONDS)) {
+                synchronized (completedLatches) {
+                    if (!completedLatches.remove(latch)) {
+                        throw new IllegalStateException("binding failed, UUID " + uuid);
+                    }
+                }
+            } else {
+                throw new IllegalStateException("waiting for binding timed out, UUID " + uuid);
+            }
+        } catch (InterruptedException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -62,14 +102,36 @@ public class PersistentFgService extends Service {
                 // be able to use its exported binder
                 res = true;
             } else {
-                // this service is protected by the signature-level permission
-                throw new SecurityException("unauthorized intent " + intent);
+                // this service is not exported
+                throw new IllegalStateException("unexpected intent action " + pkg);
             }
-            if (!res) {
-                Log.w(TAG, "unable to bind to " + pkg);
-            }
+
+            notifyCaller(intent, res);
         }
         return START_STICKY;
+    }
+
+    private static void notifyCaller(Intent intent, boolean res) {
+        ParcelUuid uuid = intent.getParcelableExtra(EXTRA_ID);
+        CountDownLatch latch;
+        synchronized (pendingLatches) {
+            latch = pendingLatches.remove(uuid);
+        }
+
+        if (latch == null) {
+            // returning START_STICKY guarantees that intent will be delivered at most once
+            throw new IllegalStateException("latch == null, UUID " + uuid);
+        }
+
+        if (res) {
+            synchronized (completedLatches) {
+                completedLatches.add(latch);
+            }
+        } else {
+            Log.e(TAG, "binding failed, UUID " + uuid);
+        }
+
+        latch.countDown();
     }
 
     private boolean bindGmsCore() {
@@ -86,7 +148,7 @@ public class PersistentFgService extends Service {
 
     private boolean bind(int pkgId, String pkg, String cls) {
         if ((boundPkgs & pkgId) != 0) {
-            Log.d(TAG, pkg + " is already bound");
+            Log.i(TAG, pkg + " is already bound");
             return true;
         }
         Intent i = new Intent();
