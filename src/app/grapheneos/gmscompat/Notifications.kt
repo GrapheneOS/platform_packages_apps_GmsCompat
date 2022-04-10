@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import java.util.concurrent.atomic.AtomicInteger
 
 object Notifications {
     enum class Channel(val id: String, val title: Int, val importance: Int = NotificationManager.IMPORTANCE_LOW) {
@@ -17,6 +18,8 @@ object Notifications {
                 R.string.missing_permission, NotificationManager.IMPORTANCE_HIGH),
         MISSING_PLAY_GAMES_APP("missing_play_games_app",
                 R.string.missing_play_games_app, NotificationManager.IMPORTANCE_HIGH),
+        BACKGROUND_ACTIVITY_START("bg_activity_start",
+                R.string.notif_channel_bg_activity_start, NotificationManager.IMPORTANCE_HIGH),
         ;
 
         fun notifBuilder(): Notification.Builder = Notification.Builder(App.ctx(), id)
@@ -27,6 +30,10 @@ object Notifications {
     const val ID_PLAY_STORE_MISSING_OBB_PERMISSION = 3
     const val ID_GMS_CORE_MISSING_NEARBY_DEVICES_PERMISSION = 4
     const val ID_MISSING_PLAY_GAMES_APP = 5
+
+    private val uniqueNotificationId = AtomicInteger(10_000)
+    fun generateUniqueNotificationId() = uniqueNotificationId.getAndIncrement()
+
 
     fun cancel(id: Int) {
         App.notificationManager().cancel(id)

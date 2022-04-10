@@ -110,4 +110,17 @@ object BinderGms2Gca : IGms2Gca.Stub() {
                 playStoreSettings()
         ).show(Notifications.ID_PLAY_STORE_MISSING_OBB_PERMISSION)
     }
+
+    override fun startActivityFromTheBackground(callerPkg: String, intent: PendingIntent) {
+        val ctx = App.ctx()
+        val pm = ctx.packageManager
+        val uiName = pm.getApplicationLabel(pm.getApplicationInfo(callerPkg, 0))
+
+        Notifications.Channel.BACKGROUND_ACTIVITY_START.notifBuilder()
+                .setSmallIcon(R.drawable.ic_configuration_required)
+                .setContentTitle(ctx.getString(R.string.notif_bg_activity_start, uiName))
+                .setContentIntent(intent)
+                .setAutoCancel(true)
+                .show(Notifications.generateUniqueNotificationId())
+    }
 }
