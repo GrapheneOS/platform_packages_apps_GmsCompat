@@ -170,7 +170,8 @@ class MainFragment : PreferenceFragmentCompat() {
                 addPsSettingsButton = true
             }
         } else {
-            if (!gmsCoreHasFullLocationPermission()) {
+            val hasFullLocationPermission = gmsCoreHasFullLocationPermission()
+            if (!hasFullLocationPermission) {
                 sb.separator()
                 sb.append(getString(R.string.play_services_no_location_permission, ctx.packageManager.backgroundPermissionOptionLabel))
                 addPsSettingsButton = true
@@ -203,25 +204,13 @@ class MainFragment : PreferenceFragmentCompat() {
                 addPsSettingsButton = true
             }
             val cr = ctx.contentResolver
-            if (intToBool(Settings.Global.getInt(cr, "wifi_scan_always_enabled", -1))) {
-                if (!psHasAnyLocationPerm) {
-                    sb.separator()
-                    sb.resString(R.string.always_on_wifi_scanning_enabled_but_disallowed)
-                    addPsSettingsButton = true
-                }
-            } else {
+            if (hasFullLocationPermission && !intToBool(Settings.Global.getInt(cr, "wifi_scan_always_enabled", -1))) {
                 sb.separator()
                 sb.resString(R.string.always_on_wifi_scanning_disabled)
                 addAlwaysOnScanningSettingsButton = true
             }
 
-            if (intToBool(Settings.Global.getInt(cr, "ble_scan_always_enabled", -1))) {
-                if (!psHasBtScanPerm) {
-                    sb.separator()
-                    sb.resString(R.string.always_on_bluetooth_scanning_enabled_but_disallowed)
-                    addPsSettingsButton = true
-                }
-            } else {
+            if (psHasBtScanPerm && !intToBool(Settings.Global.getInt(cr, "ble_scan_always_enabled", -1))) {
                 sb.separator()
                 sb.resString(R.string.always_on_bluetooth_scanning_disabled)
                 addAlwaysOnScanningSettingsButton = true
