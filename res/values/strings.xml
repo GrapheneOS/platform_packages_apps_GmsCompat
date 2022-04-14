@@ -38,9 +38,7 @@ If you decide to keep it disabled, consider enabling “%2$s“ option to improv
 "Location service assisted by Bluetooth scanning requires the “Nearby devices“ permission."
     </string>
     <string name="always_on_scanning_settings">Always-on scanning settings</string>
-    <string name="always_on_wifi_scanning_enabled_but_disallowed">Always-on Wi-Fi scanning is enabled, but not allowed (no Location permission).</string>
     <string name="always_on_wifi_scanning_disabled">Always-on Wi-Fi scanning is disabled.</string>
-    <string name="always_on_bluetooth_scanning_enabled_but_disallowed">Always-on Bluetooth scanning is enabled, but not allowed (no “Nearby devices“ permission).</string>
     <string name="always_on_bluetooth_scanning_disabled">Always-on Bluetooth scanning is disabled.</string>
 
     <string name="push_notifications">Push notifications</string>
