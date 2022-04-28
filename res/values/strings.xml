@@ -11,7 +11,7 @@
     <string name="play_services">Play services</string>
     <string name="play_store">Play Store</string>
 <!--    <string name="google_settings">Google services &amp; preferences</string>-->
-    <string name="google_settings">Google settings</string>
+    <string name="google_settings">Google Settings</string>
     <string name="component_system_settings">%s app info</string>
     <string name="gms_network_location_opt_in">Google Location Accuracy</string>
     <string name="no_gms_network_location">
