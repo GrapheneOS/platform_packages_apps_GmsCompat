@@ -56,6 +56,10 @@ To receive them quicker, set “Battery usage“ to “Unrestricted“ in Play s
 "Play services needs the “Nearby devices“ permission to enable Exposure Notifications"
     </string>
 
+    <string name="missing_permission_nearby_NearbyShare">
+"Play services needs the “Nearby devices“ permission to enable Nearby Share"
+    </string>
+
     <string name="missing_play_games_app">This game needs the Play Games app</string>
     <string name="install">Install</string>
 

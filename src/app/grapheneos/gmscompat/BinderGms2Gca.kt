@@ -123,4 +123,16 @@ object BinderGms2Gca : IGms2Gca.Stub() {
                 .setAutoCancel(true)
                 .show(Notifications.generateUniqueNotificationId())
     }
+
+    override fun showGmsCoreMissingPermissionForNearbyShareNotification() {
+        val ctx = App.ctx();
+
+        Notifications.configurationRequired(
+                Notifications.CH_MISSING_PERMISSION,
+                ctx.getText(R.string.missing_permission),
+                ctx.getText(R.string.missing_permission_nearby_NearbyShare),
+                ctx.getText(R.string.open_settings),
+                gmsCoreSettings()
+        ).show(Notifications.ID_GMS_CORE_MISSING_NEARBY_DEVICES_PERMISSION)
+    }
 }
