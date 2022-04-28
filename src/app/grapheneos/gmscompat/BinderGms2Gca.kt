@@ -87,7 +87,7 @@ object BinderGms2Gca : IGms2Gca.Stub() {
         val ctx = App.ctx()
         val intent = ctx.packageManager.getLaunchIntentForPackage(GmsInfo.PACKAGE_PLAY_STORE)
         val pendingIntent = PendingIntent.getActivity(ctx, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-        Notifications.Channel.PLAY_STORE_PENDING_USER_ACTION.notifBuilder()
+        Notifications.builder(Notifications.CH_PLAY_STORE_PENDING_USER_ACTION)
                 .setSmallIcon(R.drawable.ic_pending_action)
                 .setContentTitle(ctx.getText(R.string.play_store_pending_user_action_notif))
                 .setContentIntent(pendingIntent)
@@ -103,7 +103,7 @@ object BinderGms2Gca : IGms2Gca.Stub() {
         val ctx = App.ctx()
 
         Notifications.configurationRequired(
-                Notifications.Channel.MISSING_PERMISSION,
+                Notifications.CH_MISSING_PERMISSION,
                 ctx.getText(R.string.missing_permission),
                 ctx.getText(R.string.play_store_missing_obb_permission_notif),
                 ctx.getText(R.string.open_settings),
@@ -116,7 +116,7 @@ object BinderGms2Gca : IGms2Gca.Stub() {
         val pm = ctx.packageManager
         val uiName = pm.getApplicationLabel(pm.getApplicationInfo(callerPkg, 0))
 
-        Notifications.Channel.BACKGROUND_ACTIVITY_START.notifBuilder()
+        Notifications.builder(Notifications.CH_BACKGROUND_ACTIVITY_START)
                 .setSmallIcon(R.drawable.ic_configuration_required)
                 .setContentTitle(ctx.getString(R.string.notif_bg_activity_start, uiName))
                 .setContentIntent(intent)

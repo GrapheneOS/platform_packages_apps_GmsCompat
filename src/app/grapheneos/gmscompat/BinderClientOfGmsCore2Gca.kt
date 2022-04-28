@@ -44,7 +44,7 @@ enum class NotableInterface(val descriptor: String) {
             ExposureNotificationService -> {
                 if (!gmsCoreHasPermission(Manifest.permission.BLUETOOTH_SCAN)) {
                     Notifications.configurationRequired(
-                            Notifications.Channel.MISSING_PERMISSION,
+                            Notifications.CH_MISSING_PERMISSION,
                             ctx.getText(R.string.missing_permission),
                             ctx.getText(R.string.missing_permission_nearby_exposurenotifications),
                             ctx.getText(R.string.open_settings),
@@ -59,7 +59,7 @@ enum class NotableInterface(val descriptor: String) {
                     val resolution = Intent(Intent.ACTION_VIEW, uri)
                     resolution.setPackage(GmsInfo.PACKAGE_PLAY_STORE)
                     Notifications.configurationRequired(
-                            Notifications.Channel.MISSING_PLAY_GAMES_APP,
+                            Notifications.CH_MISSING_PLAY_GAMES_APP,
                             ctx.getText(R.string.missing_app),
                             ctx.getText(R.string.missing_play_games_app),
                             ctx.getText(R.string.install),

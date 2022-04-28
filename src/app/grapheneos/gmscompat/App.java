@@ -33,7 +33,7 @@ public class App extends Application {
             Redirections.init(preferences);
 
             notificationManager = ctx.getSystemService(NotificationManager.class);
-            Notifications.createNotificationChannels(ctx);
+            Notifications.createNotificationChannels();
         }
     }
 
