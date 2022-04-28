@@ -3,27 +3,17 @@ package app.grapheneos.gmscompat
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.NotificationManager.IMPORTANCE_HIGH
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import java.util.concurrent.atomic.AtomicInteger
 
 object Notifications {
-    enum class Channel(val id: String, val title: Int, val importance: Int = NotificationManager.IMPORTANCE_LOW) {
-        PERSISTENT_FG_SERVICE("persistent_fg_service",
-                R.string.persistent_fg_service_notif),
-        PLAY_STORE_PENDING_USER_ACTION("play_store_pending_user_action",
-                R.string.play_store_pending_user_action_notif),
-        MISSING_PERMISSION("missing_permission",
-                R.string.missing_permission, NotificationManager.IMPORTANCE_HIGH),
-        MISSING_PLAY_GAMES_APP("missing_play_games_app",
-                R.string.missing_play_games_app, NotificationManager.IMPORTANCE_HIGH),
-        BACKGROUND_ACTIVITY_START("bg_activity_start",
-                R.string.notif_channel_bg_activity_start, NotificationManager.IMPORTANCE_HIGH),
-        ;
-
-        fun notifBuilder(): Notification.Builder = Notification.Builder(App.ctx(), id)
-    }
+    const val CH_PERSISTENT_FG_SERVICE = "persistent_fg_service"
+    const val CH_PLAY_STORE_PENDING_USER_ACTION = "play_store_pending_user_action"
+    const val CH_MISSING_PERMISSION = "missing_permission"
+    const val CH_MISSING_PLAY_GAMES_APP = "missing_play_games_app"
+    const val CH_BACKGROUND_ACTIVITY_START = "bg_activity_start"
 
     const val ID_PERSISTENT_FG_SERVICE = 1
     const val ID_PLAY_STORE_PENDING_USER_ACTION = 2
@@ -34,20 +24,23 @@ object Notifications {
     private val uniqueNotificationId = AtomicInteger(10_000)
     fun generateUniqueNotificationId() = uniqueNotificationId.getAndIncrement()
 
-
-    fun cancel(id: Int) {
-        App.notificationManager().cancel(id)
-    }
-
     @JvmStatic
-    fun createNotificationChannels(ctx: Context) {
-        val list = Channel.values().map {
-            NotificationChannel(it.id, ctx.getText(it.title), it.importance)
-        }
+    fun createNotificationChannels() {
+        val list = listOf(
+            ch(CH_PERSISTENT_FG_SERVICE, R.string.persistent_fg_service_notif),
+            ch(CH_PLAY_STORE_PENDING_USER_ACTION, R.string.play_store_pending_user_action_notif),
+            ch(CH_MISSING_PERMISSION, R.string.missing_permission, IMPORTANCE_HIGH),
+            ch(CH_MISSING_PLAY_GAMES_APP, R.string.missing_play_games_app, IMPORTANCE_HIGH),
+            ch(CH_BACKGROUND_ACTIVITY_START, R.string.notif_channel_bg_activity_start, IMPORTANCE_HIGH),
+        )
+
         App.notificationManager().createNotificationChannels(list)
     }
 
-    fun configurationRequired(channel: Channel,
+    private fun ch(id: String, title: Int, importance: Int = NotificationManager.IMPORTANCE_LOW)
+        = NotificationChannel(id, App.ctx().getText(title), importance)
+
+    fun configurationRequired(channel: String,
             title: CharSequence, text: CharSequence,
             resolutionText: CharSequence, resolutionIntent: Intent): Notification.Builder
     {
@@ -56,7 +49,7 @@ object Notifications {
 
         val resolution = Notification.Action.Builder(null, resolutionText, pendingIntent).build()
 
-        return channel.notifBuilder()
+        return builder(channel)
             .setSmallIcon(R.drawable.ic_configuration_required)
             .setContentTitle(title)
             .setContentText(text)
@@ -64,6 +57,13 @@ object Notifications {
             .setTimeoutAfter(60_000)
             .setOnlyAlertOnce(true)
             .addAction(resolution)
+    }
+
+    @JvmStatic
+    fun builder(channel: String) = Notification.Builder(App.ctx(), channel)
+
+    fun cancel(id: Int) {
+        App.notificationManager().cancel(id)
     }
 }
 

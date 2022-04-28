@@ -37,7 +37,7 @@ public class PersistentFgService extends Service {
     int boundPkgs;
 
     public void onCreate() {
-        Notification.Builder nb = Notifications.Channel.PERSISTENT_FG_SERVICE.notifBuilder();
+        Notification.Builder nb = Notifications.builder(Notifications.CH_PERSISTENT_FG_SERVICE);
         nb.setSmallIcon(android.R.drawable.ic_dialog_dialer);
         nb.setContentTitle(getText(R.string.persistent_fg_service_notif));
         nb.setContentIntent(PendingIntent.getActivity(this, 0,
