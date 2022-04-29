@@ -1,6 +1,7 @@
 package app.grapheneos.gmscompat
 
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
@@ -113,12 +114,9 @@ object BinderGms2Gca : IGms2Gca.Stub() {
 
     override fun startActivityFromTheBackground(callerPkg: String, intent: PendingIntent) {
         val ctx = App.ctx()
-        val pm = ctx.packageManager
-        val uiName = pm.getApplicationLabel(pm.getApplicationInfo(callerPkg, 0))
-
         Notifications.builder(Notifications.CH_BACKGROUND_ACTIVITY_START)
                 .setSmallIcon(R.drawable.ic_configuration_required)
-                .setContentTitle(ctx.getString(R.string.notif_bg_activity_start, uiName))
+                .setContentTitle(ctx.getString(R.string.notif_bg_activity_start, applicationLabel(ctx, callerPkg)))
                 .setContentIntent(intent)
                 .setAutoCancel(true)
                 .show(Notifications.generateUniqueNotificationId())
@@ -134,5 +132,21 @@ object BinderGms2Gca : IGms2Gca.Stub() {
                 ctx.getText(R.string.open_settings),
                 gmsCoreSettings()
         ).show(Notifications.ID_GMS_CORE_MISSING_NEARBY_DEVICES_PERMISSION)
+    }
+
+    override fun showGmsMissingNearbyDevicesPermissionGeneric(callerPkg: String) {
+        val ctx = App.ctx()
+        Notifications.configurationRequired(
+                Notifications.CH_MISSING_PERMISSION,
+                ctx.getText(R.string.missing_permission),
+                ctx.getString(R.string.notif_missing_nearby_devices_perm_generic, applicationLabel(ctx, callerPkg)),
+                ctx.getText(R.string.open_settings),
+                appSettingsIntent(callerPkg)
+        ).show(Notifications.ID_MISSING_NEARBY_DEVICES_PERMISSION_GENERIC)
+    }
+
+    private fun applicationLabel(ctx: Context, pkg: String): CharSequence {
+        val pm = ctx.packageManager
+        return pm.getApplicationLabel(pm.getApplicationInfo(pkg, 0))
     }
 }

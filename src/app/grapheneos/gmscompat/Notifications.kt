@@ -19,7 +19,8 @@ object Notifications {
     const val ID_PLAY_STORE_PENDING_USER_ACTION = 2
     const val ID_PLAY_STORE_MISSING_OBB_PERMISSION = 3
     const val ID_GMS_CORE_MISSING_NEARBY_DEVICES_PERMISSION = 4
-    const val ID_MISSING_PLAY_GAMES_APP = 5
+    const val ID_MISSING_NEARBY_DEVICES_PERMISSION_GENERIC = 5
+    const val ID_MISSING_PLAY_GAMES_APP = 6
 
     private val uniqueNotificationId = AtomicInteger(10_000)
     fun generateUniqueNotificationId() = uniqueNotificationId.getAndIncrement()
