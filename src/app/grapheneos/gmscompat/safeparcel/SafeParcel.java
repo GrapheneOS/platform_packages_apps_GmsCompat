@@ -742,7 +742,8 @@ public class SafeParcel {
     }
 
     public static void skipProp(int ph, Parcel p) {
-        p.setDataPosition(p.dataPosition() + size(ph, p));
+        int propSize = size(ph, p);
+        p.setDataPosition(p.dataPosition() + propSize);
     }
 
     private static void checkSize(int expected, int ph, Parcel p) {
