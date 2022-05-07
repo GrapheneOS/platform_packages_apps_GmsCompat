@@ -33,6 +33,7 @@ fun LocationRequest.toOsLocationRequest(): android.location.LocationRequest {
     b.setMaxUpdates(maxUpdates)
     b.setMinUpdateDistanceMeters(minUpdateDistanceMeters)
     b.setMaxUpdateDelayMillis(maxUpdateDelayMillis)
+    b.setDurationMillis(durationMillis)
     return b.build()
 }
 
