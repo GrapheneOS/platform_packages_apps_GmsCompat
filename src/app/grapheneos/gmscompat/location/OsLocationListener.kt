@@ -27,12 +27,12 @@ fun LocationRequest.toOsLocationRequest(): android.location.LocationRequest {
     val quality = gmsPriorityToOsQuality(priority)
     b.setQuality(quality)
     if (explicitFastestInterval) {
-        b.setMinUpdateIntervalMillis(fastestInterval)
+        b.setMinUpdateIntervalMillis(minUpdateIntervalMillis)
     }
     b.setDurationMillis(max(1, expirationTime - SystemClock.elapsedRealtime()))
-    b.setMaxUpdates(numUpdates)
-    b.setMinUpdateDistanceMeters(smallestDesplacement)
-    b.setMaxUpdateDelayMillis(maxWaitTime)
+    b.setMaxUpdates(maxUpdates)
+    b.setMinUpdateDistanceMeters(minUpdateDistanceMeters)
+    b.setMaxUpdateDelayMillis(maxUpdateDelayMillis)
     return b.build()
 }
 
