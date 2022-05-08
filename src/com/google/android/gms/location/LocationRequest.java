@@ -24,7 +24,7 @@ public class LocationRequest extends SpReadOnly {
     @Property(8) public long maxUpdateDelayMillis;
     @Property(9) public boolean waitForAccurateLocation;
 
-    @Property(10) public long durationMillis;
+    @Property(10) public long durationMillis = Long.MAX_VALUE;
 
     /*
     unused for now:
