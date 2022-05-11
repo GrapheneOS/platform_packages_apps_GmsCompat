@@ -5,16 +5,16 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.SystemClock
-import com.google.android.gms.location.LocationAvailability
-import com.google.android.gms.location.LocationRequest
-
 import app.grapheneos.gmscompat.Const
 import app.grapheneos.gmscompat.logd
 import app.grapheneos.gmscompat.opModeToString
+import com.google.android.gms.location.LocationAvailability
+import com.google.android.gms.location.LocationRequest
 import java.lang.IllegalStateException
 import java.util.Collections
 import java.util.concurrent.CountDownLatch
 import kotlin.math.max
+import kotlin.math.min
 
 fun LocationRequest.toOsLocationRequest(): android.location.LocationRequest {
     val interval =
@@ -26,13 +26,16 @@ fun LocationRequest.toOsLocationRequest(): android.location.LocationRequest {
     val b = android.location.LocationRequest.Builder(interval)
     val quality = gmsPriorityToOsQuality(priority)
     b.setQuality(quality)
-    if (explicitFastestInterval) {
-        b.setMinUpdateIntervalMillis(minUpdateIntervalMillis)
-    }
-    b.setDurationMillis(max(1, expirationTime - SystemClock.elapsedRealtime()))
+    b.setMinUpdateIntervalMillis(minUpdateIntervalMillis)
     b.setMaxUpdates(maxUpdates)
     b.setMinUpdateDistanceMeters(minUpdateDistanceMeters)
     b.setMaxUpdateDelayMillis(maxUpdateDelayMillis)
+
+    if (expirationTime != Long.MAX_VALUE) {
+        durationMillis = min(max(1L, expirationTime - SystemClock.elapsedRealtime()), durationMillis)
+    }
+    b.setDurationMillis(durationMillis)
+
     return b.build()
 }
 
