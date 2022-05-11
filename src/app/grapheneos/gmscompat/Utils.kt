@@ -8,6 +8,7 @@ import android.net.Uri
 import android.provider.Settings
 import android.util.Log
 import app.grapheneos.gmscompat.Const.DEV
+import app.grapheneos.gmscompat.Const.ENABLE_LOGGING
 import com.android.internal.gmscompat.GmsCompatApp
 import com.android.internal.gmscompat.GmsInfo
 import java.lang.StringBuilder
@@ -34,35 +35,35 @@ fun notMainProcess() {
 }
 
 fun logd() {
-    if (!DEV) {
+    if (!ENABLE_LOGGING) {
         return
     }
     logInternal("<>", Log.DEBUG, 4)
 }
 
 fun logds(msg: String) {
-    if (!DEV) {
+    if (!ENABLE_LOGGING) {
         return
     }
     logInternal(msg, Log.DEBUG, 4)
 }
 
 inline fun logd(msg: () -> Any?) {
-    if (!DEV) {
+    if (!ENABLE_LOGGING) {
         return
     }
     logInternal(msg(), Log.DEBUG, 3)
 }
 
 inline fun log(msg: () -> Any?, level: Int) {
-    if (!DEV) {
+    if (!ENABLE_LOGGING) {
         return
     }
     logInternal(msg(), level, 3)
 }
 
 fun logInternal(o: Any?, level: Int, depth: Int) {
-    if (!DEV) {
+    if (!ENABLE_LOGGING) {
         return
     }
     val e = Thread.currentThread().stackTrace[depth]
@@ -76,7 +77,7 @@ fun logInternal(o: Any?, level: Int, depth: Int) {
     Log.println(level, sb.toString(), objectToString(o))
 }
 
-private fun objectToString(o: Any?): String {
+fun objectToString(o: Any?): String {
     if (o == null || o is String || o is Number || o is Boolean || o is Char) {
         return o.toString()
     }
