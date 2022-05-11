@@ -15,8 +15,6 @@ object BinderGms2Gca : IGms2Gca.Stub() {
     private val boundProcesses = ArrayMap<IBinder, String>(10)
 
     fun connect(pkg: String, processName: String, callerBinder: IBinder) {
-        logd{"callingPkg $pkg processName $processName callingPid ${Binder.getCallingPid()}"}
-
         val deathRecipient = DeathRecipient(callerBinder)
         try {
             // important to add before linkToDeath() to avoid race with binderDied() callback
