@@ -17,6 +17,7 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import com.android.internal.gmscompat.GmsInfo;
+import com.android.internal.gmscompat.client.GmsCompatClientService;
 
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
@@ -31,10 +32,7 @@ public class PersistentFgService extends Service {
 
     private static final String EXTRA_ID = "id";
 
-    private static final int GMS_CORE = 1;
-    private static final int PLAY_STORE = 1 << 1;
-
-    int boundPkgs;
+    final ArraySet<String> boundPackages = new ArraySet<>();
 
     public void onCreate() {
         Notification.Builder nb = Notifications.builder(Notifications.CH_PERSISTENT_FG_SERVICE);
@@ -101,6 +99,8 @@ public class PersistentFgService extends Service {
                 // GSF doesn't need to be bound, but needs GmsCompatApp process to remain running to
                 // be able to use its exported binder
                 res = true;
+            } else if (GmsInfo.PACKAGE_GSA.equals(pkg)) {
+                res = bind(pkg, GmsCompatClientService.class.getName());
             } else {
                 // this service is not exported
                 throw new IllegalStateException("unexpected intent action " + pkg);
@@ -137,7 +137,7 @@ public class PersistentFgService extends Service {
     private boolean bindGmsCore() {
         // GmsDynamiteClientHooks expects "persistent" GMS Core process to be always running, take this into account
         // if this service becomes unavailable and needs to be replaced
-        return bind(GMS_CORE, GmsInfo.PACKAGE_GMS_CORE, "com.google.android.gms.chimera.PersistentDirectBootAwareApiService");
+        return bind(GmsInfo.PACKAGE_GMS_CORE, "com.google.android.gms.chimera.PersistentDirectBootAwareApiService");
     }
 
     private boolean bindPlayStore() {
@@ -146,8 +146,8 @@ public class PersistentFgService extends Service {
     // it's important that both of these services are directBootAware,
     // keep that in mind if they become unavailable and need to be replaced
 
-    private boolean bind(int pkgId, String pkg, String cls) {
-        if ((boundPkgs & pkgId) != 0) {
+    private boolean bind(String pkg, String cls) {
+        if (boundPackages.contains(pkg)) {
             Log.i(TAG, pkg + " is already bound");
             return true;
         }
@@ -156,19 +156,19 @@ public class PersistentFgService extends Service {
 
         // BIND_INCLUDE_CAPABILITIES isn't needed, at least for now
         int flags = BIND_AUTO_CREATE | BIND_IMPORTANT;
-        boolean r = bindService(i, new Connection(pkgId, this), flags);
+        boolean r = bindService(i, new Connection(pkg, this), flags);
         if (r) {
-            boundPkgs |= pkgId;
+            boundPackages.add(pkg);
         }
         return r;
     }
 
     static class Connection implements ServiceConnection {
-        final int pkgId;
+        final String pkg;
         final PersistentFgService svc;
 
-        Connection(int pkgId, PersistentFgService svc) {
-            this.pkgId = pkgId;
+        Connection(String pkg, PersistentFgService svc) {
+            this.pkg = pkg;
             this.svc = svc;
         }
 
@@ -184,11 +184,16 @@ public class PersistentFgService extends Service {
             Log.d(TAG, "onBindingDied " + name);
             // see the onBindingDied doc
             svc.unbindService(this);
-            svc.boundPkgs &= ~pkgId;
+            svc.boundPackages.remove(pkg);
         }
 
         public void onNullBinding(ComponentName name) {
-            throw new IllegalStateException("unable to bind " + name);
+            String msg = "unable to bind " + name;
+            if (pkg.equals(GmsInfo.PACKAGE_GMS_CORE) || pkg.equals(GmsInfo.PACKAGE_PLAY_STORE)) {
+                throw new IllegalStateException(msg);
+            } else {
+                Log.e(TAG, msg);
+            }
         }
     }
 
