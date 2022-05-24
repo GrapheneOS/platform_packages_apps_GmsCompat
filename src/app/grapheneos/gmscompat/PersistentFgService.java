@@ -141,7 +141,7 @@ public class PersistentFgService extends Service {
     }
 
     private boolean bindPlayStore() {
-        return bind(PLAY_STORE, GmsInfo.PACKAGE_PLAY_STORE, "com.google.android.finsky.ipcservers.main.MainGrpcServerAndroidService");
+        return bind(GmsInfo.PACKAGE_PLAY_STORE, GmsCompatClientService.class.getName());
     }
     // it's important that both of these services are directBootAware,
     // keep that in mind if they become unavailable and need to be replaced
