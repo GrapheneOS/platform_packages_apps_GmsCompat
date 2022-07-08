@@ -3,9 +3,10 @@ package app.grapheneos.gmscompat
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Binder
+import android.net.Uri
 import android.os.IBinder
 import android.os.RemoteException
+import android.provider.Settings
 import android.util.ArrayMap
 import com.android.internal.gmscompat.GmsInfo
 import com.android.internal.gmscompat.IGms2Gca
@@ -93,12 +94,15 @@ object BinderGms2Gca : IGms2Gca.Stub() {
     override fun showPlayStoreMissingObbPermissionNotification() {
         val ctx = App.ctx()
 
+        val uri = Uri.fromParts("package", GmsInfo.PACKAGE_PLAY_STORE, null)
+        val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, uri)
+
         Notifications.configurationRequired(
                 Notifications.CH_MISSING_PERMISSION,
                 ctx.getText(R.string.missing_permission),
                 ctx.getText(R.string.play_store_missing_obb_permission_notif),
                 ctx.getText(R.string.open_settings),
-                playStoreSettings()
+                intent
         ).show(Notifications.ID_PLAY_STORE_MISSING_OBB_PERMISSION)
     }
 
