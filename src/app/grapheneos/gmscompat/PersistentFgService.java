@@ -188,6 +188,8 @@ public class PersistentFgService extends Service {
         }
 
         public void onNullBinding(ComponentName name) {
+            svc.unbindService(this);
+
             String msg = "unable to bind " + name;
             if (pkg.equals(GmsInfo.PACKAGE_GMS_CORE) || pkg.equals(GmsInfo.PACKAGE_PLAY_STORE)) {
                 throw new IllegalStateException(msg);
