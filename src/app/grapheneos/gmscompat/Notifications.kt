@@ -14,6 +14,7 @@ object Notifications {
     const val CH_MISSING_PERMISSION = "missing_permission"
     const val CH_MISSING_PLAY_GAMES_APP = "missing_play_games_app"
     const val CH_BACKGROUND_ACTIVITY_START = "bg_activity_start"
+    const val CH_GMS_CRASHED = "gms_crashed"
 
     const val ID_PERSISTENT_FG_SERVICE = 1
     const val ID_PLAY_STORE_PENDING_USER_ACTION = 2
@@ -33,6 +34,7 @@ object Notifications {
             ch(CH_MISSING_PERMISSION, R.string.missing_permission, IMPORTANCE_HIGH),
             ch(CH_MISSING_PLAY_GAMES_APP, R.string.missing_play_games_app, IMPORTANCE_HIGH),
             ch(CH_BACKGROUND_ACTIVITY_START, R.string.notif_channel_bg_activity_start, IMPORTANCE_HIGH),
+            ch(CH_GMS_CRASHED, R.string.notif_gms_crash_title, IMPORTANCE_HIGH),
         )
 
         App.notificationManager().createNotificationChannels(list)
@@ -71,4 +73,3 @@ object Notifications {
 fun Notification.Builder.show(id: Int) {
     App.notificationManager().notify(id, this.build())
 }
-
