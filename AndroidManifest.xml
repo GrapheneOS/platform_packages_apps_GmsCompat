@@ -58,6 +58,12 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name=".CrashReceiver"
+            android:exported="true"
+            android:permission="app.grapheneos.gmscompat.SHOW_UI"
+        />
     </application>
 
     <queries>

@@ -67,4 +67,7 @@ To receive them quicker, set “Battery usage“ to “Unrestricted“ in Play s
     <string name="notif_bg_activity_start">%s needs to show a screen. Tap to allow</string>
 
     <string name="notif_missing_nearby_devices_perm_generic">%s needs the “Nearby devices“ permission</string>
+
+    <string name="notif_gms_crash_title">Sandboxed Google Play crashed</string>
+    <string name="notif_gms_crash_text">Tap to see the details</string>
 </resources>
