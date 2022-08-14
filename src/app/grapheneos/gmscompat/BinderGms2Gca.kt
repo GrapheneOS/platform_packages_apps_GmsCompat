@@ -1,16 +1,21 @@
 package app.grapheneos.gmscompat
 
+import android.app.ApplicationErrorReport
 import android.app.PendingIntent
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.IBinder
 import android.os.RemoteException
+import android.os.SystemClock
 import android.provider.Settings
 import android.util.ArrayMap
 import com.android.internal.gmscompat.GmsInfo
 import com.android.internal.gmscompat.IGms2Gca
 import com.android.internal.gmscompat.dynamite.server.IFileProxyService
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 object BinderGms2Gca : IGms2Gca.Stub() {
     private val boundProcesses = ArrayMap<IBinder, String>(10)
@@ -138,6 +143,52 @@ object BinderGms2Gca : IGms2Gca.Stub() {
                 appSettingsIntent(callerPkg)
         ).show(Notifications.ID_MISSING_NEARBY_DEVICES_PERMISSION_GENERIC)
     }
+
+    override fun onUncaughtException(aer: ApplicationErrorReport) {
+        val ts = SystemClock.elapsedRealtime()
+        val stackTrace = aer.crashInfo.stackTrace
+
+        // Don't spam notifications if GMS chain-crashes with similar stack traces.
+
+        // Same privileged method call may crash with different full stack traces, check only
+        // the first few lines of the stack trace for equality (5 lines is header, exception
+        // class name and message are usually on a single line, differing callers of the crashing
+        // method are usually > 4 lines below
+        val stackTraceId = stackTrace.lines().take(10).joinToString()
+
+        synchronized(this) {
+            if (stackTraceId == prevUeNotifStackTraceId) {
+                val prev = prevUeNotifTimestamp
+                if (prev != 0L && (ts - prev) < TimeUnit.MINUTES.toMillis(10)) {
+                    return
+                }
+            }
+            prevUeNotifStackTraceId = stackTraceId
+            prevUeNotifTimestamp = ts
+        }
+
+        val ctx = App.ctx()
+
+        val intent = Intent(Intent.ACTION_APP_ERROR)
+        intent.putExtra(Intent.EXTRA_BUG_REPORT, aer)
+        intent.setComponent(ComponentName.createRelative("com.android.systemui", ".ErrorReportActivity"))
+        intent.setIdentifier(UUID.randomUUID().toString())
+
+        val pendingIntent = PendingIntent.getActivity(ctx, 0, intent,
+                PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
+
+        Notifications.builder(Notifications.CH_GMS_CRASHED).apply {
+            setContentTitle(ctx.getText(R.string.notif_gms_crash_title))
+            setContentText(ctx.getText(R.string.notif_gms_crash_text))
+            setContentIntent(pendingIntent)
+            setShowWhen(true)
+            setAutoCancel(true)
+            setSmallIcon(R.drawable.ic_crash_report)
+        }.show(Notifications.generateUniqueNotificationId())
+    }
+
+    private var prevUeNotifStackTraceId: String? = null
+    private var prevUeNotifTimestamp = 0L
 
     private fun applicationLabel(ctx: Context, pkg: String): CharSequence {
         val pm = ctx.packageManager
