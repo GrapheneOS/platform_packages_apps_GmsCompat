@@ -151,10 +151,8 @@ object BinderGms2Gca : IGms2Gca.Stub() {
         // Don't spam notifications if GMS chain-crashes with similar stack traces.
 
         // Same privileged method call may crash with different full stack traces, check only
-        // the first few lines of the stack trace for equality (5 lines is header, exception
-        // class name and message are usually on a single line, differing callers of the crashing
-        // method are usually > 4 lines below
-        val stackTraceId = stackTrace.lines().take(10).joinToString()
+        // the first few lines of the stack trace for equality
+        val stackTraceId = stackTrace.lines().filter { it.startsWith("\tat") }.take(5).joinToString()
 
         synchronized(this) {
             if (stackTraceId == prevUeNotifStackTraceId) {
