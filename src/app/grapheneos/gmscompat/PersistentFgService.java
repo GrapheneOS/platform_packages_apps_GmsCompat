@@ -41,6 +41,7 @@ public class PersistentFgService extends Service {
         nb.setContentIntent(PendingIntent.getActivity(this, 0,
             new Intent(this, MainActivity.class), PendingIntent.FLAG_IMMUTABLE));
         nb.setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE);
+        nb.setGroup(Notifications.CH_PERSISTENT_FG_SERVICE);
         startForeground(Notifications.ID_PERSISTENT_FG_SERVICE, nb.build());
     }
 
