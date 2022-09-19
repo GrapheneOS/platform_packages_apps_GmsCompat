@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.IBinder
 import android.os.RemoteException
@@ -201,6 +202,6 @@ object BinderGms2Gca : IGms2Gca.Stub() {
 
     private fun applicationLabel(ctx: Context, pkg: String): CharSequence {
         val pm = ctx.packageManager
-        return pm.getApplicationLabel(pm.getApplicationInfo(pkg, 0))
+        return pm.getApplicationLabel(pm.getApplicationInfo(pkg, PackageManager.ApplicationInfoFlags.of(0)))
     }
 }
