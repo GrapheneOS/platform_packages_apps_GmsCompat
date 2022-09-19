@@ -70,4 +70,5 @@ To receive them quicker, set “Battery usage“ to “Unrestricted“ in Play s
 
     <string name="notif_gms_crash_title">Sandboxed Google Play crashed</string>
     <string name="notif_gms_crash_text">Tap to see the details</string>
+    <string name="notif_gms_crash_report">Report to developers</string>
 </resources>
