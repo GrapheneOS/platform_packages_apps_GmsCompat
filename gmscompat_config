@@ -1,0 +1,131 @@
+[[flags]]
+
+[com.google.android.gms.fido]
+# allow Vanadium to use GMS FIDO2
+Fido2ApiKnownBrowsers__fingerprints append-string ,C6ADB8B83C6D4C17D292AFDE56FD488A51D316FF8F2C11C5410223BFF8A7DBB3
+
+[com.google.android.gms.enpromo]
+# enpromo is a GmsCore module that shows a notification that prompts the user to enable
+# Exposure Notifications (en). It needs location access to determine which location-specific app
+# needs to be installed for Exposure Notifications to function.
+# Location permission can't be revoked for privileged GmsCore, it being revoked leads to a crash
+# (location access being disabled is handled correctly, but spoofing it would break other functionality)
+PromoFeature__enabled perms-none-of android.permission.ACCESS_COARSE_LOCATION false
+
+[com.google.android.metrics]
+# controls access to privileged StatsManager#getRegisteredExperimentIds()
+add_external_experiment_ids false
+
+# needs privileged permissions to function
+[com.google.android.gms.magictether]
+MagicTether__total_kill_switch true
+WifiSync__total_kill_switch true
+
+[com.google.android.gms.cast]
+# Prevent crashes in GmsCore caused by calling ConnectivityManager#registerNetworkCallback too many
+# times when it has no INTERNET permission (there's a OS-enforced limit on the number of these callbacks).
+# Likely a regression, newer and older versions of GmsCore don't have this issue.
+# This flag makes it use a deprecated BroadcastReceiver instead.
+MdnsConfigs__use_connectivity_manager_for_wifi_monitor_if_possible false
+
+[gservices]
+finsky.AppDependencyInstall__enable_request_install_access_filter set-string 1
+# Should be enough to disable auto-install of ARCore ("Play Services for AR") on first launch
+finsky.AppDependencyInstall__request_install_access_filter set-string-empty
+
+[[stubs]]
+
+[android.app.admin.DevicePolicyManager]
+isDeviceProvisioned true
+isDeviceProvisioningConfigApplied true
+# called during account removal to check whether it's allowed, requires privileged permissions
+getFactoryResetProtectionPolicy null
+getDeviceOwnerComponentOnAnyUser null
+getDeviceOwnerNameOnAnyUser nullString
+getProfileOwnerNameAsUser nullString
+
+[android.app.backup.BackupManager]
+isBackupEnabled false
+isBackupServiceActive false
+
+[android.app.usage.UsageStatsManager]
+# 10 is STANDBY_BUCKET_ACTIVE
+getAppStandbyBucket int 10
+
+[android.bluetooth.BluetoothAdapter]
+# 20 is SCAN_MODE_NONE
+getScanMode int 20
+getName nullString
+# 02:00:00:00:00:00 is DEFAULT_MAC_ADDRESS
+getAddress String 02:00:00:00:00:00
+listenUsingInsecureL2capChannel throw java.io.IOException
+disable false
+
+[android.bluetooth.BluetoothDevice]
+getMetadata nullArray
+
+[android.content.ContentResolver]
+registerContentObserver void
+
+[android.content.pm.verify.domain.DomainVerificationManager]
+queryValidVerificationPackageNames emptyList
+
+[android.hardware.usb.UsbManager]
+getPorts emptyList
+
+[android.location.LocationManager]
+setExtraLocationControllerPackage void
+setExtraLocationControllerPackageEnabled void
+
+[android.media.AudioManager]
+muteAwaitConnection void
+getMutingExpectedDevice null
+registerMuteAwaitConnectionCallback void
+unregisterMuteAwaitConnectionCallback void
+
+[android.media.session.MediaSessionManager]
+getActiveSessions emptyList
+addOnActiveSessionsChangedListener void
+
+[android.net.wifi.WifiManager]
+getPrivilegedConfiguredNetworks emptyList
+getAllMatchingWifiConfigs emptyList
+getMatchingOsuProviders emptyMap
+getMatchingPasspointConfigsForOsuProviders emptyMap
+getCurrentNetwork null
+
+[android.nfc.NfcAdapter]
+disable false
+
+[android.os.DropBoxManager]
+getNextEntry null
+
+[android.provider.ContactsContract$SimContacts]
+getSimAccounts emptyList
+
+[android.telecom.TelecomManager]
+getAllPhoneAccountHandles emptyList
+
+[android.telephony.SubscriptionManager]
+getActiveSubscriptionIdList emptyIntArray
+getPhoneNumber emptyString
+
+[android.telephony.TelephonyManager]
+getDeviceId nullString
+getImei nullString
+getMeid nullString
+# 0 is NETWORK_TYPE_UNKNOWN
+getNetworkType int 0
+getVoiceNetworkType int 0
+# 0 is CALL_STATE_IDLE
+getCallState int 0
+getCallStateForSubscription int 0
+getSimSerialNumber nullString
+getUiccSlotsInfo nullArray
+getSubscriberId nullString
+getLine1Number nullString
+getAllCellInfo emptyList
+isIccLockEnabled false
+getGroupIdLevel1 nullString
+unregisterTelephonyCallback void
+getServiceState null
