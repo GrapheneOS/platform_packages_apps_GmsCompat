@@ -34,6 +34,8 @@ public class App extends Application {
 
             notificationManager = ctx.getSystemService(NotificationManager.class);
             Notifications.createNotificationChannels();
+
+            new ConfigUpdateReceiver(ctx);
         }
     }
 
