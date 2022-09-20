@@ -220,18 +220,43 @@ object BinderGms2Gca : IGms2Gca.Stub() {
         // the first few lines of the stack trace for equality
         val stackTraceId = stackTrace.lines().filter { it.startsWith("\tat") }.take(5).joinToString()
 
+        var checkForConfigUpdate = false
+        var showNotification = true
+
         synchronized(this) {
+            if (ts - prevConfigUpdateCheckTimestamp > TimeUnit.MINUTES.toMillis(5)) {
+                prevConfigUpdateCheckTimestamp = ts
+                checkForConfigUpdate = true
+            }
+
             if (stackTraceId == prevUeNotifStackTraceId) {
                 val prev = prevUeNotifTimestamp
                 if (prev != 0L && (ts - prev) < TimeUnit.MINUTES.toMillis(10)) {
-                    return
+                    showNotification = false
                 }
             }
-            prevUeNotifStackTraceId = stackTraceId
-            prevUeNotifTimestamp = ts
+            if (showNotification) {
+                prevUeNotifStackTraceId = stackTraceId
+                prevUeNotifTimestamp = ts
+            }
         }
 
         val ctx = App.ctx()
+
+        if (checkForConfigUpdate) {
+            val cr = ctx.contentResolver
+            val authority = "app.grapheneos.apps.RpcProvider"
+            val method = "gmscompat_config_update_check"
+            try {
+                cr.call(authority, method, null, null)
+            } catch (e: Exception) {
+                Log.d("UncaughtExceptionInGms", "unable to call " + authority, e)
+            }
+        }
+
+        if (!showNotification) {
+            return
+        }
 
         val intent = Intent(Intent.ACTION_APP_ERROR)
         intent.putExtra(Intent.EXTRA_BUG_REPORT, aer)
@@ -263,6 +288,7 @@ object BinderGms2Gca : IGms2Gca.Stub() {
 
     private var prevUeNotifStackTraceId: String? = null
     private var prevUeNotifTimestamp = 0L
+    private var prevConfigUpdateCheckTimestamp = 0L
 
     private fun applicationLabel(ctx: Context, pkg: String): CharSequence {
         val pm = ctx.packageManager
