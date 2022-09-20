@@ -65,5 +65,6 @@
         <package android:name="com.google.android.play.games" />
         <package android:name="app.grapheneos.gmscompat.config" />
         <package android:name="app.grapheneos.gmscompat.config.dev" />
+        <package android:name="app.grapheneos.apps" />
     </queries>
 </manifest>
