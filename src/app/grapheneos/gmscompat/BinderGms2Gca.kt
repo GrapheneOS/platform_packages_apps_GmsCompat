@@ -8,49 +8,59 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.DeadObjectException
 import android.os.IBinder
 import android.os.RemoteException
 import android.os.SystemClock
 import android.provider.Settings
 import android.util.ArrayMap
+import android.util.Log
+import com.android.internal.gmscompat.GmsCompatConfig
+import com.android.internal.gmscompat.GmsHooks
 import com.android.internal.gmscompat.GmsInfo
+import com.android.internal.gmscompat.GmsInfo.PACKAGE_GMS_CORE
+import com.android.internal.gmscompat.IGca2Gms
 import com.android.internal.gmscompat.IGms2Gca
 import com.android.internal.gmscompat.dynamite.server.IFileProxyService
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 object BinderGms2Gca : IGms2Gca.Stub() {
-    private val boundProcesses = ArrayMap<IBinder, String>(10)
+    private val boundProcesses = ArrayMap<IGca2Gms, String>(10)
 
-    override fun connect(pkg: String, processName: String, callerBinder: IBinder) {
-        val deathRecipient = DeathRecipient(callerBinder)
+    @Volatile
+    private var config = GmsCompatConfigParser.exec(App.ctx())
+
+    override fun connect(pkg: String, processName: String, iGca2Gms: IGca2Gms): GmsCompatConfig {
+        val deathRecipient = DeathRecipient(iGca2Gms)
         try {
             // important to add before linkToDeath() to avoid race with binderDied() callback
-            addBoundProcess(callerBinder, processName)
-            callerBinder.linkToDeath(deathRecipient, 0)
+            addBoundProcess(iGca2Gms, processName)
+            iGca2Gms.asBinder().linkToDeath(deathRecipient, 0)
         } catch (e: RemoteException) {
             logd{"binder already died: " + e}
             deathRecipient.binderDied()
-            return
+            throw e
         }
         PersistentFgService.start(pkg, processName);
+        return config
     }
 
-    class DeathRecipient(val binder: IBinder) : IBinder.DeathRecipient {
+    class DeathRecipient(val iGca2Gms: IGca2Gms) : IBinder.DeathRecipient {
         override fun binderDied() {
-            removeBoundProcess(binder)
+            removeBoundProcess(iGca2Gms)
         }
     }
 
-    fun addBoundProcess(binder: IBinder, processName: String) {
+    fun addBoundProcess(iGca2Gms: IGca2Gms, processName: String) {
         synchronized(boundProcesses) {
-            boundProcesses.put(binder, processName)
+            boundProcesses.put(iGca2Gms, processName)
         }
     }
 
-    fun removeBoundProcess(binder: IBinder) {
+    fun removeBoundProcess(iGca2Gms: IGca2Gms) {
         synchronized(boundProcesses) {
-            val processName = boundProcesses.remove(binder)
+            val processName = boundProcesses.remove(iGca2Gms)
 
             if (boundProcesses.size == 0) {
                 val ctx = App.ctx()
@@ -65,21 +75,75 @@ object BinderGms2Gca : IGms2Gca.Stub() {
                     dismissPlayStorePendingUserActionNotification()
                     Notifications.cancel(Notifications.ID_PLAY_STORE_MISSING_OBB_PERMISSION)
                 }
-                "com.google.android.gms.persistent" -> {
+                GmsHooks.PERSISTENT_GmsCore_PROCESS -> {
                     Notifications.cancel(Notifications.ID_GMS_CORE_MISSING_NEARBY_DEVICES_PERMISSION)
                 }
             }
         }
     }
 
+    fun snapshotBoundProcessses(): Array<IGca2Gms> {
+        var res: Array<IGca2Gms?>
+        synchronized(boundProcesses) {
+            val size = boundProcesses.size
+            res = arrayOfNulls(size)
+            for (i in 0 until size) {
+                res[i] = boundProcesses.keyAt(i)
+            }
+        }
+        @Suppress("UNCHECKED_CAST")
+        return res as Array<IGca2Gms>
+    }
+
+    fun getPersistentGmsCoreProcess(): IGca2Gms? {
+        val processes: ArrayMap<IGca2Gms, String> = boundProcesses
+        synchronized(processes) {
+            for (i in 0 until processes.size) {
+                if (processes.valueAt(i) == GmsHooks.PERSISTENT_GmsCore_PROCESS) {
+                    return processes.keyAt(i)
+                }
+            }
+        }
+        return null
+    }
+
+    fun updateConfig(config: GmsCompatConfig) {
+        this.config = config
+
+        snapshotBoundProcessses().forEach {
+            try {
+                it.updateConfig(config)
+            } catch (e: DeadObjectException) {
+                logd{e}
+            }
+        }
+
+        val p = getPersistentGmsCoreProcess()
+        var invalidated = false
+        if (p != null) {
+            try {
+                p.invalidateConfigCaches()
+                invalidated = true
+            } catch (e: DeadObjectException) {
+                logd{e}
+            }
+        }
+
+        if (!invalidated) {
+            logd{"persistent GmsCore process not found, restarting to apply config update"}
+            // all bound GMS processes will exit too
+            System.exit(0)
+        }
+    }
+
     @Volatile
     var dynamiteFileProxyService: IFileProxyService? = null
 
-    override fun connectGmsCore(processName: String, callerBinder: IBinder, fileProxyService: IFileProxyService?) {
+    override fun connectGmsCore(processName: String, iGca2Gms: IGca2Gms, fileProxyService: IFileProxyService?): GmsCompatConfig {
         if (fileProxyService != null) {
             dynamiteFileProxyService = fileProxyService
         }
-        connect(GmsInfo.PACKAGE_GMS_CORE, processName, callerBinder)
+        return connect(PACKAGE_GMS_CORE, processName, iGca2Gms)
     }
 
     override fun showPlayStorePendingUserActionNotification() {
