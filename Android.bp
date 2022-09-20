@@ -22,6 +22,7 @@ android_app {
 
     required: [
         "whitelist_app.grapheneos.gmscompat.xml",
+        "GmsCompatConfig",
     ]
 }
 
