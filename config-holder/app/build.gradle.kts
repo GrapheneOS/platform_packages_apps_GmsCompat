@@ -18,6 +18,7 @@ android {
 
     sourceSets.getByName("main") {
         manifest.srcFile("AndroidManifest.xml")
+        res.srcDir("res")
         resources.srcDir("../../gmscompat_config")
     }
 
@@ -41,7 +42,6 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = true
-            manifestPlaceholders["app_name"] = "GmsCompat config"
             if (useKeystoreProperties) {
                 signingConfig = signingConfigs.getByName("release")
             }
@@ -49,7 +49,6 @@ android {
         getByName("debug") {
             isMinifyEnabled = true
             applicationIdSuffix = ".dev"
-            manifestPlaceholders["app_name"] = "GmsCompat config dev"
         }
     }
 }
