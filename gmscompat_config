@@ -28,6 +28,10 @@ WifiSync__total_kill_switch true
 # This flag makes it use a deprecated BroadcastReceiver instead.
 MdnsConfigs__use_connectivity_manager_for_wifi_monitor_if_possible false
 
+[com.google.android.gms.people]
+# controls access to ContactsContract$SimContacts#getSimAccounts()
+AccountCategoriesFeature__use_cp2_sim_account_settings perms-none-of android.permission.READ_CONTACTS false
+
 [gservices]
 finsky.AppDependencyInstall__enable_request_install_access_filter set-string 1
 # Should be enough to disable auto-install of ARCore ("Play Services for AR") on first launch
@@ -99,9 +103,6 @@ disable false
 
 [android.os.DropBoxManager]
 getNextEntry null
-
-[android.provider.ContactsContract$SimContacts]
-getSimAccounts emptyList
 
 [android.telecom.TelecomManager]
 getAllPhoneAccountHandles emptyList
