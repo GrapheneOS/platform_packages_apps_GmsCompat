@@ -55,6 +55,13 @@ inline fun logd(msg: () -> Any?) {
     logInternal(msg(), Log.DEBUG, 3)
 }
 
+inline fun logw(msg: () -> Any?) {
+    if (!ENABLE_LOGGING) {
+        return
+    }
+    logInternal(msg(), Log.WARN, 3)
+}
+
 inline fun log(msg: () -> Any?, level: Int) {
     if (!ENABLE_LOGGING) {
         return
