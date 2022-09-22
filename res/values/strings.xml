@@ -49,6 +49,7 @@ To receive them quicker, set “Battery usage“ to “Unrestricted“ in Play s
 
     <string name="play_store_pending_user_action_notif">Action required in Play Store</string>
     <string name="missing_permission">Missing permission</string>
+    <string name="missing_optional_permission">Missing optional permission</string>
     <string name="missing_app">Missing app</string>
     <string name="play_store_missing_obb_permission_notif">To install this app, Play Store needs access to Android/obb folder</string>
 
@@ -71,4 +72,10 @@ To receive them quicker, set “Battery usage“ to “Unrestricted“ in Play s
     <string name="notif_gms_crash_title">Sandboxed Google Play crashed</string>
     <string name="notif_gms_crash_text">Tap to see the details</string>
     <string name="notif_gms_crash_report">Report to developers</string>
+
+    <string name="notif_gmscore_power_exemption">
+"Push notifications will be delayed, because Play services app is not allowed to always run in the background. Tap to resolve."
+    </string>
+    <string name="dont_show_again">Don\'t show again</string>
+
 </resources>

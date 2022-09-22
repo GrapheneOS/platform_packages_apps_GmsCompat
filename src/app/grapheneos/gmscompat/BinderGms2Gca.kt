@@ -143,6 +143,13 @@ object BinderGms2Gca : IGms2Gca.Stub() {
         if (fileProxyService != null) {
             dynamiteFileProxyService = fileProxyService
         }
+
+        if (processName == GmsHooks.PERSISTENT_GmsCore_PROCESS) {
+            App.ctx().mainExecutor.execute {
+                Notifications.handleGmsCorePowerExemption()
+            }
+        }
+
         return connect(PACKAGE_GMS_CORE, processName, iGca2Gms)
     }
 
