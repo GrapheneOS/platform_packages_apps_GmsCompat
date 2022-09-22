@@ -61,5 +61,6 @@ public class App extends Application {
     public interface MainProcessPrefs {
         String ENABLED_REDIRECTIONS = "enabled_redirections";
         String INITED_REDIRECTIONS = "inited_redirections";
+        String GmsCore_POWER_EXEMPTION_PROMPT_DISMISSED = "GmsCore_power_exemption_prompt_dismissed";
     }
 }
