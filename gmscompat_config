@@ -16,11 +16,6 @@ PromoFeature__enabled perms-none-of android.permission.ACCESS_COARSE_LOCATION fa
 # controls access to privileged StatsManager#getRegisteredExperimentIds()
 add_external_experiment_ids false
 
-# needs privileged permissions to function
-[com.google.android.gms.magictether]
-MagicTether__total_kill_switch true
-WifiSync__total_kill_switch true
-
 [com.google.android.gms.cast]
 # Prevent crashes in GmsCore caused by calling ConnectivityManager#registerNetworkCallback too many
 # times when it has no INTERNET permission (there's a OS-enforced limit on the number of these callbacks).
