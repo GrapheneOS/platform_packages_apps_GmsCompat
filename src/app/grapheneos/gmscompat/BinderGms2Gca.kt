@@ -7,6 +7,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.database.IContentObserver
 import android.net.Uri
 import android.os.DeadObjectException
 import android.os.IBinder
@@ -300,5 +301,27 @@ object BinderGms2Gca : IGms2Gca.Stub() {
     private fun applicationLabel(ctx: Context, pkg: String): CharSequence {
         val pm = ctx.packageManager
         return pm.getApplicationLabel(pm.getApplicationInfo(pkg, PackageManager.ApplicationInfoFlags.of(0)))
+    }
+
+    private val privSettings = PrivSettings()
+
+    override fun privSettingsGetString(ns: String, key: String): String? {
+        return privSettings.getString(ns, key)
+    }
+
+    override fun privSettingsPutString(ns: String, key: String, value: String?): Boolean {
+        return privSettings.putString(ns, key, value)
+    }
+
+    override fun privSettingsPutStrings(ns: String, keys: Array<String>, values: Array<String>): Boolean {
+        return privSettings.putStrings(ns, keys, values)
+    }
+
+    override fun privSettingsRegisterObserver(ns: String, key: String, observer: IContentObserver) {
+        privSettings.addObserver(ns, key, observer)
+    }
+
+    override fun privSettingsUnregisterObserver(observer: IContentObserver) {
+        privSettings.removeObserver(observer)
     }
 }

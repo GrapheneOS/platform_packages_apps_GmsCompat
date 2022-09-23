@@ -9,6 +9,7 @@ import com.android.internal.gmscompat.GmsCompatApp;
 
 public class App extends Application {
     private static Context ctx;
+    private static Context deviceProtectedStorageContext;
     private static NotificationManager notificationManager;
     private static SharedPreferences preferences;
     private static Thread mainThread;
@@ -27,9 +28,9 @@ public class App extends Application {
 
         if (GmsCompatApp.PKG_NAME.equals(Application.getProcessName())) {
             // main process
-            preferences = ctx
-                .createDeviceProtectedStorageContext()
-                .getSharedPreferences(MAIN_PROCESS_PREFS_FILE, MODE_PRIVATE);
+            deviceProtectedStorageContext = ctx.createDeviceProtectedStorageContext();
+            preferences = deviceProtectedStorageContext
+                    .getSharedPreferences(MAIN_PROCESS_PREFS_FILE, MODE_PRIVATE);
             Redirections.init(preferences);
 
             notificationManager = ctx.getSystemService(NotificationManager.class);
@@ -41,6 +42,10 @@ public class App extends Application {
 
     public static Context ctx() {
         return ctx;
+    }
+
+    public static Context deviceProtectedStorageContext() {
+        return deviceProtectedStorageContext;
     }
 
     public static NotificationManager notificationManager() {
