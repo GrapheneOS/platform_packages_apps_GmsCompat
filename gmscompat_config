@@ -29,7 +29,8 @@ AccountCategoriesFeature__use_cp2_sim_account_settings perms-none-of android.per
 
 [com.google.android.westworld]
 # seems to be an OS stats/analytics service, requires privileged permissions to function
-enabled false
+is_enabled false
+metrics_enabled false
 
 [gservices]
 finsky.AppDependencyInstall__enable_request_install_access_filter set-string 1
