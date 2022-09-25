@@ -27,6 +27,10 @@ MdnsConfigs__use_connectivity_manager_for_wifi_monitor_if_possible false
 # controls access to ContactsContract$SimContacts#getSimAccounts()
 AccountCategoriesFeature__use_cp2_sim_account_settings perms-none-of android.permission.READ_CONTACTS false
 
+[com.google.android.westworld]
+# seems to be an OS stats/analytics service, requires priviliged permissions to function
+enabled false
+
 [gservices]
 finsky.AppDependencyInstall__enable_request_install_access_filter set-string 1
 # Should be enough to disable auto-install of ARCore ("Play Services for AR") on first launch
