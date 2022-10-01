@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.NotificationManager.IMPORTANCE_HIGH
 import android.app.PendingIntent
+import android.app.compat.gms.GmsCompat
 import android.content.Intent
 import android.net.Uri
 import android.os.PowerManager
@@ -19,6 +20,8 @@ object Notifications {
     const val CH_PLAY_STORE_PENDING_USER_ACTION = "play_store_pending_user_action"
     const val CH_MISSING_PERMISSION = "missing_permission"
     const val CH_MISSING_OPTIONAL_PERMISSION = "missing_optional_permission"
+    const val CH_MISSING_APP = "missing_app"
+    // separate channel to allow silencing it without impacting other missing app prompts
     const val CH_MISSING_PLAY_GAMES_APP = "missing_play_games_app"
     const val CH_BACKGROUND_ACTIVITY_START = "bg_activity_start"
     const val CH_GMS_CRASHED = "gms_crashed"
@@ -28,7 +31,7 @@ object Notifications {
     const val ID_PLAY_STORE_MISSING_OBB_PERMISSION = 3
     const val ID_GMS_CORE_MISSING_NEARBY_DEVICES_PERMISSION = 4
     const val ID_MISSING_NEARBY_DEVICES_PERMISSION_GENERIC = 5
-    const val ID_MISSING_PLAY_GAMES_APP = 6
+    const val ID_MISSING_APP = 6
     const val ID_GmsCore_POWER_EXEMPTION_PROMPT = 7
 
     private val uniqueNotificationId = AtomicInteger(10_000)
@@ -41,6 +44,7 @@ object Notifications {
             ch(CH_PLAY_STORE_PENDING_USER_ACTION, R.string.play_store_pending_user_action_notif),
             ch(CH_MISSING_PERMISSION, R.string.missing_permission, IMPORTANCE_HIGH),
             ch(CH_MISSING_OPTIONAL_PERMISSION, R.string.missing_optional_permission),
+            ch(CH_MISSING_APP, R.string.missing_app, IMPORTANCE_HIGH),
             ch(CH_MISSING_PLAY_GAMES_APP, R.string.missing_play_games_app, IMPORTANCE_HIGH),
             ch(CH_BACKGROUND_ACTIVITY_START, R.string.notif_channel_bg_activity_start, IMPORTANCE_HIGH),
             ch(CH_GMS_CRASHED, R.string.notif_gms_crash_title, IMPORTANCE_HIGH),
@@ -124,6 +128,29 @@ object Notifications {
             addAction(dontShowAgainAction)
             show(ID_GmsCore_POWER_EXEMPTION_PROMPT)
         }
+    }
+
+    fun handleMissingApp(channel: String, prompt: CharSequence, appPkg: String) {
+        if (isPkgInstalled(appPkg)) {
+            return
+        }
+
+        val ctx = App.ctx()
+
+        if (!GmsCompat.isGmsApp(GmsInfo.PACKAGE_PLAY_STORE, ctx.userId)) {
+            return
+        }
+
+        val uri = Uri.parse("market://details?id=$appPkg")
+        val resolution = Intent(Intent.ACTION_VIEW, uri)
+        resolution.setPackage(GmsInfo.PACKAGE_PLAY_STORE)
+        configurationRequired(
+                channel,
+                ctx.getText(R.string.missing_app),
+                prompt,
+                ctx.getText(R.string.install),
+                resolution
+        ).show(ID_MISSING_APP)
     }
 }
 
