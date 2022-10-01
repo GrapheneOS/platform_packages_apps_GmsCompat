@@ -66,5 +66,6 @@
         <package android:name="app.grapheneos.gmscompat.config" />
         <package android:name="app.grapheneos.gmscompat.config.dev" />
         <package android:name="app.grapheneos.apps" />
+        <package android:name="com.google.android.tts" />
     </queries>
 </manifest>
