@@ -31,6 +31,15 @@ object BinderClientOfGmsCore2Gca : IClientOfGmsCore2Gca.Stub() {
     override fun onNotableInterfaceAcquired(interfaceDescriptor: String) {
         mapOfDescriptorsOfNotableInterfaces[interfaceDescriptor]!!.onAcquiredByClient()
     }
+
+    override fun showMissingAppNotification(pkgName: String) {
+        val prompt = when (pkgName) {
+            "com.google.android.tts" -> R.string.missing_speech_services
+            else -> throw IllegalArgumentException(pkgName)
+        }
+
+        Notifications.handleMissingApp(Notifications.CH_MISSING_APP, App.ctx().getText(prompt), pkgName)
+    }
 }
 
 enum class NotableInterface(val descriptor: String) {
@@ -53,19 +62,9 @@ enum class NotableInterface(val descriptor: String) {
                 }
             }
             GamesService -> {
-                val playGamesPkg = "com.google.android.play.games"
-                if (!isPkgInstalled(playGamesPkg) && GmsCompat.isGmsApp(GmsInfo.PACKAGE_PLAY_STORE, ctx.userId)) {
-                    val uri = Uri.parse("market://details?id=$playGamesPkg")
-                    val resolution = Intent(Intent.ACTION_VIEW, uri)
-                    resolution.setPackage(GmsInfo.PACKAGE_PLAY_STORE)
-                    Notifications.configurationRequired(
-                            Notifications.CH_MISSING_PLAY_GAMES_APP,
-                            ctx.getText(R.string.missing_app),
-                            ctx.getText(R.string.missing_play_games_app),
-                            ctx.getText(R.string.install),
-                            resolution
-                    ).show(Notifications.ID_MISSING_PLAY_GAMES_APP)
-                }
+                Notifications.handleMissingApp(Notifications.CH_MISSING_PLAY_GAMES_APP,
+                    ctx.getText(R.string.missing_play_games_app),
+                    "com.google.android.play.games")
             }
         }
     }
