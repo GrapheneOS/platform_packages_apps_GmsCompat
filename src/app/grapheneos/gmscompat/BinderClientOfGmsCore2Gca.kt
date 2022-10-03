@@ -57,7 +57,7 @@ enum class NotableInterface(val descriptor: String) {
                             ctx.getText(R.string.missing_permission),
                             ctx.getText(R.string.missing_permission_nearby_exposurenotifications),
                             ctx.getText(R.string.open_settings),
-                            gmsCoreSettings()
+                            appSettingsIntent(GmsInfo.PACKAGE_GMS_CORE, APP_INFO_ITEM_PERMISSIONS)
                     ).show(Notifications.ID_GMS_CORE_MISSING_NEARBY_DEVICES_PERMISSION)
                 }
             }
