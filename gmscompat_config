@@ -72,6 +72,10 @@ getAddress String 02:00:00:00:00:00
 listenUsingInsecureL2capChannel throw java.io.IOException
 disable false
 
+[android.bluetooth.BluetoothDevice]
+getMetadata default
+setMetadata default
+
 [android.content.ContentResolver]
 registerContentObserver void
 
