@@ -369,6 +369,9 @@ public class GmsCompatConfigParser {
                 d.type = StubDef.THROW;
                 d.stringVal = parser.next();
                 break;
+            case "default":
+                d.type = StubDef.DEFAULT;
+                break;
             default:
                 Log.i(TAG, "unknown token " + token);
                 invalid = true;
@@ -533,6 +536,9 @@ public class GmsCompatConfigParser {
                     );
                     break;
             }
+            case StubDef.DEFAULT:
+                // unknown return type
+                break;
             default:
                 stubCheck(signature, false);
                 break;
