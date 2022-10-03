@@ -13,6 +13,7 @@ import android.provider.Settings
 import app.grapheneos.gmscompat.App.MainProcessPrefs
 import app.grapheneos.gmscompat.util.PendingAction
 import com.android.internal.gmscompat.GmsInfo
+import java.util.UUID
 import java.util.concurrent.atomic.AtomicInteger
 
 object Notifications {
@@ -33,6 +34,7 @@ object Notifications {
     const val ID_MISSING_NEARBY_DEVICES_PERMISSION_GENERIC = 5
     const val ID_MISSING_APP = 6
     const val ID_GmsCore_POWER_EXEMPTION_PROMPT = 7
+    const val ID_CONTACTS_SYNC_PROMPT = 8
 
     private val uniqueNotificationId = AtomicInteger(10_000)
     fun generateUniqueNotificationId() = uniqueNotificationId.getAndIncrement()
@@ -158,6 +160,54 @@ object Notifications {
                 ctx.getText(R.string.install),
                 resolution
         ).show(ID_MISSING_APP)
+    }
+
+    // returns null if "do not show again" is already set for this notificationId
+    private fun doNotShowAgainAction(notificationId: Int): Notification.Action? {
+        val pref = MainProcessPrefs.NOTIFICATION_DO_NOT_SHOW_AGAIN_PREFIX + notificationId
+
+        if (App.preferences().getBoolean(pref, false)) {
+            return null
+        }
+
+        val pa = PendingAction.addOneShot {
+            App.preferences().edit()
+                    .putBoolean(pref, true)
+                    .apply()
+
+            cancel(notificationId)
+        }
+
+        return Notification.Action.Builder(null, App.ctx().getText(R.string.dont_show_again),
+                pa.pendingIntent).build()
+    }
+
+    private var handledContactsSync = false
+
+    fun handleContactsSync() {
+        if (handledContactsSync) {
+            return
+        }
+        handledContactsSync = true
+
+        val id = ID_CONTACTS_SYNC_PROMPT
+
+        val doNotShowAgainAction = doNotShowAgainAction(id)
+
+        if (doNotShowAgainAction == null) {
+            return
+        }
+
+        builder(CH_MISSING_OPTIONAL_PERMISSION).apply {
+            setSmallIcon(R.drawable.ic_configuration_required)
+            setContentTitle(R.string.missing_optional_permission)
+            setContentText(R.string.notif_contacts_sync_prompt)
+            setStyle(Notification.BigTextStyle())
+            setContentIntent(appSettingsPendingIntent(GmsInfo.PACKAGE_GMS_CORE, APP_INFO_ITEM_PERMISSIONS))
+            setAutoCancel(true)
+            addAction(doNotShowAgainAction)
+            show(id)
+        }
     }
 }
 

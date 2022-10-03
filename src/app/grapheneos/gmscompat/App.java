@@ -67,5 +67,6 @@ public class App extends Application {
         String ENABLED_REDIRECTIONS = "enabled_redirections";
         String INITED_REDIRECTIONS = "inited_redirections";
         String GmsCore_POWER_EXEMPTION_PROMPT_DISMISSED = "GmsCore_power_exemption_prompt_dismissed";
+        String NOTIFICATION_DO_NOT_SHOW_AGAIN_PREFIX = "do_not_show_notification_";
     }
 }
