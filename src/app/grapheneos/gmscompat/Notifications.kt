@@ -69,9 +69,7 @@ object Notifications {
             title: CharSequence, text: CharSequence,
             resolutionText: CharSequence, resolutionIntent: Intent): Notification.Builder
     {
-        val ctx = App.ctx()
-        val pendingIntent = PendingIntent.getActivity(ctx, 0, freshActivity(resolutionIntent), PendingIntent.FLAG_IMMUTABLE)
-
+        val pendingIntent = activityPendingIntent(resolutionIntent)
         val resolution = Notification.Action.Builder(null, resolutionText, pendingIntent).build()
 
         return builder(channel)
@@ -113,8 +111,6 @@ object Notifications {
 
         val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
         intent.data = Uri.fromParts("package", GmsInfo.PACKAGE_GMS_CORE, null)
-        val piFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_ONE_SHOT
-        val pi = PendingIntent.getActivity(ctx, 0, intent, piFlags)
 
         val dontShowAgainPa = PendingAction.addOneShot {
             App.preferences().edit()
@@ -132,7 +128,7 @@ object Notifications {
             setContentTitle(R.string.missing_optional_permission)
             setContentText(R.string.notif_gmscore_power_exemption)
             setStyle(Notification.BigTextStyle())
-            setContentIntent(pi)
+            setContentIntent(activityPendingIntent(intent))
             setAutoCancel(true)
             addAction(dontShowAgainAction)
             show(ID_GmsCore_POWER_EXEMPTION_PROMPT)

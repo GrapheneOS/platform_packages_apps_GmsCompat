@@ -2,6 +2,7 @@ package app.grapheneos.gmscompat
 
 import android.app.AppOpsManager
 import android.app.Application
+import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -12,8 +13,8 @@ import app.grapheneos.gmscompat.Const.DEV
 import app.grapheneos.gmscompat.Const.ENABLE_LOGGING
 import com.android.internal.gmscompat.GmsCompatApp
 import com.android.internal.gmscompat.GmsInfo
-import java.lang.StringBuilder
 import java.lang.reflect.Modifier
+import java.util.UUID
 
 fun mainThread() {
     if (DEV) {
@@ -160,3 +161,12 @@ fun appSettingsIntent(pkg: String, item: String? = null): Intent {
 
 fun gmsCoreSettings() = appSettingsIntent(GmsInfo.PACKAGE_GMS_CORE)
 fun playStoreSettings() = appSettingsIntent(GmsInfo.PACKAGE_PLAY_STORE)
+
+fun appSettingsPendingIntent(pkg: String, item: String? = null) =
+        activityPendingIntent(appSettingsIntent(pkg, item))
+
+fun activityPendingIntent(i: Intent, flags: Int = PendingIntent.FLAG_IMMUTABLE): PendingIntent {
+    i.setIdentifier(UUID.randomUUID().toString())
+    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+    return PendingIntent.getActivity(App.ctx(), 0, i, flags)
+}
