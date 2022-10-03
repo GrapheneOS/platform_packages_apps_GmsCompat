@@ -5,6 +5,7 @@ import android.app.Application
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import app.grapheneos.gmscompat.Const.DEV
@@ -142,9 +143,19 @@ fun freshActivity(intent: Intent): Intent {
     return intent
 }
 
-fun appSettingsIntent(pkg: String): Intent {
+const val APP_INFO_ITEM_PERMISSIONS = "permission_settings"
+
+fun appSettingsIntent(pkg: String, item: String? = null): Intent {
     val uri = Uri.fromParts("package", pkg, null)
-    return freshActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, uri))
+    val i =  freshActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, uri))
+    if (item != null) {
+        val args = Bundle()
+        // :settings constants aren't exposed by Settings as part of its API, but are used in
+        // multiple places in the OS
+        args.putString(":settings:fragment_args_key", item)
+        i.putExtra(":settings:show_fragment_args", args)
+    }
+    return i
 }
 
 fun gmsCoreSettings() = appSettingsIntent(GmsInfo.PACKAGE_GMS_CORE)

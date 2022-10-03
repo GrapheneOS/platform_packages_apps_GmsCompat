@@ -203,7 +203,7 @@ object BinderGms2Gca : IGms2Gca.Stub() {
                 ctx.getText(R.string.missing_permission),
                 ctx.getText(R.string.missing_permission_nearby_NearbyShare),
                 ctx.getText(R.string.open_settings),
-                gmsCoreSettings()
+                appSettingsIntent(PACKAGE_GMS_CORE, APP_INFO_ITEM_PERMISSIONS)
         ).show(Notifications.ID_GMS_CORE_MISSING_NEARBY_DEVICES_PERMISSION)
     }
 
@@ -214,7 +214,7 @@ object BinderGms2Gca : IGms2Gca.Stub() {
                 ctx.getText(R.string.missing_permission),
                 ctx.getString(R.string.notif_missing_nearby_devices_perm_generic, applicationLabel(ctx, callerPkg)),
                 ctx.getText(R.string.open_settings),
-                appSettingsIntent(callerPkg)
+                appSettingsIntent(callerPkg, APP_INFO_ITEM_PERMISSIONS)
         ).show(Notifications.ID_MISSING_NEARBY_DEVICES_PERMISSION_GENERIC)
     }
 
