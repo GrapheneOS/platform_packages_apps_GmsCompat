@@ -273,24 +273,18 @@ object BinderGms2Gca : IGms2Gca.Stub() {
         val intent = Intent(Intent.ACTION_APP_ERROR)
         intent.putExtra(Intent.EXTRA_BUG_REPORT, aer)
         intent.setComponent(ComponentName.createRelative("com.android.systemui", ".ErrorReportActivity"))
-        intent.setIdentifier(UUID.randomUUID().toString())
-
-        val pendingIntent = PendingIntent.getActivity(ctx, 0, intent,
-                PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
 
         val reportAction = run {
             val url = "https://github.com/GrapheneOS/os-issue-tracker/issues"
             val urlIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-            val piFlags = PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
-            val pi = PendingIntent.getActivity(ctx, 0, urlIntent, piFlags)
             val label = ctx.getText(R.string.notif_gms_crash_report)
-            Notification.Action.Builder(null, label, pi).build()
+            Notification.Action.Builder(null, label, activityPendingIntent(urlIntent)).build()
         }
 
         Notifications.builder(Notifications.CH_GMS_CRASHED).apply {
             setContentTitle(ctx.getText(R.string.notif_gms_crash_title))
             setContentText(ctx.getText(R.string.notif_gms_crash_text))
-            setContentIntent(pendingIntent)
+            setContentIntent(activityPendingIntent(intent))
             setShowWhen(true)
             setAutoCancel(true)
             setSmallIcon(R.drawable.ic_crash_report)
