@@ -218,6 +218,10 @@ object BinderGms2Gca : IGms2Gca.Stub() {
         ).show(Notifications.ID_MISSING_NEARBY_DEVICES_PERMISSION_GENERIC)
     }
 
+    override fun maybeShowContactsSyncNotification() {
+        Notifications.handleContactsSync()
+    }
+
     override fun onUncaughtException(aer: ApplicationErrorReport) {
         val ts = SystemClock.elapsedRealtime()
         val stackTrace = aer.crashInfo.stackTrace

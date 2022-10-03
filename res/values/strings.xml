@@ -79,4 +79,8 @@ To receive them quicker, set “Battery usage“ to “Unrestricted“ in Play s
     <string name="dont_show_again">Don\'t show again</string>
 
     <string name="missing_speech_services">This app needs the Speech Services component</string>
+
+    <string name="notif_contacts_sync_prompt">
+"To sync contacts from a Google account, Play services needs the Contacts permission. Tap to open settings."
+    </string>
 </resources>
