@@ -53,8 +53,15 @@ object Notifications {
         App.notificationManager().createNotificationChannels(list)
     }
 
-    private fun ch(id: String, title: Int, importance: Int = NotificationManager.IMPORTANCE_LOW)
-        = NotificationChannel(id, App.ctx().getText(title), importance)
+    private fun ch(id: String, title: Int, importance: Int = NotificationManager.IMPORTANCE_LOW,
+                   silent: Boolean = true): NotificationChannel {
+        val c = NotificationChannel(id, App.ctx().getText(title), importance)
+        if (silent) {
+            c.setSound(null, null)
+            c.enableVibration(false)
+        }
+        return c
+    }
 
     fun configurationRequired(channel: String,
             title: CharSequence, text: CharSequence,
