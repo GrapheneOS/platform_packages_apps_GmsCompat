@@ -38,6 +38,10 @@ is_enabled false
 metrics_enabled false
 metadata_enabled false
 
+[com.google.android.gms.auth_account]
+# needed to prevent GmsCore from blocking Google account removal due to lacking a privileged integration into OS
+BugFixFeatures__fix_frp_in_r false
+
 [gservices]
 finsky.AppDependencyInstall__enable_request_install_access_filter set-string 1
 # Should be enough to disable auto-install of ARCore ("Play Services for AR") on first launch
@@ -48,8 +52,6 @@ finsky.AppDependencyInstall__request_install_access_filter set-string-empty
 [android.app.admin.DevicePolicyManager]
 isDeviceProvisioned true
 isDeviceProvisioningConfigApplied true
-# called during account removal to check whether it's allowed, requires privileged permissions
-getFactoryResetProtectionPolicy null
 getDeviceOwnerComponentOnAnyUser null
 getDeviceOwnerNameOnAnyUser nullString
 getProfileOwnerNameAsUser nullString
