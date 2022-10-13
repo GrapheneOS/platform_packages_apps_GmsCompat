@@ -16,6 +16,10 @@ PromoFeature__enabled perms-none-of android.permission.ACCESS_COARSE_LOCATION fa
 # controls access to privileged StatsManager#getRegisteredExperimentIds()
 add_external_experiment_ids false
 
+[com.google.android.gms.nearby]
+# disable WearableDataListenerService, it needs privileged permissions
+FastPairFeature__enable_wearable_service false
+
 [com.google.android.gms.cast]
 # Prevent crashes in GmsCore caused by calling ConnectivityManager#registerNetworkCallback too many
 # times when it has no INTERNET permission (there's a OS-enforced limit on the number of these callbacks).
@@ -73,6 +77,7 @@ getName nullString
 getAddress String 02:00:00:00:00:00
 listenUsingInsecureL2capChannel throw java.io.IOException
 disable false
+getProfileProxy false
 
 [android.bluetooth.BluetoothDevice]
 getMetadata default
