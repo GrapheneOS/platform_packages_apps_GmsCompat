@@ -40,7 +40,7 @@ fun Listeners.update(client: Client, key: Any, listener: OsLocationListener) {
             }
 
         }
-        client.locationManager.requestLocationUpdates(listener.provider, listener.request,
+        client.locationManager.requestLocationUpdates(listener.provider.name, listener.request,
             GLocationService.listenerCallbacksExecutor, listener)
 
         val curIdx = indexOfKey(key)
