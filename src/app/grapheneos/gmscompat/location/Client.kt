@@ -2,11 +2,8 @@ package app.grapheneos.gmscompat.location
 
 import android.Manifest
 import android.app.AppOpsManager
-import android.content.AttributionSource
 import android.content.Context
-import android.content.ContextParams
 import android.content.pm.PackageManager.PERMISSION_GRANTED
-import android.location.Criteria
 import android.location.LocationManager
 import android.os.Binder
 import androidx.annotation.CheckResult
@@ -59,37 +56,6 @@ class Client(val gls: GLocationService, unverifiedPackageName: String? = null, v
     }
 
     val locationManager = ctx.getSystemService(LocationManager::class.java)!!
-
-    fun getProvider(req: LocationRequest): String {
-        val priority = req.priority
-        if (priority == LocationRequest.PRIORITY_NO_POWER) {
-            return LocationManager.PASSIVE_PROVIDER
-        } else {
-            return LocationManager.GPS_PROVIDER
-        }
-        // getBestProvider() returns FUSED_PROVIDER sometimes, which doesn't do anything useful when
-        // there's no NETWORK_PROVIDER, but exposes more potential framework bugs
-        /*
-        val criteria = Criteria()
-        when (priority) {
-            LocationRequest.PRIORITY_HIGH_ACCURACY ->
-                criteria.accuracy = Criteria.ACCURACY_FINE
-            LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY ->
-                criteria.accuracy = Criteria.ACCURACY_FINE
-            LocationRequest.PRIORITY_LOW_POWER ->
-                criteria.powerRequirement = Criteria.POWER_LOW
-            else ->
-                throw IllegalArgumentException(priority.toString())
-        }
-        return locationManager.getBestProvider(criteria, true)!!
-         */
-    }
-
-    fun enforceFinePermission() {
-        if (permission != Permission.FINE) {
-            throw SecurityException("missing " + Permission.FINE.string())
-        }
-    }
 
     @CheckResult
     fun noteProxyAppOp(): Int {

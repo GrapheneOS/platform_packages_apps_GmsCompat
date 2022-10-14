@@ -10,9 +10,9 @@ import app.grapheneos.gmscompat.logd
 import app.grapheneos.gmscompat.opModeToString
 import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationRequest
-import java.lang.IllegalStateException
 import java.util.Collections
 import java.util.concurrent.CountDownLatch
+import kotlin.IllegalStateException
 import kotlin.math.max
 import kotlin.math.min
 
@@ -53,20 +53,13 @@ fun gmsPriorityToOsQuality(priority: Int): Int =
             throw IllegalArgumentException()
     }
 
-class OsLocationListener(val client: Client, val provider: String,
+class OsLocationListener(val client: Client, val provider: OsLocationProvider,
                          val request: android.location.LocationRequest,
                          val forwarder: GLocationForwarder
 ) : LocationListener {
     init {
         forwarder.osLocationListener = this
     }
-
-    private val fudger =
-        if (client.permission == Permission.COARSE) {
-            LocationFudger()
-        } else {
-            null
-        }
 
     override fun onLocationChanged(location: Location) {
         onLocationChanged(Collections.singletonList(location))
@@ -84,14 +77,7 @@ class OsLocationListener(val client: Client, val provider: String,
             it.provider = LocationManager.FUSED_PROVIDER
         }
 
-        val locationsToForward =
-        if (fudger != null) {
-            locations.map {
-                fudger.createCoarse(it)
-            }
-        } else {
-            locations
-        }
+        val locationsToForward = locations.map { provider.maybeFudge(it) }
 
         if (Const.DEV
             && false
@@ -126,13 +112,13 @@ class OsLocationListener(val client: Client, val provider: String,
 
     override fun onProviderEnabled(provider: String) {
         logd{provider}
-        check(provider == this.provider)
+        check(provider == this.provider.name)
         onLocationAvailabilityChanged(true)
     }
 
     override fun onProviderDisabled(provider: String) {
         logd{provider}
-        check(provider == this.provider)
+        check(provider == this.provider.name)
         onLocationAvailabilityChanged(false)
     }
 
@@ -143,7 +129,7 @@ class OsLocationListener(val client: Client, val provider: String,
         synchronized(this) {
             flushLatch = l
             try {
-                client.locationManager.requestFlush(provider, this, 0)
+                client.locationManager.requestFlush(provider.name, this, 0)
             } catch (e: IllegalStateException) {
                 // may get thrown if other thread unregisters this listener
                 return
