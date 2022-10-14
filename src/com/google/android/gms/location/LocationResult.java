@@ -21,7 +21,7 @@ public class LocationResult extends SpWriteOnly {
 // SafeParcel code block generated with Spoon | START
     public void writeToParcel(Parcel p, int wtpFlags) {
         final int headerEnd = SafeParcel.beginObjectHeader(p);
-        SafeParcel.writeParcelableInternal(1, this.locations, p, 0);
+        SafeParcel.writeParcelableList(1, this.locations, p, 0);
         SafeParcel.completeObjectHeader(headerEnd, p);
     }
 
