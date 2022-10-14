@@ -722,7 +722,7 @@ public class SafeParcel {
         return res;
     }
 
-    public static <T extends Parcelable> void writeParcelableInternal(int pi, List<T> v, Parcel p, int flags) {
+    public static <T extends Parcelable> void writeParcelableList(int pi, List<T> v, Parcel p, int flags) {
         if (v != null) {
             int phe = beginPropHeader(pi, p);
             int size = v.size();
