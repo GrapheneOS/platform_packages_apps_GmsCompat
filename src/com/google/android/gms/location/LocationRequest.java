@@ -14,6 +14,15 @@ public class LocationRequest extends SpReadOnly {
     public static final int PRIORITY_LOW_POWER = 104;
     public static final int PRIORITY_NO_POWER = 105;
 
+    // https://developers.google.com/android/reference/com/google/android/gms/location/Granularity
+    public static final int GRANULARITY_PERMISSION_LEVEL = 0;
+    public static final int GRANULARITY_COARSE = 1;
+    public static final int GRANULARITY_FINE = 2;
+
+    public static final int THROTTLE_BACKGROUND = 0;
+    public static final int THROTTLE_ALWAYS = 1;
+    public static final int THROTTLE_NEVER = 2;
+
     @Property(1) public int priority;
     @Property(2) public long interval;
     @Property(3) public long minUpdateIntervalMillis;
@@ -23,12 +32,11 @@ public class LocationRequest extends SpReadOnly {
     @Property(8) public long maxUpdateDelayMillis;
     @Property(9) public boolean waitForAccurateLocation;
     @Property(10) public long durationMillis = Long.MAX_VALUE;
-
+    @Property(12) public int granularity = GRANULARITY_PERMISSION_LEVEL;
     /*
     unused for now:
 
     @Property(11) public long maxUpdateAgeMillis = -1L;
-    @Property(12) public int granularity;
     @Property(13) public int throttleBehavior;
     @Property(14) public String moduleId;
     @Property(15) public boolean bypass;
@@ -70,14 +78,17 @@ public class LocationRequest extends SpReadOnly {
                     case 10 :
                         o.durationMillis = SafeParcel.readLong(ph, p);
                         continue;
+                    case 12 :
+                        o.granularity = SafeParcel.readInt(ph, p);
+                        continue;
                     default :
                         SafeParcel.skipProp(ph, p);
                 }
-            } 
+            }
             SafeParcel.checkFullRead(objectEnd, p);
             return o;
         }
-    
+
         public LocationRequest[] newArray(int size) {
             return new LocationRequest[size];
         }
