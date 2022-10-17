@@ -5,6 +5,7 @@ import android.location.Location;
 import android.os.Bundle;
 
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.common.api.internal.IStatusCallback;
 import com.google.android.gms.common.internal.ICancelToken;
 import com.google.android.gms.location.CurrentLocationRequest;
 import com.google.android.gms.location.LastLocationRequest;
@@ -16,7 +17,6 @@ import com.google.android.gms.location.ILocationListener;
 import com.google.android.gms.location.internal.IFusedLocationProviderCallback;
 import com.google.android.gms.location.internal.ILocationStatusCallback;
 import com.google.android.gms.location.internal.ISettingsCallbacks;
-import com.google.android.gms.location.internal.IStatusCallback;
 import com.google.android.gms.location.internal.LocationReceiver;
 import com.google.android.gms.location.internal.LocationRequestInternal;
 import com.google.android.gms.location.internal.LocationRequestUpdateData;

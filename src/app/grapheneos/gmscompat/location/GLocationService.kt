@@ -14,6 +14,7 @@ import android.os.CancellationSignal
 import android.os.RemoteException
 import android.util.SparseArray
 import com.google.android.gms.common.api.Status
+import com.google.android.gms.common.api.internal.IStatusCallback
 import com.google.android.gms.common.internal.ICancelToken
 import com.google.android.gms.location.ILocationCallback
 import com.google.android.gms.location.ILocationListener
@@ -28,7 +29,6 @@ import com.google.android.gms.location.internal.IGoogleLocationManagerService
 import com.google.android.gms.location.internal.ILocationAvailabilityStatusCallback
 import com.google.android.gms.location.internal.ILocationStatusCallback
 import com.google.android.gms.location.internal.ISettingsCallbacks
-import com.google.android.gms.location.internal.IStatusCallback
 import com.google.android.gms.location.internal.LocationRequestUpdateData
 import app.grapheneos.gmscompat.App
 import app.grapheneos.gmscompat.Const
