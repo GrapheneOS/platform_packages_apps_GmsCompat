@@ -1,4 +1,4 @@
-package com.google.android.gms.location.internal;
+package com.google.android.gms.common.api.internal;
 
 import android.location.Location;
 
