@@ -82,6 +82,7 @@ getProfileProxy false
 [android.bluetooth.BluetoothDevice]
 getMetadata default
 setMetadata default
+setSilenceMode default
 
 [android.content.ContentResolver]
 registerContentObserver void
