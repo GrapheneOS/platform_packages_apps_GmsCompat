@@ -26,6 +26,12 @@ FastPairFeature__enable_wearable_service false
 # Likely a regression, newer and older versions of GmsCore don't have this issue.
 # This flag makes it use a deprecated BroadcastReceiver instead.
 MdnsConfigs__use_connectivity_manager_for_wifi_monitor_if_possible false
+# CAST_CONNECTION_NOTIFY dialogs are incompatible with gmscompat code that shows a notification
+# prompt on background activity starts, because startActivity() calls are used for both showing and
+# auto-dismissing them. These dialogs are disabled by default, but were enabled with a PhenotypeFlag
+# update.
+# See https://discuss.grapheneos.org/d/1263-notification-says-google-play-services-needs-to-show-a-screen
+ReceiverControlChannelFeatures__enable_user_accept_dialogs false
 
 [com.google.android.gms.people]
 # controls access to ContactsContract$SimContacts#getSimAccounts()
