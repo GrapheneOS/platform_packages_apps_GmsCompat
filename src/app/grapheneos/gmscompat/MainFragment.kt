@@ -96,7 +96,7 @@ class MainFragment : PreferenceFragmentCompat() {
             screen.addPref().apply {
                 title = getString(R.string.gms_network_location_opt_in)
                 val i = Intent("com.google.android.gms.location.settings.LOCATION_ACCURACY")
-                i.setClassName(PACKAGE_GMS_CORE, "com.google.android.gms.location.settings.LocationAccuracyActivity")
+                i.setClassName(PACKAGE_GMS_CORE, "com.google.android.gms.location.settings.LocationAccuracyV31Activity")
                 intent = freshActivity(i)
             }
 
