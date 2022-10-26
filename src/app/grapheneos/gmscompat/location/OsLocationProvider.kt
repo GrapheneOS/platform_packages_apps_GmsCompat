@@ -6,7 +6,7 @@ import android.location.LocationManager
 import android.location.provider.ProviderProperties
 import com.google.android.gms.location.LocationRequest
 
-class OsLocationProvider(val name: String, val properties: ProviderProperties?, val fudger: LocationFudger?) {
+class OsLocationProvider(val name: String, val properties: ProviderProperties?, val fudger: LocationFudger?, val permission: Permission) {
 
     fun maybeFudge(location: Location): Location {
         if (fudger == null) {
@@ -81,6 +81,10 @@ class OsLocationProvider(val name: String, val properties: ProviderProperties?, 
         fun get(client: Client, name: String, granularity: Int): OsLocationProvider {
             val properties: ProviderProperties? = client.locationManager.getProviderProperties(name)
 
+            // attribute permission usage correctly based on granularity: usage of GRANULARITY_COARSE
+            // by client that has Permission.FINE should pass Permission.COARSE to AppOpsManager
+            var permission = client.permission
+
             val fudger: LocationFudger? = when (client.permission) {
                 Permission.COARSE -> {
                     when (granularity) {
@@ -100,7 +104,8 @@ class OsLocationProvider(val name: String, val properties: ProviderProperties?, 
                 }
                 Permission.FINE -> {
                     when (granularity) {
-                        LocationRequest.GRANULARITY_COARSE ->
+                        LocationRequest.GRANULARITY_COARSE -> {
+                            permission = Permission.COARSE
                             if (properties == null) {
                                 LocationFudger()
                             } else when (properties.accuracy) {
@@ -108,6 +113,7 @@ class OsLocationProvider(val name: String, val properties: ProviderProperties?, 
                                 ProviderProperties.ACCURACY_COARSE -> null
                                 else -> throw IllegalStateException()
                             }
+                        }
                         LocationRequest.GRANULARITY_PERMISSION_LEVEL,
                         LocationRequest.GRANULARITY_FINE ->
                             null
@@ -116,7 +122,7 @@ class OsLocationProvider(val name: String, val properties: ProviderProperties?, 
                 }
             }
 
-            return OsLocationProvider(name, properties, fudger)
+            return OsLocationProvider(name, properties, fudger, permission)
         }
     }
 }
