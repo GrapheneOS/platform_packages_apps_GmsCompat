@@ -66,7 +66,7 @@ class OsLocationListener(val client: Client, val provider: OsLocationProvider,
     }
 
     override fun onLocationChanged(locations: List<Location>) {
-        val opMode = client.noteProxyAppOp()
+        val opMode = client.noteProxyAppOp(provider)
         if (opMode != AppOpsManager.MODE_ALLOWED) {
             logd{"noteProxyAppOp returned ${opModeToString(opMode)}, unregister " + forwarder.listenerKey()}
             forwarder.unregister()

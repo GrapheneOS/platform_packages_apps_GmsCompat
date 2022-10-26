@@ -226,7 +226,7 @@ object GLocationService : IGoogleLocationManagerService.Stub() {
         }
         logd{"client ${client.packageName} contextAttributionTag $contextAttributionTag"}
 
-        val opMode = client.noteProxyAppOp()
+        val opMode = client.noteProxyAppOp(client.permission)
         if (opMode != MODE_ALLOWED) {
             if (Const.DEV) {
                 throw SecurityException("noteProxyAppOp returned ${opModeToString(opMode)}")
@@ -256,7 +256,7 @@ object GLocationService : IGoogleLocationManagerService.Stub() {
         }
 
         if (location != null) {
-            val opMode = client.noteProxyAppOp()
+            val opMode = client.noteProxyAppOp(provider)
             if (opMode != MODE_ALLOWED) {
                 logd{"opMode ${opModeToString(opMode)}"}
                 location = null
@@ -310,7 +310,7 @@ object GLocationService : IGoogleLocationManagerService.Stub() {
             if (origLocation != null) {
                 var location: Location? = provider.maybeFudge(origLocation)
 
-                val opMode = client.noteProxyAppOp()
+                val opMode = client.noteProxyAppOp(provider)
                 if (opMode != MODE_ALLOWED) {
                     logd{"${client.packageName} opMode ${opModeToString(opMode)}"}
                     // GmsCore returns Status.SUCCESS even in this case
