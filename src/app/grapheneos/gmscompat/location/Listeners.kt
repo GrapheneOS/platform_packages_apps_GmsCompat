@@ -34,7 +34,7 @@ fun Listeners.update(client: Client, key: Any, listener: OsLocationListener) {
             throw e.cause!!
         }
         if (size == 0) {
-            val opMode = client.startMonitorAppOp()
+            val opMode = client.startMonitorAppOp(listener.provider)
             if (opMode != AppOpsManager.MODE_ALLOWED) {
                 throw SecurityException("startMonitorAppOp returned " + opModeToString(opMode))
             }
@@ -76,12 +76,13 @@ fun Listeners.remove(client: Client, key: Any) {
         if (idx < 0) {
             return
         }
-        removeInternal(valueAt(idx))
+        val listener = valueAt(idx)
+        removeInternal(listener)
         removeAt(idx)
         logd{"client ${client.packageName} removed listener $key, listenerCount $size"}
 
         if (size == 0) {
-            client.finishMonitorAppOp()
+            client.finishMonitorAppOp(listener.provider)
             gc = true
         }
     }

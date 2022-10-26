@@ -62,17 +62,22 @@ class Client(val gls: GLocationService, unverifiedPackageName: String? = null, v
     }
 
     @CheckResult
-    fun noteProxyAppOp(): Int {
+    fun noteProxyAppOp(permission: Permission): Int {
         return gls.appOpsManager.noteProxyOpNoThrow(permission.appOp(), packageName, uid, attributionTag, appOpsReasonMessage)
     }
 
     @CheckResult
-    fun startMonitorAppOp(): Int {
-        return gls.appOpsManager.startProxyOpNoThrow(permission.monitorAppOp(), uid, packageName, attributionTag, appOpsReasonMessage)
+    fun noteProxyAppOp(provider: OsLocationProvider): Int {
+        return noteProxyAppOp(provider.permission)
     }
 
-    fun finishMonitorAppOp() {
-        gls.appOpsManager.finishProxyOp(permission.monitorAppOp(), uid, packageName, attributionTag)
+    @CheckResult
+    fun startMonitorAppOp(provider: OsLocationProvider): Int {
+        return gls.appOpsManager.startProxyOpNoThrow(provider.permission.monitorAppOp(), uid, packageName, attributionTag, appOpsReasonMessage)
+    }
+
+    fun finishMonitorAppOp(provider: OsLocationProvider) {
+        gls.appOpsManager.finishProxyOp(provider.permission.monitorAppOp(), uid, packageName, attributionTag)
     }
 }
 
