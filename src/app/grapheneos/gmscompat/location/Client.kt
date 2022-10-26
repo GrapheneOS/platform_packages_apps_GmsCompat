@@ -57,6 +57,10 @@ class Client(val gls: GLocationService, unverifiedPackageName: String? = null, v
 
     val locationManager = ctx.getSystemService(LocationManager::class.java)!!
 
+    fun earlyRejectCheck(permission: Permission): Int {
+        return GLocationService.appOpsManager.unsafeCheckOp(permission.appOp(), uid, packageName)
+    }
+
     @CheckResult
     fun noteProxyAppOp(): Int {
         return gls.appOpsManager.noteProxyOpNoThrow(permission.appOp(), packageName, uid, attributionTag, appOpsReasonMessage)
