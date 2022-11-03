@@ -129,6 +129,9 @@ disable false
 [android.os.DropBoxManager]
 getNextEntry null
 
+[android.os.UserManager]
+getUserName String Owner
+
 [android.telecom.TelecomManager]
 getAllPhoneAccountHandles emptyList
 
