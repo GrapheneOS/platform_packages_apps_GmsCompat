@@ -94,6 +94,8 @@ getAddress String 02:00:00:00:00:00
 listenUsingInsecureL2capChannel throw java.io.IOException
 disable false
 getProfileProxy false
+registerBluetoothConnectionCallback default
+unregisterBluetoothConnectionCallback default
 
 [android.bluetooth.BluetoothDevice]
 getMetadata default
