@@ -120,8 +120,15 @@ public class PersistentFgService extends Service {
         }
 
         if (latch == null) {
-            // returning START_STICKY guarantees that intent will be delivered at most once
-            throw new IllegalStateException("latch == null, UUID " + uuid);
+            // Returning START_STICKY guarantees that intent will be delivered at most once, but
+            // if our process is killed before the service is started (eg due to an out-of-memory
+            // condition, or due to an OS bug), then the process will be recreated, which means
+            // that pendingLatches map contents will be lost.
+            // Caller that waited on this latch is guaranteed to exit in this case: transaction to
+            // our process would have failed because of previous process death, see
+            // GmsCompatApp#connect method
+            Log.d(TAG, "latch == null, UUID " + uuid);
+            return;
         }
 
         if (res) {
