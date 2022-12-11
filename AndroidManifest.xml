@@ -41,19 +41,11 @@
             tools:ignore="ExportedContentProvider"
         />
 
-        <provider
-            android:name=".PrefsProvider"
-            android:authorities="${applicationId}.PrefsProvider"
-            android:exported="false"
-            android:directBootAware="true"
-        />
-
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleInstance"
             android:theme="@style/Theme.SubSettingsBase"
-            android:process=":ui"
             android:permission="app.grapheneos.gmscompat.SHOW_UI"
             android:label="@string/activity_name"
         >

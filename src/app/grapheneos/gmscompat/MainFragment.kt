@@ -59,10 +59,10 @@ class MainFragment : PreferenceFragmentCompat() {
             SwitchPreference(ctx).apply {
                 title = getString(R.string.reroute_location_requests_to_os_apis)
                 isSingleLineTitle = false
-                isChecked = PrefsProvider.isRedirectionEnabled(Redirections.ID_GoogleLocationManagerService)
+                isChecked = Redirections.isEnabled(Redirections.ID_GoogleLocationManagerService)
                 setOnPreferenceChangeListener { _, value ->
                     val redirectionEnabled = value as Boolean
-                    PrefsProvider.setRedirectionState(
+                    Redirections.setState(
                         Redirections.ID_GoogleLocationManagerService,
                         redirectionEnabled
                     )
@@ -158,7 +158,7 @@ class MainFragment : PreferenceFragmentCompat() {
         var addAlwaysOnScanningSettingsButton = false
         var addSelfSettingsButton = false
 
-        if (PrefsProvider.isRedirectionEnabled(Redirections.ID_GoogleLocationManagerService)) {
+        if (Redirections.isEnabled(Redirections.ID_GoogleLocationManagerService)) {
             if (ctx.checkSelfPermission(permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 sb.separator()
                 sb.append(getString(R.string.missing_location_permission, ctx.packageManager.backgroundPermissionOptionLabel))
