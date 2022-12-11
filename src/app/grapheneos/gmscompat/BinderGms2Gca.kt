@@ -119,7 +119,11 @@ object BinderGms2Gca : IGms2Gca.Stub() {
         return null
     }
 
-    fun updateConfig(config: GmsCompatConfig) {
+    fun parseAndUpdateConfig() {
+        updateConfig(GmsCompatConfigParser.exec(App.ctx()))
+    }
+
+    private fun updateConfig(config: GmsCompatConfig) {
         this.config = config
 
         snapshotBoundProcessses().forEach {
