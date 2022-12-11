@@ -16,6 +16,7 @@ import android.os.SystemClock
 import android.provider.Settings
 import android.util.ArrayMap
 import android.util.Log
+import app.grapheneos.gmscompat.GmsCompatConfigParser.configHolderInfo
 import com.android.internal.gmscompat.GmsCompatConfig
 import com.android.internal.gmscompat.GmsHooks
 import com.android.internal.gmscompat.GmsInfo
@@ -44,6 +45,16 @@ object BinderGms2Gca : IGms2Gca.Stub() {
             throw e
         }
         PersistentFgService.start(pkg, processName);
+
+        // Config holder update event might be delivered after GMS process starts if both
+        // GMS component and GmsCompatConfig holder are updated together, atomically.
+        // This would lead to crashes or errors if the new version of GMS component
+        // (most llkely GmsCore) depends on the updated GmsCompatConfig.
+        val ctx = App.ctx()
+        if (config.version != configHolderInfo(ctx).longVersionCode) {
+            config = GmsCompatConfigParser.exec(ctx)
+        }
+
         return config
     }
 
