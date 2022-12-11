@@ -167,3 +167,8 @@ isIccLockEnabled false
 getGroupIdLevel1 nullString
 unregisterTelephonyCallback void
 getServiceState null
+
+[[versionMap]]
+# section name is gmscompat version, section contents are max supported versions of GmsCore and Play Store
+[1000]
+224517999 83321299
