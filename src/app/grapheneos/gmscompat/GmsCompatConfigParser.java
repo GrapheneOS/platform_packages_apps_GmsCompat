@@ -106,6 +106,9 @@ public class GmsCompatConfigParser {
 
         final int SECTION_FLAGS = 0;
         final int SECTION_STUBS = 1;
+        final int SECTION_VERSION_MAP = 2;
+
+        final long selfVersionCode = App.ctx().getApplicationInfo().longVersionCode;
 
         sectionL2Loop: // level-2 section
         for (;;) {
@@ -129,7 +132,10 @@ public class GmsCompatConfigParser {
                 section2Type = SECTION_FLAGS;
             } else if ("stubs".equals(sectionL2)) {
                 section2Type = SECTION_STUBS;
-            } else {
+            } else if ("versionMap".equals(sectionL2)) {
+                section2Type = SECTION_VERSION_MAP;
+            }
+            else {
                 invalidLine(line);
                 return;
             }
@@ -152,6 +158,7 @@ public class GmsCompatConfigParser {
 
                 ArrayMap<String, GmsFlag> packageFlags = null;
                 ArrayMap<String, StubDef> classStubs = null;
+                long versionMapTargetVersion = 0L;
 
                 if (section2Type == SECTION_FLAGS) {
                     String ns = sectionL1;
@@ -165,6 +172,8 @@ public class GmsCompatConfigParser {
                     String className = sectionL1;
                     classStubs = new ArrayMap<>();
                     res.stubs.put(className, classStubs);
+                } else if (section2Type == SECTION_VERSION_MAP) {
+                    versionMapTargetVersion = Long.parseLong(sectionL1);
                 }
 
                 sectionL0Loop:
@@ -214,6 +223,11 @@ public class GmsCompatConfigParser {
 
                         if (stub != null) {
                             classStubs.put(methodName, stub);
+                        }
+                    } else if (section2Type == SECTION_VERSION_MAP) {
+                        if (versionMapTargetVersion == selfVersionCode) {
+                            res.maxGmsCoreVersion = Long.parseLong(lineParser.next());
+                            res.maxPlayStoreVersion = Long.parseLong(lineParser.next());
                         }
                     }
                 }
