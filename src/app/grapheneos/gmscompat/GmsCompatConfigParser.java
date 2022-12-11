@@ -58,6 +58,19 @@ public class GmsCompatConfigParser {
         }
     }
 
+    public static ApplicationInfo configHolderInfo(Context ctx) throws PackageManager.NameNotFoundException {
+        var flags = PackageManager.ApplicationInfoFlags.of(0L);
+        PackageManager pm = ctx.getPackageManager();
+        if (Build.isDebuggable()) {
+            try {
+                return pm.getApplicationInfo(ConfigUpdateReceiver.CONFIG_HOLDER_PACKAGE_DEV, flags);
+            } catch (PackageManager.NameNotFoundException e) {
+                // fallthrouugh
+            }
+        }
+        return pm.getApplicationInfo(ConfigUpdateReceiver.CONFIG_HOLDER_PACKAGE, flags);
+    }
+
     private static GmsCompatConfig execInner(Context ctx, String pkg) throws PackageManager.NameNotFoundException, IOException {
         ApplicationInfo appInfo = ctx.getPackageManager()
                 .getApplicationInfo(pkg, PackageManager.ApplicationInfoFlags.of(0));
