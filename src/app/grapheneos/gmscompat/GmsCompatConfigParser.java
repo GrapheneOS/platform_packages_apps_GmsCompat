@@ -38,9 +38,7 @@ public class GmsCompatConfigParser {
         if (Build.isDebuggable()) {
             try {
                 GmsCompatConfig res = execInner(ctx, ConfigUpdateReceiver.CONFIG_HOLDER_PACKAGE_DEV);
-                // override version to remove the need to update it manually during testing
-                res.version = System.currentTimeMillis();
-                return res;
+                return Objects.requireNonNull(res);
             } catch (PackageManager.NameNotFoundException e) {
                 // fallthrough
             } catch (IOException e) {
