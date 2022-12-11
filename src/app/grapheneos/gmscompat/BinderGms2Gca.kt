@@ -136,13 +136,16 @@ object BinderGms2Gca : IGms2Gca.Stub() {
             try {
                 p.invalidateConfigCaches()
                 invalidated = true
-            } catch (e: DeadObjectException) {
+            } catch (e: Throwable) {
+                // DeadObjectException if GmsCore racily died, or another exception if actual invalidation
+                // failed. This may happen when GSF is being updated, which causes
+                // invalidation of Gservices to throw due to GSF being frozen during update
                 logd{e}
             }
         }
 
         if (!invalidated) {
-            logd{"persistent GmsCore process not found, restarting to apply config update"}
+            logd{"unable to invalidate config caches, restarting to apply config update"}
             // all bound GMS processes will exit too
             System.exit(0)
         }
