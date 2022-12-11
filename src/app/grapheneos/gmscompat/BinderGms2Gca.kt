@@ -272,9 +272,10 @@ object BinderGms2Gca : IGms2Gca.Stub() {
         if (checkForConfigUpdate) {
             val cr = ctx.contentResolver
             val authority = "app.grapheneos.apps.RpcProvider"
-            val method = "gmscompat_config_update_check"
+            val method = "update_package"
+            val pkgName = ConfigUpdateReceiver.CONFIG_HOLDER_PACKAGE
             try {
-                cr.call(authority, method, null, null)
+                cr.call(authority, method, pkgName, null)
             } catch (e: Exception) {
                 Log.d("UncaughtExceptionInGms", "unable to call " + authority, e)
             }
