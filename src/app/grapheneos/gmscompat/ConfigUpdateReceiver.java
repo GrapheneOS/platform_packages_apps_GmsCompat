@@ -30,7 +30,6 @@ public class ConfigUpdateReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d("ConfigUpdateReceiver", "" + intent + " | uri: " + intent.getData());
-        GmsCompatConfig newConfig = GmsCompatConfigParser.exec(App.ctx());
-        BinderGms2Gca.INSTANCE.updateConfig(newConfig);
+        BinderGms2Gca.INSTANCE.parseAndUpdateConfig();
     }
 }

@@ -11,6 +11,7 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.android.internal.gmscompat.GmsCompatConfig;
+import com.android.internal.gmscompat.GmsInfo;
 import com.android.internal.gmscompat.flags.GmsFlag;
 import com.android.internal.gmscompat.StubDef;
 
@@ -20,9 +21,11 @@ import java.io.InvalidObjectException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -94,6 +97,17 @@ public class GmsCompatConfigParser {
             }
         }
         res.version = version;
+        {
+            String key = App.MainProcessPrefs.GMS_PACKAGES_ALLOWED_TO_UPDATE_TO_UNKNOWN_VERSIONS;
+            Set<String> set = App.preferences().getStringSet(key, Collections.emptySet());
+
+            if (set.contains(GmsInfo.PACKAGE_GMS_CORE)) {
+                res.maxGmsCoreVersion = Long.MAX_VALUE;
+            }
+            if (set.contains(GmsInfo.PACKAGE_PLAY_STORE)) {
+                res.maxPlayStoreVersion = Long.MAX_VALUE;
+            }
+        }
         return res;
     }
 

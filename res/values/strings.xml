@@ -83,4 +83,12 @@ To receive them quicker, set “Battery usage“ to “Unrestricted“ in Play s
     <string name="notif_contacts_sync_prompt">
 "To sync contacts from a Google account, Play services needs the Contacts permission. Tap to open settings."
     </string>
+
+    <string name="menu_item_configure_play_store_updates">Configure Play Store updates</string>
+    <string name="msg_allow_updates_to_unknown_versions_by_play_store">
+"Select which components of sandboxed Google Play are allowed to be updated to unknown versions by the Play Store.
+
+Warning:
+Update to an unknown version may cause crashes and errors in sandboxed Google Play."
+    </string>
 </resources>
