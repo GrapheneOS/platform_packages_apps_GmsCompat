@@ -68,5 +68,8 @@ public class App extends Application {
         String INITED_REDIRECTIONS = "inited_redirections";
         String GmsCore_POWER_EXEMPTION_PROMPT_DISMISSED = "GmsCore_power_exemption_prompt_dismissed";
         String NOTIFICATION_DO_NOT_SHOW_AGAIN_PREFIX = "do_not_show_notification_";
+
+        // set of package names of core GMS components that Play Store to allowed to update to unknown versions
+        String GMS_PACKAGES_ALLOWED_TO_UPDATE_TO_UNKNOWN_VERSIONS = "gms_packages_allowed_to_update_to_unknown_versions";
     }
 }

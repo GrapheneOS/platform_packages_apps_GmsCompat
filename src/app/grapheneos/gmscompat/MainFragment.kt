@@ -10,7 +10,14 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
+import android.widget.CheckBox
+import android.widget.LinearLayout
+import android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+import android.widget.TextView
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
@@ -21,11 +28,14 @@ import com.android.internal.gmscompat.GmsInfo.PACKAGE_GMS_CORE
 import com.android.internal.gmscompat.GmsInfo.PACKAGE_PLAY_STORE
 import java.lang.Exception
 import java.lang.StringBuilder
+import java.util.Collections
 
 class MainFragment : PreferenceFragmentCompat() {
     lateinit var potentialIssuesCategory: PreferenceCategory
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        setHasOptionsMenu(true)
+
         val ctx = preferenceManager.context
         val screen = preferenceManager.createPreferenceScreen(ctx)
 
@@ -274,6 +284,79 @@ class MainFragment : PreferenceFragmentCompat() {
 
     fun startFreshActivity(intent: Intent) {
         startActivity(freshActivity(intent))
+    }
+
+    private lateinit var menuItemConfigurePlayStoreUpdates: MenuItem
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        menuItemConfigurePlayStoreUpdates = menu.add(R.string.menu_item_configure_play_store_updates);
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item) {
+            menuItemConfigurePlayStoreUpdates -> {
+                showConfigurePlayStoreUpdatesDialog()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun showConfigurePlayStoreUpdatesDialog() {
+        val ctx = requireContext()
+
+        val textSizeSp = 16f
+
+        val txt = TextView(ctx, null, R.style.TextAppearance_Material3_TitleMedium)
+        txt.setTextSize(textSizeSp)
+        txt.setText(R.string.msg_allow_updates_to_unknown_versions_by_play_store)
+
+        val layout = LinearLayout(ctx).apply {
+            orientation = LinearLayout.VERTICAL
+            addView(txt)
+        }
+
+        val pad = txt.getTextSize().toInt()
+        layout.setPadding(pad, pad, pad, pad)
+
+        val key = App.MainProcessPrefs.GMS_PACKAGES_ALLOWED_TO_UPDATE_TO_UNKNOWN_VERSIONS
+
+        val initialSet = App.preferences().getStringSet(key, Collections.emptySet())!!
+
+        arrayOf(
+            Pair(PACKAGE_GMS_CORE, R.string.play_services),
+            Pair(PACKAGE_PLAY_STORE, R.string.play_store),
+        ).forEachIndexed { idx, pair ->
+            CheckBox(ctx).let {
+                val pkgName = pair.first
+                it.isChecked = initialSet.contains(pkgName)
+                it.setText(pair.second)
+                it.setTextSize(textSizeSp)
+
+                it.setOnCheckedChangeListener { _, isChecked ->
+                    val curSet = App.preferences().getStringSet(key, Collections.emptySet())!!.toMutableSet()
+                    if (isChecked) {
+                        curSet.add(pkgName)
+                    } else {
+                        curSet.remove(pkgName)
+                    }
+                    App.preferences().edit().let {
+                        it.putStringSet(key, curSet)
+                        it.apply()
+                    }
+                    BinderGms2Gca.parseAndUpdateConfig()
+                }
+
+                val lp = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
+                lp.topMargin = pad
+                layout.addView(it, lp)
+            }
+        }
+
+        AlertDialog.Builder(ctx).run {
+            setView(layout)
+            show()
+        }
     }
 }
 
