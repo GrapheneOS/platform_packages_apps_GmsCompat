@@ -320,7 +320,7 @@ class MainFragment : PreferenceFragmentCompat() {
 
         val textSizeSp = 16f
 
-        val txt = TextView(ctx, null, R.style.TextAppearance_Material3_TitleMedium)
+        val txt = TextView(ctx, null, R.style.Base_TextAppearance_AppCompat_Medium)
         txt.setTextSize(textSizeSp)
         txt.setText(R.string.msg_allow_updates_to_unknown_versions_by_play_store)
 
@@ -339,7 +339,7 @@ class MainFragment : PreferenceFragmentCompat() {
         arrayOf(
             Pair(PACKAGE_GMS_CORE, R.string.play_services),
             Pair(PACKAGE_PLAY_STORE, R.string.play_store),
-        ).forEachIndexed { idx, pair ->
+        ).forEach { pair ->
             CheckBox(ctx).let {
                 val pkgName = pair.first
                 it.isChecked = initialSet.contains(pkgName)

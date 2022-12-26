@@ -130,7 +130,7 @@ fun appHasPermission(pkg: String, perm: String): Boolean {
 
 fun isPkgInstalled(pkg: String): Boolean {
     try {
-        App.ctx().packageManager.getPackageInfo(pkg, PackageManager.PackageInfoFlags.of(0))
+        App.ctx().packageManager.getPackageInfo(pkg, 0)
         return true
     } catch (e: PackageManager.NameNotFoundException) {
         return false
