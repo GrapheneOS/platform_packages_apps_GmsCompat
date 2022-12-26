@@ -172,3 +172,14 @@ getServiceState null
 # section name is gmscompat version, section contents are max supported versions of GmsCore and Play Store
 [1000]
 224517999 83321299
+
+[[stubs_12.1]]
+
+[android.bluetooth.BluetoothDevice]
+getMetadata null
+setMetadata false
+setSilenceMode false
+
+[android.bluetooth.BluetoothAdapter]
+registerBluetoothConnectionCallback false
+unregisterBluetoothConnectionCallback false
