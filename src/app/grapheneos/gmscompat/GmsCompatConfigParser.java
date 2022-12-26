@@ -32,7 +32,7 @@ import java.util.zip.ZipFile;
 public class GmsCompatConfigParser {
     private static final String TAG = "GmsCompatConfigParser";
 
-    private final boolean strict = Build.isDebuggable();
+    private final boolean strict = Build.isDebuggable() && Build.VERSION.SDK_INT >= 33;
     private boolean invalid;
 
     private GmsCompatConfigParser() {}
@@ -141,6 +141,8 @@ public class GmsCompatConfigParser {
             }
             line = lines.get(lineIdx++);
 
+            boolean skipStubs = false;
+
             int section2Type;
             if ("flags".equals(sectionL2)) {
                 section2Type = SECTION_FLAGS;
@@ -148,6 +150,9 @@ public class GmsCompatConfigParser {
                 section2Type = SECTION_STUBS;
             } else if ("versionMap".equals(sectionL2)) {
                 section2Type = SECTION_VERSION_MAP;
+            } else if ("stubs_12.1".equals(sectionL2)) {
+                section2Type = SECTION_STUBS;
+                skipStubs = Build.VERSION.SDK_INT >= 33;
             }
             else {
                 invalidLine(line);
@@ -184,8 +189,10 @@ public class GmsCompatConfigParser {
                     }
                 } else if (section2Type == SECTION_STUBS) {
                     String className = sectionL1;
-                    classStubs = new ArrayMap<>();
-                    res.stubs.put(className, classStubs);
+                    if (!skipStubs) {
+                        classStubs = new ArrayMap<>();
+                        res.stubs.put(className, classStubs);
+                    }
                 } else if (section2Type == SECTION_VERSION_MAP) {
                     versionMapTargetVersion = Long.parseLong(sectionL1);
                 }
@@ -225,7 +232,7 @@ public class GmsCompatConfigParser {
 
                         StubDef stub = parseStubDef(lineParser);
 
-                        if (strict) {
+                        if (strict && !skipStubs) {
                             String className = sectionL1;
                             try {
                                 checkStubDef(className, methodName, stub);
@@ -235,7 +242,7 @@ public class GmsCompatConfigParser {
                             }
                         }
 
-                        if (stub != null) {
+                        if (stub != null && !skipStubs) {
                             classStubs.put(methodName, stub);
                         }
                     } else if (section2Type == SECTION_VERSION_MAP) {
