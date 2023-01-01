@@ -21,6 +21,8 @@ public class ConfigUpdateReceiver extends BroadcastReceiver {
         filter.addDataSchemeSpecificPart(CONFIG_HOLDER_PACKAGE, PATTERN_LITERAL);
 
         if (Build.isDebuggable()) {
+            filter.addAction(Intent.ACTION_PACKAGE_ADDED);
+            filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
             filter.addDataSchemeSpecificPart(CONFIG_HOLDER_PACKAGE_DEV, PATTERN_LITERAL);
         }
 
