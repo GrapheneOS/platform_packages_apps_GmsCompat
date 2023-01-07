@@ -9,8 +9,11 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.IContentObserver
 import android.net.Uri
+import android.os.Bundle
 import android.os.DeadObjectException
+import android.os.Handler
 import android.os.IBinder
+import android.os.Messenger
 import android.os.RemoteException
 import android.os.SystemClock
 import android.provider.Settings
@@ -241,6 +244,7 @@ object BinderGms2Gca : IGms2Gca.Stub() {
     }
 
     override fun onUncaughtException(aer: ApplicationErrorReport) {
+        val TAG = "onGmsUncaughtException"
         val ts = SystemClock.elapsedRealtime()
         val stackTrace = aer.crashInfo.stackTrace
 
@@ -278,16 +282,44 @@ object BinderGms2Gca : IGms2Gca.Stub() {
             val authority = "app.grapheneos.apps.RpcProvider"
             val method = "update_package"
             val pkgName = ConfigUpdateReceiver.CONFIG_HOLDER_PACKAGE
+
+            val handler = Handler(ctx.mainLooper) { msg ->
+                val configUpdated = msg.arg1 != 0
+                Log.d(TAG, "callback from Apps: configUpdated: $configUpdated")
+                if (configUpdated && showNotification) {
+                    Log.d(TAG, "suppressed notification for crash that happened when config was out-of-date")
+                    return@Handler true
+                }
+                if (showNotification) {
+                    showGmsCrashNotification(aer)
+                }
+                return@Handler true
+            }
+
+            val callback = Messenger(handler)
+            val extras = Bundle().apply {
+                putParcelable("callback", callback)
+            }
+
             try {
-                cr.call(authority, method, pkgName, null)
+                cr.call(authority, method, pkgName, extras)
             } catch (e: Exception) {
                 Log.d("UncaughtExceptionInGms", "unable to call " + authority, e)
             }
+
+            if (showNotification) {
+                Log.d(TAG, "delaying notification until callback from Apps")
+                return
+            }
         }
 
-        if (!showNotification) {
-            return
+        if (showNotification) {
+            showGmsCrashNotification(aer)
         }
+    }
+
+    fun showGmsCrashNotification(aer: ApplicationErrorReport) {
+        val ctx = App.ctx()
 
         val intent = Intent(Intent.ACTION_APP_ERROR)
         intent.putExtra(Intent.EXTRA_BUG_REPORT, aer)
@@ -303,7 +335,7 @@ object BinderGms2Gca : IGms2Gca.Stub() {
             Notification.Action.Builder(null, label, activityPendingIntent(urlIntent)).build()
         }
 
-        Notifications.builder(Notifications.CH_GMS_CRASHED).apply {
+        Notifications.builder(Notifications.CH_GMS_CRASHED).run {
             setContentTitle(ctx.getText(R.string.notif_gms_crash_title))
             setContentText(ctx.getText(R.string.notif_gms_crash_text))
             setContentIntent(activityPendingIntent(intent))
@@ -311,7 +343,8 @@ object BinderGms2Gca : IGms2Gca.Stub() {
             setAutoCancel(true)
             setSmallIcon(R.drawable.ic_crash_report)
             addAction(reportAction)
-        }.show(Notifications.generateUniqueNotificationId())
+            show(Notifications.generateUniqueNotificationId())
+        }
     }
 
     private var prevUeNotifStackTraceId: String? = null
