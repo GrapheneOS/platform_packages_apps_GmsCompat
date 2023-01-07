@@ -28,7 +28,9 @@ import com.android.internal.gmscompat.IGca2Gms
 import com.android.internal.gmscompat.IGms2Gca
 import com.android.internal.gmscompat.dynamite.server.IFileProxyService
 import java.util.*
+import java.util.concurrent.SynchronousQueue
 import java.util.concurrent.TimeUnit
+import java.util.function.Consumer
 
 object BinderGms2Gca : IGms2Gca.Stub() {
     private val boundProcesses = ArrayMap<IGca2Gms, String>(10)
@@ -275,36 +277,16 @@ object BinderGms2Gca : IGms2Gca.Stub() {
             }
         }
 
-        val ctx = App.ctx()
-
         if (checkForConfigUpdate) {
-            val cr = ctx.contentResolver
-            val authority = "app.grapheneos.apps.RpcProvider"
-            val method = "update_package"
-            val pkgName = ConfigUpdateReceiver.CONFIG_HOLDER_PACKAGE
-
-            val handler = Handler(ctx.mainLooper) { msg ->
-                val configUpdated = msg.arg1 != 0
+            requestConfigUpdate{ configUpdated ->
                 Log.d(TAG, "callback from Apps: configUpdated: $configUpdated")
                 if (configUpdated && showNotification) {
                     Log.d(TAG, "suppressed notification for crash that happened when config was out-of-date")
-                    return@Handler true
+                    return@requestConfigUpdate
                 }
                 if (showNotification) {
                     showGmsCrashNotification(aer)
                 }
-                return@Handler true
-            }
-
-            val callback = Messenger(handler)
-            val extras = Bundle().apply {
-                putParcelable("callback", callback)
-            }
-
-            try {
-                cr.call(authority, method, pkgName, extras)
-            } catch (e: Exception) {
-                Log.d("UncaughtExceptionInGms", "unable to call " + authority, e)
             }
 
             if (showNotification) {
@@ -315,6 +297,52 @@ object BinderGms2Gca : IGms2Gca.Stub() {
 
         if (showNotification) {
             showGmsCrashNotification(aer)
+        }
+    }
+
+    override fun requestConfigUpdate(reason: String): GmsCompatConfig {
+        val TAG = "requestConfigUpdate"
+        Log.d(TAG, "reason: $reason")
+
+        val sq = SynchronousQueue<Boolean>()
+        requestConfigUpdate { configUpdated ->
+            sq.put(configUpdated)
+        }
+        // block until request completes
+        val configUpdated = sq.take()
+        Log.d(TAG, "configUpdated: $configUpdated")
+
+        // Config update (if it happened) will be broadcast to all bound GMS apps,
+        // but that may happen after return of this method, there's no ordering guarantee.
+        // Return config directly to avoid this race condition.
+        return GmsCompatConfigParser.exec(App.ctx())
+    }
+
+    private fun requestConfigUpdate(configUpdateCallback: Consumer<Boolean>) {
+        val ctx = App.ctx()
+        val cr = ctx.contentResolver
+        val authority = "app.grapheneos.apps.RpcProvider"
+        val method = "update_package"
+        val pkgName = ConfigUpdateReceiver.CONFIG_HOLDER_PACKAGE
+
+        // otherwise synchronous waiting for callback would deadlock
+        check(Thread.currentThread() !== App.mainThread())
+
+        val handler = Handler(ctx.mainLooper) { msg ->
+            val configUpdated = msg.arg1 != 0
+            configUpdateCallback.accept(configUpdated)
+            return@Handler true
+        }
+
+        val callback = Messenger(handler)
+        val extras = Bundle().apply {
+            putParcelable("callback", callback)
+        }
+
+        try {
+            cr.call(authority, method, pkgName, extras)
+        } catch (e: Exception) {
+            Log.d("requestConfigUpdate", "unable to call " + authority, e)
         }
     }
 
