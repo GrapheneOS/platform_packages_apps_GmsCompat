@@ -26,9 +26,11 @@ import androidx.preference.SwitchPreference
 import com.android.internal.gmscompat.GmsCompatApp
 import com.android.internal.gmscompat.GmsInfo.PACKAGE_GMS_CORE
 import com.android.internal.gmscompat.GmsInfo.PACKAGE_PLAY_STORE
-import java.lang.Exception
 import java.lang.StringBuilder
 import java.util.Collections
+import java.util.concurrent.Executors
+
+private val bgExecutor = Executors.newSingleThreadExecutor()
 
 class MainFragment : PreferenceFragmentCompat() {
     lateinit var potentialIssuesCategory: PreferenceCategory
@@ -115,17 +117,28 @@ class MainFragment : PreferenceFragmentCompat() {
 
         potentialIssuesCategory = PreferenceCategory(ctx).apply {
             title = getString(R.string.potential_issues)
+            isVisible = false
             screen.addPreference(this)
         }
         preferenceScreen = screen
     }
 
     private fun updatePotentialIssues() {
+        val ctx: Context = requireContext()
+        bgExecutor.execute {
+            val geolocationIssues = geolocationIssues(ctx)
+
+            ctx.mainExecutor.execute {
+                updatePotentialIssuesInner(geolocationIssues)
+            }
+        }
+    }
+
+    private fun updatePotentialIssuesInner(locationIssues: AlertDialog.Builder?) {
         val cat = potentialIssuesCategory
         cat.removeAll()
         val ctx = cat.context
 
-        val locationIssues = geolocationIssues(ctx)
         if (locationIssues != null) {
             cat.addDialogPref(locationIssues).apply {
                 title = getString(R.string.geolocation)
