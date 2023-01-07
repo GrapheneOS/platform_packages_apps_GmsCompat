@@ -139,7 +139,6 @@ public class GmsCompatConfigParser {
                     return;
                 }
             }
-            line = lines.get(lineIdx++);
 
             boolean skipStubs = false;
 
@@ -158,6 +157,8 @@ public class GmsCompatConfigParser {
                 invalidLine(line);
                 return;
             }
+
+            line = lines.get(lineIdx++);
 
             sectionL1Loop: // level-1 section
             for (;;) {
