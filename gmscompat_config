@@ -114,6 +114,7 @@ getPorts emptyList
 [android.location.LocationManager]
 setExtraLocationControllerPackage void
 setExtraLocationControllerPackageEnabled void
+registerGnssStatusCallback false
 
 [android.media.AudioManager]
 muteAwaitConnection void
