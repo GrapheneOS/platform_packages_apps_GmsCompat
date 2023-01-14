@@ -1,0 +1,12 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: daily
+    target-branch: "13"
+  - package-ecosystem: gradle
+    directory: "/config-holder"
+    schedule:
+      interval: daily
+    target-branch: "13"
