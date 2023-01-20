@@ -39,6 +39,6 @@ interface IGoogleLocationManagerService {
     void registerLocationReceiver(in LocationReceiver receiver, in LocationRequest request, IStatusCallback callback) = 87;
     void unregisterLocationReceiver(in LocationReceiver receiver, IStatusCallback callback) = 88;
 
-    @nullable ICancelToken getCurrentLocation(in CurrentLocationRequest request, ILocationStatusCallback callback) = 86;
-    @nullable ICancelToken getCurrentLocation2(in CurrentLocationRequest request, in LocationReceiver receiver) = 91;
+    ICancelToken getCurrentLocation(in CurrentLocationRequest request, ILocationStatusCallback callback) = 86;
+    ICancelToken getCurrentLocation2(in CurrentLocationRequest request, in LocationReceiver receiver) = 91;
 }

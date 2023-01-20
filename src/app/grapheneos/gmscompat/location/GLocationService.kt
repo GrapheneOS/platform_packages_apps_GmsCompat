@@ -283,7 +283,7 @@ object GLocationService : IGoogleLocationManagerService.Stub() {
         return getLastLocation3(null)
     }
 
-    override fun getCurrentLocation(request: CurrentLocationRequest, callback: ILocationStatusCallback): ICancelToken? {
+    override fun getCurrentLocation(request: CurrentLocationRequest, callback: ILocationStatusCallback): ICancelToken {
         val client = Client(this)
 
         val earlyRejectCheck = client.earlyRejectCheck(client.permission)
@@ -291,7 +291,9 @@ object GLocationService : IGoogleLocationManagerService.Stub() {
             logd{client.packageName + " earlyRejectCheck returned ${opModeToString(earlyRejectCheck)}"}
             // GmsCore returns Status.SUCCESS too
             callback.onResult(Status.SUCCESS, null)
-            return null
+            return object : ICancelToken.Stub() {
+                override fun cancel() {}
+            }
         }
 
         logd{client.packageName}
@@ -344,7 +346,7 @@ object GLocationService : IGoogleLocationManagerService.Stub() {
         }
     }
 
-    override fun getCurrentLocation2(request: CurrentLocationRequest, receiver: LocationReceiver): ICancelToken? {
+    override fun getCurrentLocation2(request: CurrentLocationRequest, receiver: LocationReceiver): ICancelToken {
         require(receiver.type == LocationReceiver.TYPE_ILocationStatusCallback)
         return getCurrentLocation(request, ILocationStatusCallback.Stub.asInterface(receiver.binder))
     }
