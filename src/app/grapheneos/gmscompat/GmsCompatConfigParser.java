@@ -247,7 +247,7 @@ public class GmsCompatConfigParser {
                             classStubs.put(methodName, stub);
                         }
                     } else if (section2Type == SECTION_VERSION_MAP) {
-                        if (versionMapTargetVersion == selfVersionCode) {
+                        if (versionMapTargetVersion <= selfVersionCode) {
                             res.maxGmsCoreVersion = Long.parseLong(lineParser.next());
                             res.maxPlayStoreVersion = Long.parseLong(lineParser.next());
                         }
