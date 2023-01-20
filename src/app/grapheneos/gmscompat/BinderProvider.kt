@@ -15,7 +15,6 @@ class BinderProvider : AbsContentProvider() {
                 // WRITE_GSERVICES is a signature-protected permission held by GSF, GMS Core and Play Store
                 if (context.checkCallingPermission("com.google.android.providers.gsf.permission.WRITE_GSERVICES") != PackageManager.PERMISSION_GRANTED) {
                     val pkgName = context.packageManager.getPackagesForUid(Binder.getCallingUid())!![0]
-                    check(pkgName == GmsInfo.PACKAGE_GSA)
                     if (!GmsCompat.isGmsApp(pkgName, context.userId)) {
                         throw SecurityException()
                     }
