@@ -3,10 +3,12 @@ package app.grapheneos.gmscompat;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.app.compat.gms.GmsCompat;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.ParcelUuid;
@@ -103,8 +105,12 @@ public class PersistentFgService extends Service {
             } else if (GmsInfo.PACKAGE_GSA.equals(pkg)) {
                 res = bind(pkg, GmsCompatClientService.class.getName());
             } else {
-                // this service is not exported
-                throw new IllegalStateException("unexpected intent action " + pkg);
+                if (Build.isDebuggable() && GmsCompat.isTestPackage(pkg, getUserId(), false)) {
+                    res = true;
+                } else {
+                    // this service is not exported
+                    throw new IllegalStateException("unexpected intent action " + pkg);
+                }
             }
 
             notifyCaller(intent, res);
