@@ -47,6 +47,8 @@ If you decide to keep it disabled, consider enabling “%2$s“ option to improv
 To receive them quicker, set “Battery usage“ to “Unrestricted“ in Play services app info."
     </string>
 
+    <string name="pending_play_store_update_notif_title">Play Store needs to update %1$s</string>
+    <string name="pending_play_store_update_notif_text">It\'s recommended to allow this. Tap to proceed.</string>
     <string name="play_store_pending_user_action_notif">Action required in Play Store</string>
     <string name="missing_permission">Missing permission</string>
     <string name="missing_optional_permission">Missing optional permission</string>

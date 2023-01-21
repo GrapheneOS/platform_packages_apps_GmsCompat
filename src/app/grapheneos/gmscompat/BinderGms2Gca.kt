@@ -24,6 +24,7 @@ import com.android.internal.gmscompat.GmsCompatConfig
 import com.android.internal.gmscompat.GmsHooks
 import com.android.internal.gmscompat.GmsInfo
 import com.android.internal.gmscompat.GmsInfo.PACKAGE_GMS_CORE
+import com.android.internal.gmscompat.GmsInfo.PACKAGE_PLAY_STORE
 import com.android.internal.gmscompat.IGca2Gms
 import com.android.internal.gmscompat.IGms2Gca
 import com.android.internal.gmscompat.dynamite.server.IFileProxyService
@@ -177,16 +178,31 @@ object BinderGms2Gca : IGms2Gca.Stub() {
         return connect(PACKAGE_GMS_CORE, processName, iGca2Gms)
     }
 
-    override fun showPlayStorePendingUserActionNotification() {
+    override fun showPlayStorePendingUserActionNotification(pkgName: String?) {
         val ctx = App.ctx()
-        val intent = ctx.packageManager.getLaunchIntentForPackage(GmsInfo.PACKAGE_PLAY_STORE)
+        val intent = ctx.packageManager.getLaunchIntentForPackage(PACKAGE_PLAY_STORE)
         val pendingIntent = PendingIntent.getActivity(ctx, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-        Notifications.builder(Notifications.CH_PLAY_STORE_PENDING_USER_ACTION)
-                .setSmallIcon(R.drawable.ic_pending_action)
-                .setContentTitle(ctx.getText(R.string.play_store_pending_user_action_notif))
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true)
-                .show(Notifications.ID_PLAY_STORE_PENDING_USER_ACTION)
+
+        var text = R.string.pending_play_store_update_notif_text
+        val title = when (pkgName) {
+            PACKAGE_GMS_CORE -> ctx.getString(R.string.pending_play_store_update_notif_title, ctx.getString(R.string.play_services))
+            PACKAGE_PLAY_STORE -> ctx.getString(R.string.pending_play_store_update_notif_title, ctx.getString(R.string.play_store))
+            else -> {
+                text = 0
+                ctx.getText(R.string.play_store_pending_user_action_notif)
+            }
+        }
+
+        Notifications.builder(Notifications.CH_PLAY_STORE_PENDING_USER_ACTION).run {
+            setSmallIcon(R.drawable.ic_pending_action)
+            setContentTitle(title)
+            if (text != 0) {
+                setContentText(text)
+            }
+            setContentIntent(pendingIntent)
+            setAutoCancel(true)
+            show(Notifications.ID_PLAY_STORE_PENDING_USER_ACTION)
+        }
     }
 
     override fun dismissPlayStorePendingUserActionNotification() {
