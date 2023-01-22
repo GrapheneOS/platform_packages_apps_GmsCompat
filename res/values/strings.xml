@@ -93,4 +93,6 @@ To receive them quicker, set “Battery usage“ to “Unrestricted“ in Play s
 Warning:
 Update to an unknown version may cause crashes and errors in sandboxed Google Play."
     </string>
+
+    <string name="notif_screen_capture_is_running">Screen capture is running</string>
 </resources>

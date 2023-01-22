@@ -421,4 +421,12 @@ object BinderGms2Gca : IGms2Gca.Stub() {
     override fun privSettingsUnregisterObserver(observer: IContentObserver) {
         privSettings.removeObserver(observer)
     }
+
+    override fun getMediaProjectionNotification(): Notification {
+        return Notification.Builder(App.ctx(), "cast_system_mirroring_service").run {
+            setSmallIcon(R.drawable.ic_screen_share)
+            setContentTitle(R.string.notif_screen_capture_is_running)
+            build()
+        }
+    }
 }
