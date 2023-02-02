@@ -5,6 +5,12 @@ plugins {
     id("com.android.application")
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(11))
+    }
+}
+
 android {
     namespace = "app.grapheneos.gmscompat.config"
 
