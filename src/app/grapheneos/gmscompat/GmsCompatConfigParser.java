@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -121,6 +123,7 @@ public class GmsCompatConfigParser {
         final int SECTION_FLAGS = 0;
         final int SECTION_STUBS = 1;
         final int SECTION_VERSION_MAP = 2;
+        final int SECTION_FORCE_DEFAULT_FLAGS = 3;
 
         final long selfVersionCode = App.ctx().getApplicationInfo().longVersionCode;
 
@@ -152,6 +155,8 @@ public class GmsCompatConfigParser {
             } else if ("stubs_12.1".equals(sectionL2)) {
                 section2Type = SECTION_STUBS;
                 skipStubs = Build.VERSION.SDK_INT >= 33;
+            } else if ("force_default_flags".equals(sectionL2)) {
+                section2Type = SECTION_FORCE_DEFAULT_FLAGS;
             }
             else {
                 invalidLine(line);
@@ -179,6 +184,7 @@ public class GmsCompatConfigParser {
                 ArrayMap<String, GmsFlag> packageFlags = null;
                 ArrayMap<String, StubDef> classStubs = null;
                 long versionMapTargetVersion = 0L;
+                ArrayList<String> forceDefaultFlags = null;
 
                 if (section2Type == SECTION_FLAGS) {
                     String ns = sectionL1;
@@ -196,6 +202,10 @@ public class GmsCompatConfigParser {
                     }
                 } else if (section2Type == SECTION_VERSION_MAP) {
                     versionMapTargetVersion = Long.parseLong(sectionL1);
+                } else if (section2Type == SECTION_FORCE_DEFAULT_FLAGS) {
+                    String namespace = sectionL1;
+                    forceDefaultFlags = new ArrayList<>();
+                    res.forceDefaultFlagsMap.put(namespace, forceDefaultFlags);
                 }
 
                 sectionL0Loop:
@@ -217,6 +227,15 @@ public class GmsCompatConfigParser {
                                 invalidLine(line);
                                 return;
                         }
+                    }
+
+                    if (section2Type == SECTION_FORCE_DEFAULT_FLAGS) {
+                        String regex = line;
+                        if (strict) {
+                            checkRegex(regex);
+                        }
+                        forceDefaultFlags.add(regex);
+                        continue;
                     }
 
                     lineParser.start(line);
@@ -595,6 +614,15 @@ public class GmsCompatConfigParser {
     private static void stubCheck(String sig, boolean v) throws InvalidObjectException {
         if (!v) {
             throw new InvalidObjectException("invalid stub for " + sig);
+        }
+    }
+
+    private void checkRegex(String regex) {
+        try {
+            Pattern.compile(regex);
+        } catch (PatternSyntaxException e) {
+            Log.d(TAG, "invalid regex " + regex, e);
+            invalid = true;
         }
     }
 
