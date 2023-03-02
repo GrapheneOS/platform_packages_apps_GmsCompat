@@ -146,21 +146,26 @@ public class GmsCompatConfigParser {
             boolean skipStubs = false;
 
             int section2Type;
-            if ("flags".equals(sectionL2)) {
-                section2Type = SECTION_FLAGS;
-            } else if ("stubs".equals(sectionL2)) {
-                section2Type = SECTION_STUBS;
-            } else if ("versionMap".equals(sectionL2)) {
-                section2Type = SECTION_VERSION_MAP;
-            } else if ("stubs_12.1".equals(sectionL2)) {
-                section2Type = SECTION_STUBS;
-                skipStubs = Build.VERSION.SDK_INT >= 33;
-            } else if ("force_default_flags".equals(sectionL2)) {
-                section2Type = SECTION_FORCE_DEFAULT_FLAGS;
-            }
-            else {
-                invalidLine(line);
-                return;
+            switch (sectionL2) {
+                case "flags":
+                    section2Type = SECTION_FLAGS;
+                    break;
+                case "stubs":
+                    section2Type = SECTION_STUBS;
+                    break;
+                case "versionMap":
+                    section2Type = SECTION_VERSION_MAP;
+                    break;
+                case "stubs_12.1":
+                    section2Type = SECTION_STUBS;
+                    skipStubs = Build.VERSION.SDK_INT >= 33;
+                    break;
+                case "force_default_flags":
+                    section2Type = SECTION_FORCE_DEFAULT_FLAGS;
+                    break;
+                default:
+                    invalidLine(line);
+                    return;
             }
 
             line = lines.get(lineIdx++);
