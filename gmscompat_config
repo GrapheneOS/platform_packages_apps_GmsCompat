@@ -188,10 +188,3 @@ setSilenceMode false
 [android.bluetooth.BluetoothAdapter]
 registerBluetoothConnectionCallback false
 unregisterBluetoothConnectionCallback false
-
-[[spoof_self_permission_checks]]
-
-[com.google.android.gms]
-# GmsDeviceComplianceService is unavailable when GmsCore detects that it doesn't have this permission.
-# This service is needed for Play Integrity API to work.
-android.permission.READ_PHONE_STATE
