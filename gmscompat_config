@@ -1,9 +1,5 @@
 [[flags]]
 
-[com.google.android.gms.fido]
-# allow Vanadium to use GMS FIDO2
-Fido2ApiKnownBrowsers__fingerprints append-string ,C6ADB8B83C6D4C17D292AFDE56FD488A51D316FF8F2C11C5410223BFF8A7DBB3
-
 [com.google.android.gms.enpromo]
 # enpromo is a GmsCore module that shows a notification that prompts the user to enable
 # Exposure Notifications (en). It needs location access to determine which location-specific app
