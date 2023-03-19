@@ -35,6 +35,7 @@ ReceiverControlChannelFeatures__enable_user_accept_dialogs false
 [com.google.android.gms.people]
 # controls access to ContactsContract$SimContacts#getSimAccounts()
 AccountCategoriesFeature__use_cp2_sim_account_settings perms-none-of android.permission.READ_CONTACTS false
+FsaDeviceContactsMoveFeature__large_contact_list_device_opt_in_disallowed perms-none-of android.permission.READ_CONTACTS false
 
 [com.google.android.gms.security]
 # disable TelecomTaskService, it needs privileged MODIFY_PHONE_STATE permission
