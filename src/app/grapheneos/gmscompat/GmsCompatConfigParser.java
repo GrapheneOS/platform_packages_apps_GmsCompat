@@ -167,7 +167,7 @@ public class GmsCompatConfigParser {
                 case "force_default_flags":
                     section2Type = SECTION_FORCE_DEFAULT_FLAGS;
                     break;
-                case "spoof_self_permission_checks":
+                case "spoof_self_permission_checks_v2":
                     section2Type = SECTION_SPOOF_SELF_PERMISSION_CHECKS;
                     break;
                 default:
