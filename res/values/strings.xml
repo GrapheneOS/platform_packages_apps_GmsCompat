@@ -34,6 +34,10 @@ If you decide to keep it disabled, consider enabling “%2$s“ option to improv
     <string name="play_services_no_location_permission">
 "Play services needs Location permission to be set to “%s“, and “Use precise location“ needs to be enabled."
     </string>
+    <string name="play_services_no_wifi_control_appop">
+"Play services needs the “Wi-Fi control“ permission to scan for Wi-Fi networks, which is used to estimate location.
+This permission can be allowed in Settings ⮕ Apps ⮕ Special app access ⮕ Wi-Fi control."
+    </string>
     <string name="play_services_no_ble_location">
 "Location service assisted by Bluetooth scanning requires the “Nearby devices“ permission."
     </string>
