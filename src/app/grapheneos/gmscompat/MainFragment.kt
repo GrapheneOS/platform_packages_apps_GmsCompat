@@ -2,9 +2,11 @@ package app.grapheneos.gmscompat
 
 import android.Manifest.permission
 import android.app.AlertDialog
+import android.app.AppOpsManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.PackageManager.PackageInfoFlags
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
@@ -220,6 +222,22 @@ class MainFragment : PreferenceFragmentCompat() {
                     getString(R.string.reroute_location_requests_to_os_apis)))
             }
 
+            val appOpsManager = ctx.getSystemService(AppOpsManager::class.java)!!
+            val packageManager = ctx.packageManager
+            val gmsCoreUid = packageManager.getPackageUid(PACKAGE_GMS_CORE, PackageInfoFlags.of(0L))
+
+            // CHANGE_WIFI_STATE permission is always granted (it's a non-runtime permission), but
+            // OP_CHANGE_WIFI_STATE app-op, which guards a subset of methods that are also guarded
+            // by this permission (eg Wi-Fi scanning), can be revoked by the user
+            val gmsCoreHasChangeWifiStateAppOp = appOpsManager.unsafeCheckOpNoThrow(
+                AppOpsManager.OPSTR_CHANGE_WIFI_STATE, gmsCoreUid,
+                    PACKAGE_GMS_CORE) == AppOpsManager.MODE_ALLOWED
+
+            if (!gmsCoreHasChangeWifiStateAppOp) {
+                sb.separator()
+                sb.resString(R.string.play_services_no_wifi_control_appop)
+            }
+
             val psHasBtScanPerm = gmsCoreHasPermission(permission.BLUETOOTH_SCAN)
             if (!psHasBtScanPerm) {
                 sb.separator()
@@ -339,7 +357,7 @@ class MainFragment : PreferenceFragmentCompat() {
         arrayOf(
             Pair(PACKAGE_GMS_CORE, R.string.play_services),
             Pair(PACKAGE_PLAY_STORE, R.string.play_store),
-        ).forEachIndexed { idx, pair ->
+        ).forEach { pair ->
             CheckBox(ctx).let {
                 val pkgName = pair.first
                 it.isChecked = initialSet.contains(pkgName)
