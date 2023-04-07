@@ -133,6 +133,7 @@ getAllMatchingWifiConfigs emptyList
 getMatchingOsuProviders emptyMap
 getMatchingPasspointConfigsForOsuProviders emptyMap
 getCurrentNetwork null
+reconnect false
 
 [android.nfc.NfcAdapter]
 disable false
