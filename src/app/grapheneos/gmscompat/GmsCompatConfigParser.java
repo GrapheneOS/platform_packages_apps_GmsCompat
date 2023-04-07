@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Parcelable;
 import android.util.ArrayMap;
+import android.util.ArraySet;
 import android.util.Base64;
 import android.util.Log;
 
@@ -128,6 +129,7 @@ public class GmsCompatConfigParser {
         final int SECTION_VERSION_MAP = 2;
         final int SECTION_FORCE_DEFAULT_FLAGS = 3;
         final int SECTION_SPOOF_SELF_PERMISSION_CHECKS = 4;
+        final int SECTION_GmsServiceBroker_SELF_PERMISSION_BYPASS = 5;
 
         final long selfVersionCode = App.ctx().getApplicationInfo().longVersionCode;
 
@@ -170,6 +172,9 @@ public class GmsCompatConfigParser {
                 case "spoof_self_permission_checks_v2":
                     section2Type = SECTION_SPOOF_SELF_PERMISSION_CHECKS;
                     break;
+                case "GmsServiceBroker_self_permission_bypass":
+                    section2Type = SECTION_GmsServiceBroker_SELF_PERMISSION_BYPASS;
+                    break;
                 default:
                     invalidLine(line);
                     return;
@@ -195,7 +200,7 @@ public class GmsCompatConfigParser {
 
                 ArrayMap<String, GmsFlag> packageFlags = null;
                 ArrayMap<String, StubDef> classStubs = null;
-                long versionMapTargetVersion = 0L;
+                long targetGmsCompatVersion = 0L;
                 ArrayList<String> forceDefaultFlags = null;
                 ArrayList<String> spoofSelfPermissionChecks = null;
 
@@ -214,7 +219,7 @@ public class GmsCompatConfigParser {
                         res.stubs.put(className, classStubs);
                     }
                 } else if (section2Type == SECTION_VERSION_MAP) {
-                    versionMapTargetVersion = Long.parseLong(sectionL1);
+                    targetGmsCompatVersion = Long.parseLong(sectionL1);
                 } else if (section2Type == SECTION_FORCE_DEFAULT_FLAGS) {
                     String namespace = sectionL1;
                     forceDefaultFlags = new ArrayList<>();
@@ -223,6 +228,9 @@ public class GmsCompatConfigParser {
                     String packageName = sectionL1;
                     spoofSelfPermissionChecks = new ArrayList<>();
                     res.spoofSelfPermissionChecksMap.put(packageName, spoofSelfPermissionChecks);
+                } else if (section2Type == SECTION_GmsServiceBroker_SELF_PERMISSION_BYPASS) {
+                    targetGmsCompatVersion = Long.parseLong(sectionL1);
+                    res.gmsServiceBrokerPermissionBypasses.clear();
                 }
 
                 sectionL0Loop:
@@ -290,9 +298,15 @@ public class GmsCompatConfigParser {
                             classStubs.put(methodName, stub);
                         }
                     } else if (section2Type == SECTION_VERSION_MAP) {
-                        if (versionMapTargetVersion <= selfVersionCode) {
+                        if (targetGmsCompatVersion <= selfVersionCode) {
                             res.maxGmsCoreVersion = Long.parseLong(lineParser.next());
                             res.maxPlayStoreVersion = Long.parseLong(lineParser.next());
+                        }
+                    } else if (section2Type == SECTION_GmsServiceBroker_SELF_PERMISSION_BYPASS) {
+                        if (targetGmsCompatVersion <= selfVersionCode) {
+                            int serviceId = Integer.parseInt(lineParser.next());
+                            String[] permissions = lineParser.next().split(",");
+                            res.gmsServiceBrokerPermissionBypasses.put(serviceId, new ArraySet<>(permissions));
                         }
                     }
                 }
