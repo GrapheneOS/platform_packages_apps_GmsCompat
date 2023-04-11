@@ -186,3 +186,9 @@ setSilenceMode false
 [android.bluetooth.BluetoothAdapter]
 registerBluetoothConnectionCallback false
 unregisterBluetoothConnectionCallback false
+
+[[GmsServiceBroker_self_permission_bypass]]
+[1003]
+# DROID_GUARD (25) service can work without the Phone permission, despite requiring it to be granted.
+# This service is used for the Play Integrity API.
+25 android.permission.READ_PHONE_STATE
