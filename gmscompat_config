@@ -142,6 +142,7 @@ disable false
 getNextEntry null
 
 [android.os.UserManager]
+getSeedAccountOptions null
 getUserName String Owner
 
 [android.telecom.TelecomManager]
