@@ -145,6 +145,9 @@ getNextEntry null
 getSeedAccountOptions null
 getUserName String Owner
 
+[android.safetycenter.SafetyCenterManager]
+isSafetyCenterEnabled false
+
 [android.telecom.TelecomManager]
 getAllPhoneAccountHandles emptyList
 
