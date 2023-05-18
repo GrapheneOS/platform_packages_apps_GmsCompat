@@ -178,7 +178,7 @@ getServiceState null
 [[versionMap]]
 # section name is gmscompat version, section contents are max supported versions of GmsCore and Play Store
 [1000]
-231899999 83579999
+231899999 83589999
 
 [[stubs_12.1]]
 
