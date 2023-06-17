@@ -197,3 +197,7 @@ unregisterBluetoothConnectionCallback false
 # DROID_GUARD (25) service can work without the Phone permission, despite requiring it to be granted.
 # This service is used for the Play Integrity API.
 25 android.permission.READ_PHONE_STATE
+
+[[force_default_flags]]
+[com.google.android.gms.fido]
+.+
