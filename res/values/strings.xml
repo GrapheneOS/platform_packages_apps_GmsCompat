@@ -2,7 +2,7 @@
     <string name="app_name">GmsCompat</string>
     <string name="activity_name">Sandboxed Google Play</string>
     <string name="reroute_location_requests_to_os_apis">Reroute location requests to the OS</string>
-    <string name="missing_location_permission">Location permission needs to be set to “%s“.</string>
+    <string name="missing_location_permission">Location permission needs to be set to “%s”.</string>
     <string name="open_app_info">Open app info</string>
     <string name="open_settings">Open settings</string>
     <string name="persistent_fg_service_notif">Sandboxed Google Play is running</string>
@@ -15,8 +15,8 @@
     <string name="component_system_settings">%s app info</string>
     <string name="gms_network_location_opt_in">Google Location Accuracy</string>
     <string name="no_gms_network_location">
-"Google’s location service is disabled. Tap “%1$s“ to learn more.
-If you decide to keep it disabled, consider enabling “%2$s“ option to improve app compatibility."
+"Google’s location service is disabled. Tap “%1$s” to learn more.
+If you decide to keep it disabled, consider enabling “%2$s” option to improve app compatibility."
     </string>
     <string name="revoke_location_permission">Revoke the Location permission from Play services.</string>
 
@@ -32,14 +32,14 @@ If you decide to keep it disabled, consider enabling “%2$s“ option to improv
 "Location requests are rerouted to the OS, but Play services still has the Location permission."
     </string>
     <string name="play_services_no_location_permission">
-"Play services needs Location permission to be set to “%s“, and “Use precise location“ needs to be enabled."
+"Play services needs Location permission to be set to “%s”, and “Use precise location” needs to be enabled."
     </string>
     <string name="play_services_no_wifi_control_appop">
-"Play services needs the “Wi-Fi control“ permission to scan for Wi-Fi networks, which is used to estimate location.
+"Play services needs the “Wi-Fi control” permission to scan for Wi-Fi networks, which is used to estimate location.
 This permission can be allowed in Settings ⮕ Apps ⮕ Special app access ⮕ Wi-Fi control."
     </string>
     <string name="play_services_no_ble_location">
-"Location service assisted by Bluetooth scanning requires the “Nearby devices“ permission."
+"Location service assisted by Bluetooth scanning requires the “Nearby devices” permission."
     </string>
     <string name="always_on_scanning_settings">Always-on scanning settings</string>
     <string name="always_on_wifi_scanning_disabled">Always-on Wi-Fi scanning is disabled.</string>
@@ -48,7 +48,7 @@ This permission can be allowed in Settings ⮕ Apps ⮕ Special app access ⮕ W
     <string name="push_notifications">Push notifications</string>
     <string name="play_services_no_battery_exemption">
 "When device is idle, push notifications will be delayed to improve battery life.
-To receive them quicker, set “Battery usage“ to “Unrestricted“ in Play services app info."
+To receive them quicker, set “Battery usage” to “Unrestricted” in Play services app info."
     </string>
 
     <string name="pending_play_store_update_notif_title">Play Store needs to update %1$s</string>
@@ -60,7 +60,7 @@ To receive them quicker, set “Battery usage“ to “Unrestricted“ in Play s
     <string name="play_store_missing_obb_permission_notif">To install this app, Play Store needs access to Android/obb folder</string>
 
     <string name="missing_permission_nearby_exposurenotifications">
-"Play services needs the “Nearby devices“ permission to enable Exposure Notifications"
+"Play services needs the “Nearby devices” permission to enable Exposure Notifications"
     </string>
 
     <string name="missing_permission_nearby_NearbyShare">
@@ -73,7 +73,7 @@ To receive them quicker, set “Battery usage“ to “Unrestricted“ in Play s
     <string name="notif_channel_bg_activity_start">Request to show a screen</string>
     <string name="notif_bg_activity_start">%s needs to show a screen. Tap to allow</string>
 
-    <string name="notif_missing_nearby_devices_perm_generic">%s needs the “Nearby devices“ permission</string>
+    <string name="notif_missing_nearby_devices_perm_generic">%s needs the “Nearby devices” permission</string>
 
     <string name="notif_gms_crash_title">Sandboxed Google Play crashed</string>
     <string name="notif_gms_crash_text">Tap to see the details</string>
