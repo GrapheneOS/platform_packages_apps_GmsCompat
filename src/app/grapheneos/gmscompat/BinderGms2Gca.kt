@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.IContentObserver
 import android.net.Uri
+import android.os.Binder
 import android.os.Bundle
 import android.os.DeadObjectException
 import android.os.Handler
@@ -32,18 +33,27 @@ import java.util.*
 import java.util.concurrent.SynchronousQueue
 import java.util.concurrent.TimeUnit
 import java.util.function.Consumer
+import java.util.function.Predicate
+import kotlin.collections.ArrayList
 
 object BinderGms2Gca : IGms2Gca.Stub() {
-    private val boundProcesses = ArrayMap<IGca2Gms, String>(10)
+    val ctx: Context = App.ctx()
+
+    class BoundProcess(val iGca2Gms: IGca2Gms, val pid: Int, val uid: Int, val pkgName: String, val processName: String)
+
+    private val boundProcesses = ArrayMap<IGca2Gms, BoundProcess>(10)
 
     @Volatile
     private var config = GmsCompatConfigParser.exec(App.ctx())
 
     override fun connect(pkg: String, processName: String, iGca2Gms: IGca2Gms): GmsCompatConfig {
+        val boundProcess = BoundProcess(iGca2Gms, Binder.getCallingPid(), Binder.getCallingUid(),
+                                        pkg, processName)
+
         val deathRecipient = DeathRecipient(iGca2Gms)
         try {
             // important to add before linkToDeath() to avoid race with binderDied() callback
-            addBoundProcess(iGca2Gms, processName)
+            addBoundProcess(iGca2Gms, boundProcess)
             iGca2Gms.asBinder().linkToDeath(deathRecipient, 0)
         } catch (e: RemoteException) {
             logd{"binder already died: " + e}
@@ -70,15 +80,15 @@ object BinderGms2Gca : IGms2Gca.Stub() {
         }
     }
 
-    fun addBoundProcess(iGca2Gms: IGca2Gms, processName: String) {
+    fun addBoundProcess(iGca2Gms: IGca2Gms, boundProcess: BoundProcess) {
         synchronized(boundProcesses) {
-            boundProcesses.put(iGca2Gms, processName)
+            boundProcesses.put(iGca2Gms, boundProcess)
         }
     }
 
     fun removeBoundProcess(iGca2Gms: IGca2Gms) {
         synchronized(boundProcesses) {
-            val processName = boundProcesses.remove(iGca2Gms)
+            val bp = boundProcesses.remove(iGca2Gms)
 
             if (boundProcesses.size == 0) {
                 val ctx = App.ctx()
@@ -88,7 +98,7 @@ object BinderGms2Gca : IGms2Gca.Stub() {
                 }
             }
 
-            when (processName) {
+            when (bp?.processName) {
                 GmsInfo.PACKAGE_PLAY_STORE -> {
                     dismissPlayStorePendingUserActionNotification()
                     Notifications.cancel(Notifications.ID_PLAY_STORE_MISSING_OBB_PERMISSION)
@@ -100,24 +110,30 @@ object BinderGms2Gca : IGms2Gca.Stub() {
         }
     }
 
-    fun snapshotBoundProcessses(): Array<IGca2Gms> {
-        var res: Array<IGca2Gms?>
+    fun snapshotBoundProcessses(predicate: Predicate<BoundProcess>? = null): List<IGca2Gms> {
         synchronized(boundProcesses) {
             val size = boundProcesses.size
-            res = arrayOfNulls(size)
+            val res = ArrayList<IGca2Gms>(size)
             for (i in 0 until size) {
-                res[i] = boundProcesses.keyAt(i)
+                val bp = boundProcesses.valueAt(i)
+                if (predicate == null || predicate.test(bp)) {
+                    res.add(boundProcesses.keyAt(i))
+                }
+
             }
+            return res
         }
-        @Suppress("UNCHECKED_CAST")
-        return res as Array<IGca2Gms>
     }
 
     fun getPersistentGmsCoreProcess(): IGca2Gms? {
-        val processes: ArrayMap<IGca2Gms, String> = boundProcesses
+        return getBoundProcessByName(GmsHooks.PERSISTENT_GmsCore_PROCESS)
+    }
+
+    fun getBoundProcessByName(name: String): IGca2Gms? {
+        val processes: ArrayMap<IGca2Gms, BoundProcess> = boundProcesses
         synchronized(processes) {
             for (i in 0 until processes.size) {
-                if (processes.valueAt(i) == GmsHooks.PERSISTENT_GmsCore_PROCESS) {
+                if (processes.valueAt(i).processName == name) {
                     return processes.keyAt(i)
                 }
             }
