@@ -34,8 +34,8 @@
         />
 
         <provider
-            android:name=".BinderProvider"
-            android:authorities="${applicationId}.BinderProvider"
+            android:name=".RpcProvider"
+            android:authorities="${applicationId}.RpcProvider"
             android:exported="true"
             android:directBootAware="true"
             tools:ignore="ExportedContentProvider"
