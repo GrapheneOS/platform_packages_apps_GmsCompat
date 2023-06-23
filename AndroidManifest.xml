@@ -16,10 +16,10 @@
         android:protectionLevel="signature|privileged" />
 
     <permission
-        android:name="${applicationId}.permission.REDIRECTION_STATE_CHANGED_BROADCAST"
+        android:name="${applicationId}.SIGNATURE_PROTECTED_PERMISSION"
         android:protectionLevel="signature" />
 
-    <uses-permission android:name="${applicationId}.permission.REDIRECTION_STATE_CHANGED_BROADCAST" />
+    <uses-permission android:name="${applicationId}.SIGNATURE_PROTECTED_PERMISSION" />
 
     <application
         android:name=".App"
