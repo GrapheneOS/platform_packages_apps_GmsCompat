@@ -35,6 +35,7 @@ object Notifications {
     const val ID_MISSING_APP = 6
     const val ID_GmsCore_POWER_EXEMPTION_PROMPT = 7
     const val ID_CONTACTS_SYNC_PROMPT = 8
+    const val ID_MISSING_POST_NOTIFICATIONS_PERM = 9;
 
     private val uniqueNotificationId = AtomicInteger(10_000)
     fun generateUniqueNotificationId() = uniqueNotificationId.getAndIncrement()
@@ -76,8 +77,8 @@ object Notifications {
             .setSmallIcon(R.drawable.ic_configuration_required)
             .setContentTitle(title)
             .setContentText(text)
+            .setStyle(Notification.BigTextStyle())
             .setAutoCancel(true)
-            .setTimeoutAfter(60_000)
             .setOnlyAlertOnce(true)
             .addAction(resolution)
     }
@@ -159,8 +160,9 @@ object Notifications {
     }
 
     // returns null if "do not show again" is already set for this notificationId
-    private fun doNotShowAgainAction(notificationId: Int): Notification.Action? {
-        val pref = MainProcessPrefs.NOTIFICATION_DO_NOT_SHOW_AGAIN_PREFIX + notificationId
+    fun doNotShowAgainAction(actionId: Int, notifId: Int = actionId, prefSuffix: String = ""): Notification.Action? {
+        val pref = MainProcessPrefs.NOTIFICATION_DO_NOT_SHOW_AGAIN_PREFIX +
+                actionId + prefSuffix
 
         if (App.preferences().getBoolean(pref, false)) {
             return null
@@ -171,7 +173,7 @@ object Notifications {
                     .putBoolean(pref, true)
                     .apply()
 
-            cancel(notificationId)
+            cancel(notifId)
         }
 
         return Notification.Action.Builder(null, App.ctx().getText(R.string.dont_show_again),

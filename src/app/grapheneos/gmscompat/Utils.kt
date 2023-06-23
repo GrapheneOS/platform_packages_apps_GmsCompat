@@ -159,6 +159,12 @@ fun appSettingsIntent(pkg: String, item: String? = null): Intent {
     return i
 }
 
+fun notificationSettingsIntent(pkg: String): Intent {
+    return Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+        putExtra(Settings.EXTRA_APP_PACKAGE, pkg)
+    }
+}
+
 fun gmsCoreSettings() = appSettingsIntent(GmsInfo.PACKAGE_GMS_CORE)
 fun playStoreSettings() = appSettingsIntent(GmsInfo.PACKAGE_PLAY_STORE)
 

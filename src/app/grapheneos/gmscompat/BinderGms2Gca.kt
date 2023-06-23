@@ -445,4 +445,35 @@ object BinderGms2Gca : IGms2Gca.Stub() {
             build()
         }
     }
+
+  val missingPostNotifsNotifIds = ArrayMap<String, Int>()
+
+    override fun showMissingPostNotifsPermissionNotification(callerPkg: String) {
+        val notifId = synchronized(missingPostNotifsNotifIds) {
+            missingPostNotifsNotifIds.getOrPut(callerPkg) {
+                Notifications.generateUniqueNotificationId()
+            }
+        }
+
+        val doNotShowAgain = Notifications.doNotShowAgainAction(
+                Notifications.ID_MISSING_POST_NOTIFICATIONS_PERM, notifId, callerPkg)
+
+        if (doNotShowAgain == null) {
+            return
+        }
+
+        val text = ctx.getString(R.string.notif_missing_nofications_perm,
+                applicationLabel(ctx, callerPkg))
+
+        Notifications.configurationRequired(
+                Notifications.CH_MISSING_PERMISSION,
+                ctx.getText(R.string.missing_permission),
+                text,
+                ctx.getText(R.string.open_settings),
+                notificationSettingsIntent(callerPkg)
+        ).run {
+            addAction(doNotShowAgain)
+            show(notifId)
+        }
+    }
 }
