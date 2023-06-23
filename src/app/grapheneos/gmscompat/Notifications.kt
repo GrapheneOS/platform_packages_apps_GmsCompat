@@ -4,7 +4,6 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.NotificationManager.IMPORTANCE_HIGH
-import android.app.PendingIntent
 import android.app.compat.gms.GmsCompat
 import android.content.Intent
 import android.net.Uri
@@ -13,7 +12,6 @@ import android.provider.Settings
 import app.grapheneos.gmscompat.App.MainProcessPrefs
 import app.grapheneos.gmscompat.util.PendingAction
 import com.android.internal.gmscompat.GmsInfo
-import java.util.UUID
 import java.util.concurrent.atomic.AtomicInteger
 
 object Notifications {
@@ -31,7 +29,6 @@ object Notifications {
     const val ID_PLAY_STORE_PENDING_USER_ACTION = 2
     const val ID_PLAY_STORE_MISSING_OBB_PERMISSION = 3
     const val ID_GMS_CORE_MISSING_NEARBY_DEVICES_PERMISSION = 4
-    const val ID_MISSING_NEARBY_DEVICES_PERMISSION_GENERIC = 5
     const val ID_MISSING_APP = 6
     const val ID_GmsCore_POWER_EXEMPTION_PROMPT = 7
     const val ID_CONTACTS_SYNC_PROMPT = 8

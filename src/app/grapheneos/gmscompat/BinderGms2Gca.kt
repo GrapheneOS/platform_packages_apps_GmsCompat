@@ -29,7 +29,6 @@ import com.android.internal.gmscompat.GmsInfo.PACKAGE_PLAY_STORE
 import com.android.internal.gmscompat.IGca2Gms
 import com.android.internal.gmscompat.IGms2Gca
 import com.android.internal.gmscompat.dynamite.server.IFileProxyService
-import java.util.*
 import java.util.concurrent.SynchronousQueue
 import java.util.concurrent.TimeUnit
 import java.util.function.Consumer
@@ -251,26 +250,25 @@ object BinderGms2Gca : IGms2Gca.Stub() {
     }
 
     override fun showGmsCoreMissingPermissionForNearbyShareNotification() {
+        val text = ctx.getText(R.string.missing_permission_nearby_NearbyShare)
+        showGmsCoreMissingNearbyDevicesPermission(text)
+    }
+
+    override fun showGmsCoreMissingNearbyDevicesPermissionGeneric() {
+         val text = ctx.getText(R.string.notif_gmscore_missing_nearby_devices_perm_generic)
+         showGmsCoreMissingNearbyDevicesPermission(text)
+    }
+
+    private fun showGmsCoreMissingNearbyDevicesPermission(text: CharSequence) {
         val ctx = App.ctx();
 
         Notifications.configurationRequired(
                 Notifications.CH_MISSING_PERMISSION,
                 ctx.getText(R.string.missing_permission),
-                ctx.getText(R.string.missing_permission_nearby_NearbyShare),
+                text,
                 ctx.getText(R.string.open_settings),
                 appSettingsIntent(PACKAGE_GMS_CORE, APP_INFO_ITEM_PERMISSIONS)
         ).show(Notifications.ID_GMS_CORE_MISSING_NEARBY_DEVICES_PERMISSION)
-    }
-
-    override fun showGmsMissingNearbyDevicesPermissionGeneric(callerPkg: String) {
-        val ctx = App.ctx()
-        Notifications.configurationRequired(
-                Notifications.CH_MISSING_PERMISSION,
-                ctx.getText(R.string.missing_permission),
-                ctx.getString(R.string.notif_missing_nearby_devices_perm_generic, applicationLabel(ctx, callerPkg)),
-                ctx.getText(R.string.open_settings),
-                appSettingsIntent(callerPkg, APP_INFO_ITEM_PERMISSIONS)
-        ).show(Notifications.ID_MISSING_NEARBY_DEVICES_PERMISSION_GENERIC)
     }
 
     override fun maybeShowContactsSyncNotification() {
