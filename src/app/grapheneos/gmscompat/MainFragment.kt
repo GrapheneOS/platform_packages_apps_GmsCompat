@@ -182,11 +182,6 @@ class MainFragment : PreferenceFragmentCompat() {
         var addSelfSettingsButton = false
 
         if (BinderDefs.isEnabled(BinderDefGroup.LOCATION)) {
-            if (ctx.checkSelfPermission(permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                sb.separator()
-                sb.append(getString(R.string.missing_location_permission, ctx.packageManager.backgroundPermissionOptionLabel))
-                addSelfSettingsButton = true
-            }
             if (psHasAnyLocationPerm) {
                 sb.separator()
                 sb.resString(R.string.location_redirection_extra_permissions)

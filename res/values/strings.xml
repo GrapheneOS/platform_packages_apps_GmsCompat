@@ -2,7 +2,6 @@
     <string name="app_name">GmsCompat</string>
     <string name="activity_name">Sandboxed Google Play</string>
     <string name="reroute_location_requests_to_os_apis">Reroute location requests to the OS</string>
-    <string name="missing_location_permission">Location permission needs to be set to “%s”.</string>
     <string name="open_app_info">Open app info</string>
     <string name="open_settings">Open settings</string>
     <string name="persistent_fg_service_notif">Sandboxed Google Play is running</string>
