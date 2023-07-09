@@ -53,7 +53,6 @@ public class App extends Application {
     }
 
     public static SharedPreferences preferences() {
-        UtilsKt.mainProcess();
         return preferences;
     }
 

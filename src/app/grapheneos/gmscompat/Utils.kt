@@ -22,20 +22,6 @@ fun mainThread() {
     }
 }
 
-private fun isMainProcess() = Application.getProcessName() == GmsCompatApp.PKG_NAME
-
-fun mainProcess() {
-    if (DEV) {
-        check(isMainProcess())
-    }
-}
-
-fun notMainProcess() {
-    if (DEV) {
-        check(!isMainProcess())
-    }
-}
-
 fun logd() {
     if (!ENABLE_LOGGING) {
         return
