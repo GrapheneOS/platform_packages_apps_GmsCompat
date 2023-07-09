@@ -101,4 +101,6 @@ Update to an unknown version may cause crashes and errors in sandboxed Google Pl
     </string>
 
     <string name="notif_screen_capture_is_running">Screen capture is running</string>
+
+    <string name="notif_GmsCore_missing_nearby_devices_perm_generic">%1$s requires Play services to have the “Nearby devices” permission</string>
 </resources>
