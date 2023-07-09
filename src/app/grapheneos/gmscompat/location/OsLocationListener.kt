@@ -1,18 +1,15 @@
 package app.grapheneos.gmscompat.location
 
-import android.app.AppOpsManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.SystemClock
 import app.grapheneos.gmscompat.Const
 import app.grapheneos.gmscompat.logd
-import app.grapheneos.gmscompat.opModeToString
 import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationRequest
 import java.util.Collections
 import java.util.concurrent.CountDownLatch
-import kotlin.IllegalStateException
 import kotlin.math.max
 import kotlin.math.min
 
@@ -57,23 +54,13 @@ class OsLocationListener(val client: Client, val provider: OsLocationProvider,
                          val request: android.location.LocationRequest,
                          val forwarder: GLocationForwarder
 ) : LocationListener {
-    init {
-        forwarder.osLocationListener = this
-    }
-
     override fun onLocationChanged(location: Location) {
         onLocationChanged(Collections.singletonList(location))
     }
 
     override fun onLocationChanged(locations: List<Location>) {
-        val opMode = client.noteProxyAppOp(provider)
-        if (opMode != AppOpsManager.MODE_ALLOWED) {
-            logd{"noteProxyAppOp returned ${opModeToString(opMode)}, unregister " + forwarder.listenerKey()}
-            forwarder.unregister()
-            return
-        }
-
         locations.forEach {
+            // mimic GMS location service
             it.provider = LocationManager.FUSED_PROVIDER
         }
 

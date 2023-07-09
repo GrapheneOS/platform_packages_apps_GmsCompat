@@ -35,23 +35,11 @@ class OsLocationProvider(val name: String, val properties: ProviderProperties?, 
         fun get(client: Client, name: String, granularity: Int): OsLocationProvider {
             val properties: ProviderProperties? = client.locationManager.getProviderProperties(name)
 
-            // attribute permission usage correctly based on granularity: usage of GRANULARITY_COARSE
-            // by client that has Permission.FINE should pass Permission.COARSE to AppOpsManager
             var permission = client.permission
 
             val fudger: LocationFudger? = when (client.permission) {
                 Permission.COARSE -> {
                     when (granularity) {
-                        LocationRequest.GRANULARITY_PERMISSION_LEVEL,
-                        LocationRequest.GRANULARITY_COARSE -> {
-                            if (properties == null) {
-                                LocationFudger()
-                            } else when (properties.accuracy) {
-                                ProviderProperties.ACCURACY_FINE -> LocationFudger()
-                                ProviderProperties.ACCURACY_COARSE -> null
-                                else -> throw IllegalStateException()
-                            }
-                        }
                         LocationRequest.GRANULARITY_FINE -> throw SecurityException()
                         else -> throw IllegalArgumentException()
                     }
