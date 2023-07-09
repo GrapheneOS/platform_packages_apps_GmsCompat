@@ -1,7 +1,6 @@
 package app.grapheneos.gmscompat
 
 import android.app.AppOpsManager
-import android.app.Application
 import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -9,17 +8,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
-import app.grapheneos.gmscompat.Const.DEV
 import app.grapheneos.gmscompat.Const.ENABLE_LOGGING
-import com.android.internal.gmscompat.GmsCompatApp
 import com.android.internal.gmscompat.GmsInfo
 import java.lang.reflect.Modifier
 import java.util.UUID
 
 fun mainThread() {
-    if (DEV) {
-        check(Thread.currentThread() === App.mainThread())
-    }
+    check(Thread.currentThread() === App.mainThread())
 }
 
 fun logd() {
