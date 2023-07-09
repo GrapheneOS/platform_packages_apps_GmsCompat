@@ -126,6 +126,11 @@ fun freshActivity(intent: Intent): Intent {
     return intent
 }
 
+fun getApplicationLabel(ctx: Context, pkg: String): CharSequence {
+    val pm = ctx.packageManager
+    return pm.getApplicationLabel(pm.getApplicationInfo(pkg, 0))
+}
+
 fun verifyCallerPkg(providedPkgName: String) {
     val ctx = App.ctx()
     val pm = ctx.packageManager

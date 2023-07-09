@@ -248,7 +248,7 @@ object BinderGms2Gca : IGms2Gca.Stub() {
         val ctx = App.ctx()
         Notifications.builder(Notifications.CH_BACKGROUND_ACTIVITY_START)
                 .setSmallIcon(R.drawable.ic_configuration_required)
-                .setContentTitle(ctx.getString(R.string.notif_bg_activity_start, applicationLabel(ctx, callerPkg)))
+                .setContentTitle(ctx.getString(R.string.notif_bg_activity_start, getApplicationLabel(ctx, callerPkg)))
                 .setContentIntent(intent)
                 .setAutoCancel(true)
                 .show(Notifications.generateUniqueNotificationId())
@@ -414,11 +414,6 @@ object BinderGms2Gca : IGms2Gca.Stub() {
     private var prevUeNotifTimestamp = 0L
     private var prevConfigUpdateCheckTimestamp = 0L
 
-    private fun applicationLabel(ctx: Context, pkg: String): CharSequence {
-        val pm = ctx.packageManager
-        return pm.getApplicationLabel(pm.getApplicationInfo(pkg, PackageManager.ApplicationInfoFlags.of(0)))
-    }
-
     private val privSettings = PrivSettings()
 
     override fun privSettingsGetString(ns: String, key: String): String? {
@@ -466,7 +461,7 @@ object BinderGms2Gca : IGms2Gca.Stub() {
         }
 
         val text = ctx.getString(R.string.notif_missing_nofications_perm,
-                applicationLabel(ctx, callerPkg))
+                getApplicationLabel(ctx, callerPkg))
 
         Notifications.configurationRequired(
                 Notifications.CH_MISSING_PERMISSION,
