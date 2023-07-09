@@ -2,6 +2,7 @@ package app.grapheneos.gmscompat
 
 import android.app.AppOpsManager
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -123,6 +124,12 @@ fun freshActivity(intent: Intent): Intent {
     // otherwise existing instance that is in unknown state could be shown
     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
     return intent
+}
+
+fun verifyCallerPkg(providedPkgName: String) {
+    val ctx = App.ctx()
+    val pm = ctx.packageManager
+    check(pm.getApplicationInfo(providedPkgName, 0).uid == android.os.Binder.getCallingUid())
 }
 
 const val APP_INFO_ITEM_PERMISSIONS = "permission_settings"

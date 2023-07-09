@@ -10,6 +10,7 @@ import android.content.pm.PackageManager
 import android.database.IContentObserver
 import android.net.Uri
 import android.os.Binder
+import android.os.BinderDef
 import android.os.Bundle
 import android.os.DeadObjectException
 import android.os.Handler
@@ -218,6 +219,10 @@ object BinderGms2Gca : IGms2Gca.Stub() {
             setAutoCancel(true)
             show(Notifications.ID_PLAY_STORE_PENDING_USER_ACTION)
         }
+    }
+
+    override fun maybeGetBinderDef(callerPkg: String, processState: Int, ifaceName: String): BinderDef? {
+        return BinderDefs.maybeGetBinderDef(callerPkg, processState, ifaceName, true)
     }
 
     override fun dismissPlayStorePendingUserActionNotification() {
