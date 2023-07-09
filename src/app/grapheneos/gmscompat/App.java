@@ -7,12 +7,16 @@ import android.content.SharedPreferences;
 
 import com.android.internal.gmscompat.GmsCompatApp;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
 public class App extends Application {
     private static Context ctx;
     private static Context deviceProtectedStorageContext;
     private static NotificationManager notificationManager;
     private static SharedPreferences preferences;
     private static Thread mainThread;
+    private static Executor bgExecutor;
 
     public void onCreate() {
         super.onCreate();
@@ -25,14 +29,13 @@ public class App extends Application {
         }
         ctx = componentContext.getApplicationContext();
         mainThread = Thread.currentThread();
+        bgExecutor = Executors.newSingleThreadExecutor();
 
         if (GmsCompatApp.PKG_NAME.equals(Application.getProcessName())) {
             // main process
             deviceProtectedStorageContext = ctx.createDeviceProtectedStorageContext();
             preferences = deviceProtectedStorageContext
                     .getSharedPreferences(MAIN_PROCESS_PREFS_FILE, MODE_PRIVATE);
-            Redirections.init(preferences);
-
             notificationManager = ctx.getSystemService(NotificationManager.class);
             Notifications.createNotificationChannels();
 
@@ -58,6 +61,10 @@ public class App extends Application {
 
     public static Thread mainThread() {
         return mainThread;
+    }
+
+    public static Executor bgExecutor() {
+        return bgExecutor;
     }
 
     private static final String MAIN_PROCESS_PREFS_FILE = "prefs";
