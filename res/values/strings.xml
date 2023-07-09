@@ -67,7 +67,7 @@ To receive them quicker, set “Battery usage” to “Unrestricted” in Play s
 "Play services needs the “Nearby devices“ permission to enable Nearby Share"
     </string>
 
-    <string name="missing_play_games_app">This game needs the Play Games app</string>
+    <string name="missing_play_games_app">%1$s needs the Play Games app</string>
     <string name="install">Install</string>
 
     <string name="notif_channel_bg_activity_start">Request to show a screen</string>

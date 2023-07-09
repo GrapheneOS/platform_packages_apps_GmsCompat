@@ -35,7 +35,7 @@ enum class NotableInterface(val ifaceName: String) {
             }
             GamesService -> {
                 Notifications.handleMissingApp(Notifications.CH_MISSING_PLAY_GAMES_APP,
-                        ctx.getString(R.string.missing_play_games_app),
+                        ctx.getString(R.string.missing_play_games_app, getApplicationLabel(ctx, callerPkg)),
                         "com.google.android.play.games")
             }
         }
