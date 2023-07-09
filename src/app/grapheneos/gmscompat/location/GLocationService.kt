@@ -1,24 +1,24 @@
 package app.grapheneos.gmscompat.location
 
-import android.app.AppOpsManager
-import android.app.AppOpsManager.MODE_ALLOWED
-import android.location.GnssAntennaInfo
-import android.location.GnssMeasurementsEvent
-import android.location.GnssNavigationMessage
-import android.location.GnssStatus
+import android.content.Context
 import android.location.Location
 import android.location.LocationManager
-import android.location.OnNmeaMessageListener
-import android.os.Binder
 import android.os.CancellationSignal
 import android.os.RemoteException
-import android.util.SparseArray
+import androidx.annotation.Keep
+import app.grapheneos.gmscompat.BinderDefSupplier
+import app.grapheneos.gmscompat.logd
+import app.grapheneos.gmscompat.objectToString
+import com.google.android.gms.common.api.CommonStatusCodes
 import com.google.android.gms.common.api.Status
 import com.google.android.gms.common.api.internal.IStatusCallback
 import com.google.android.gms.common.internal.ICancelToken
+import com.google.android.gms.location.CurrentLocationRequest
 import com.google.android.gms.location.ILocationCallback
 import com.google.android.gms.location.ILocationListener
+import com.google.android.gms.location.LastLocationRequest
 import com.google.android.gms.location.LocationAvailability
+import com.google.android.gms.location.LocationAvailabilityRequest
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.LocationSettingsResult
@@ -29,39 +29,20 @@ import com.google.android.gms.location.internal.IGoogleLocationManagerService
 import com.google.android.gms.location.internal.ILocationAvailabilityStatusCallback
 import com.google.android.gms.location.internal.ILocationStatusCallback
 import com.google.android.gms.location.internal.ISettingsCallbacks
-import com.google.android.gms.location.internal.LocationRequestUpdateData
-import app.grapheneos.gmscompat.App
-import app.grapheneos.gmscompat.Const
-import app.grapheneos.gmscompat.logd
-import app.grapheneos.gmscompat.objectToString
-import app.grapheneos.gmscompat.opModeToString
-import com.google.android.gms.common.api.CommonStatusCodes
-import com.google.android.gms.location.CurrentLocationRequest
-import com.google.android.gms.location.LastLocationRequest
-import com.google.android.gms.location.LocationAvailabilityRequest
 import com.google.android.gms.location.internal.LocationReceiver
-import java.lang.ref.WeakReference
-import java.util.Arrays
+import com.google.android.gms.location.internal.LocationRequestUpdateData
 import java.util.concurrent.Executors
 import java.util.function.Consumer
 
-object GLocationService : IGoogleLocationManagerService.Stub() {
-    val ctx = App.ctx()
-    val appOpsManager = ctx.getSystemService(AppOpsManager::class.java)!!
-    val packageManager = ctx.packageManager!!
+@Keep
+class GLocationService(val ctx: Context) : IGoogleLocationManagerService.Stub() {
     val listenerCallbacksExecutor = Executors.newCachedThreadPool()
     val nonClientLocationManager = ctx.getSystemService(LocationManager::class.java)!!
 
-    // maps app uid to its registered listeners
-    // gc would be hard to do correctly if listeners were strongly referenced
-    val mapOfListeners = SparseArray<WeakReference<Listeners>>(50)
+    val listeners = Listeners(7)
 
     override fun registerLocationReceiver(receiver: LocationReceiver, request: LocationRequest, callback: IStatusCallback) {
         val client = Client(this)
-
-//        logd{client.packageName}
-
-        val clientListeners = getOrCreateListeners(client)
 
         val key: Any
         val glf: GLocationForwarder
@@ -82,20 +63,18 @@ object GLocationService : IGoogleLocationManagerService.Stub() {
                 throw IllegalArgumentException()
             }
         }
-        glf.listeners = clientListeners
+        glf.listeners = listeners
 
         val provider = OsLocationProvider.get(client, request)
 
         val oll = OsLocationListener(client, provider, request.toOsLocationRequest(), glf)
-        clientListeners.update(client, key, oll)
+        updateListener(this, client, key, oll)
 
         callback.onCompletion(Status.SUCCESS)
     }
 
     override fun unregisterLocationReceiver(receiver: LocationReceiver, callback: IStatusCallback) {
-        val client = Client(this)
-
-        val clientListeners = getOrCreateListeners(client)
+        Client(this)
 
         val key: Any = when (receiver.type) {
             LocationReceiver.TYPE_ILocationListener,
@@ -105,46 +84,27 @@ object GLocationService : IGoogleLocationManagerService.Stub() {
                 receiver.pendingIntent
             else -> throw IllegalArgumentException()
         }
+//        logd{"key ${key}"}
 
-//        logd{"${client.packageName} key ${key}"}
-
-        clientListeners.remove(client, key)
+        removeListener(listeners, key)
         callback.onCompletion(Status.SUCCESS)
-    }
-
-    private fun getOrCreateListeners(client: Client): Listeners {
-        return synchronized(mapOfListeners) {
-            val cur = mapOfListeners.get(client.uid)?.get()
-            if (cur != null) {
-                cur
-            } else {
-                val l = Listeners(7)
-                mapOfListeners.put(client.uid, WeakReference(l))
-                l
-            }
-        }
     }
 
     override fun updateLocationRequest(data: LocationRequestUpdateData) {
 //        logd{data}
         val pendingIntent = data.pendingIntent
         val client = try {
-            Client(this, pendingIntent?.creatorPackage, data.request?.contextAttributionTag, data.appOpsReasonMessage)
+            Client(this, pendingIntent?.creatorPackage, data.request?.contextAttributionTag)
         } catch (e: SecurityException) {
             data.fusedLocationProviderCallback?.onFusedLocationProviderResult(
                 FusedLocationProviderResult(Status(CommonStatusCodes.INTERNAL_ERROR)))
             return
         }
 
-        val clientListeners = getOrCreateListeners(client)
-
         if (data.opCode == LocationRequestUpdateData.OP_REQUEST_UPDATES) {
             val key: Any
             val glf: GLocationForwarder
             if (pendingIntent != null) {
-                if (pendingIntent.creatorUid != client.uid) {
-                    throw SecurityException()
-                }
                 key = pendingIntent
                 glf = GlfPendingIntent(pendingIntent)
             } else {
@@ -158,12 +118,12 @@ object GLocationService : IGoogleLocationManagerService.Stub() {
                     glf = GlfLocationListener(llistener)
                 }
             }
-            glf.listeners = clientListeners
+            glf.listeners = listeners
 
             val req: LocationRequest = data.request.request
             val oll = OsLocationListener(client, OsLocationProvider.get(client, req),
                     req.toOsLocationRequest(), glf)
-            clientListeners.update(client, key, oll)
+            updateListener(this, client, key, oll)
         } else {
             require(data.opCode == LocationRequestUpdateData.OP_REMOVE_UPDATES)
             val key: Any
@@ -178,40 +138,17 @@ object GLocationService : IGoogleLocationManagerService.Stub() {
                     key = llistener!!.asBinder()
                 }
             }
-            clientListeners.remove(client, key)
+            removeListener(listeners, key)
         }
         data.fusedLocationProviderCallback?.onFusedLocationProviderResult(FusedLocationProviderResult.SUCCESS)
     }
 
-    fun gcMapOfListeners() {
-        val map: SparseArray<WeakReference<Listeners>> = mapOfListeners
-        synchronized(map) {
-            var i = 0
-            while (i < map.size()) {
-                if (map.valueAt(i).get() == null) {
-                    map.removeAt(i)
-                } else {
-                    ++i
-                }
-            }
-        }
-    }
-
     // https://developers.google.com/android/reference/com/google/android/gms/location/FusedLocationProviderClient#flushLocations()
     override fun flushLocations(callback: IFusedLocationProviderCallback) {
-        val client = Client(this)
-        logd{"client ${client.packageName}"}
+        Client(this)
+        logd{}
 
-        val listeners =
-        synchronized(mapOfListeners) {
-            val cur = mapOfListeners.get(client.uid)?.get()
-            if (cur != null) {
-                cur
-            } else {
-                return
-            }
-        }
-        listeners.all().forEach {
+        getAllOsLocationListeners(listeners).forEach {
             it.flush()
         }
         callback.onFusedLocationProviderResult(FusedLocationProviderResult.SUCCESS)
@@ -224,15 +161,7 @@ object GLocationService : IGoogleLocationManagerService.Stub() {
         } catch (e: SecurityException) {
             return null
         }
-        logd{"client ${client.packageName} contextAttributionTag $contextAttributionTag"}
-
-        val opMode = client.noteProxyAppOp(client.permission)
-        if (opMode != MODE_ALLOWED) {
-            if (Const.DEV) {
-                throw SecurityException("noteProxyAppOp returned ${opModeToString(opMode)}")
-            }
-            return null
-        }
+        logd{"contextAttributionTag $contextAttributionTag"}
 
         val provider = OsLocationProvider.get(client, LocationRequest.GRANULARITY_PERMISSION_LEVEL)
 
@@ -243,24 +172,15 @@ object GLocationService : IGoogleLocationManagerService.Stub() {
 
     override fun getLastLocation4(request: LastLocationRequest, callback: ILocationStatusCallback) {
         val client = Client(this)
-        logd{"client ${client.packageName} maxAge ${request.maxAge}"}
+        logd{"maxAge ${request.maxAge}"}
 
         val provider = OsLocationProvider.get(client, request.granularity)
 
-        var location = client.locationManager.getLastKnownLocation(provider.name)?.let {
+        val location = client.locationManager.getLastKnownLocation(provider.name)?.let {
             if (it.elapsedRealtimeAgeMillis <= request.maxAge) {
                 provider.maybeFudge(it)
             } else {
                 null
-            }
-        }
-
-        if (location != null) {
-            val opMode = client.noteProxyAppOp(provider)
-            if (opMode != MODE_ALLOWED) {
-                logd{"opMode ${opModeToString(opMode)}"}
-                location = null
-                // GmsCore returns Status.SUCCESS even in this case
             }
         }
 
@@ -279,24 +199,14 @@ object GLocationService : IGoogleLocationManagerService.Stub() {
 
     override fun getLastLocation2(packageName: String?): Location? {
         logd()
-        // GMS ignores packageName too
+        // GmsCore ignores packageName too
         return getLastLocation3(null)
     }
 
     override fun getCurrentLocation(request: CurrentLocationRequest, callback: ILocationStatusCallback): ICancelToken {
         val client = Client(this)
 
-        val earlyRejectCheck = client.earlyRejectCheck(client.permission)
-        if (earlyRejectCheck != MODE_ALLOWED) {
-            logd{client.packageName + " earlyRejectCheck returned ${opModeToString(earlyRejectCheck)}"}
-            // GmsCore returns Status.SUCCESS too
-            callback.onResult(Status.SUCCESS, null)
-            return object : ICancelToken.Stub() {
-                override fun cancel() {}
-            }
-        }
-
-        logd{client.packageName}
+        logd{}
 
         val osRequest = android.location.LocationRequest.Builder(0L).apply {
             setDurationMillis(request.durationMillis)
@@ -310,14 +220,7 @@ object GLocationService : IGoogleLocationManagerService.Stub() {
             // check is not needed, maxUpdateAgeMillis applies only to historical locations
             // which are never returned by OsLocationProvider
             if (origLocation != null) {
-                var location: Location? = provider.maybeFudge(origLocation)
-
-                val opMode = client.noteProxyAppOp(provider)
-                if (opMode != MODE_ALLOWED) {
-                    logd{"${client.packageName} opMode ${opModeToString(opMode)}"}
-                    // GmsCore returns Status.SUCCESS even in this case
-                    location = null
-                }
+                val location: Location = provider.maybeFudge(origLocation)
 
                 try {
                     callback.onResult(Status.SUCCESS, location)
@@ -340,7 +243,7 @@ object GLocationService : IGoogleLocationManagerService.Stub() {
 
         return object : ICancelToken.Stub() {
             override fun cancel() {
-                logd{"cancel signal from ${client.packageName}"}
+                logd{"cancel signal"}
                 cancellationSignal.cancel()
             }
         }
@@ -358,7 +261,6 @@ object GLocationService : IGoogleLocationManagerService.Stub() {
         } catch (e: SecurityException) {
             return LocationAvailability.get(false)
         }
-        logd{"client ${client.packageName}"}
         return LocationAvailability.get(client.locationManager.isLocationEnabled())
     }
 
@@ -376,8 +278,8 @@ object GLocationService : IGoogleLocationManagerService.Stub() {
         callback: ISettingsCallbacks,
         packageName: String?
     ) {
-        logd{"client: ${packageManager.getPackagesForUid(Binder.getCallingUid())?.first()} ${objectToString(settingsRequest)}"}
-        // GMS doesn't check whether caller has a location permission in this case
+        logd{objectToString(settingsRequest)}
+        // GmsCore doesn't check whether caller has a location permission in this case
 
         val lss = LocationSettingsStates()
         lss.gpsPresent = true
@@ -388,27 +290,26 @@ object GLocationService : IGoogleLocationManagerService.Stub() {
         callback.onLocationSettingsResult(LocationSettingsResult(lss, Status.SUCCESS))
     }
 
-    @JvmField
-    val CODES = intArrayOf(
-        // to generate, copy TRANSACTION_* definitions from IGoogleLocationManagerService.Stub and run:
-        // xsel --clipboard | sed -e 's/static final int TRANSACTION_/\/* /' -e 's/=/*\//' -e 's/;/,/' | xsel --clipboard --input
+    class BinderDef : BinderDefSupplier(IGoogleLocationManagerService.DESCRIPTOR, GLocationService::class) {
 
-        /* getLastLocation */ 7,
-        /* getLastLocation2 */ 21,
-        /* getLastLocation3 */ 80,
-        /* getLastLocation4 */ 82,
-        /* getLastLocation5 */ 90,
-        /* getLocationAvailability */ 34,
-        /* getLocationAvailability2 */ 91,
-        /* requestLocationSettingsDialog */ 63,
-        /* updateLocationRequest */ 59,
-        /* flushLocations */ 67,
-        /* registerLocationReceiver */ 88,
-        /* unregisterLocationReceiver */ 89,
-        /* getCurrentLocation */ 87,
-        /* getCurrentLocation2 */ 92,
-    )
-    init {
-        Arrays.sort(CODES)
+        override fun transactionCodes(callerPkg: String) = intArrayOf(
+            // to generate, copy TRANSACTION_* definitions from IGoogleLocationManagerService.Stub and run:
+            // xsel --clipboard | sed -e 's/static final int TRANSACTION_/\/* /' -e 's/=/*\//' -e 's/;/,/' | xsel --clipboard --input
+
+            /* getLastLocation */ 7,
+            /* getLastLocation2 */ 21,
+            /* getLastLocation3 */ 80,
+            /* getLastLocation4 */ 82,
+            /* getLastLocation5 */ 90,
+            /* getLocationAvailability */ 34,
+            /* getLocationAvailability2 */ 91,
+            /* requestLocationSettingsDialog */ 63,
+            /* updateLocationRequest */ 59,
+            /* flushLocations */ 67,
+            /* registerLocationReceiver */ 88,
+            /* unregisterLocationReceiver */ 89,
+            /* getCurrentLocation */ 87,
+            /* getCurrentLocation2 */ 92,
+        )
     }
 }
