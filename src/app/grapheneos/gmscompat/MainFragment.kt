@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.content.pm.PackageManager.PackageInfoFlags
 import android.location.LocationManager
 import android.net.Uri
+import android.os.Build.IS_DEBUGGABLE
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
@@ -401,7 +402,7 @@ private fun intToBool(v: Int) =
     if (v == 1) {
         true
     } else {
-        if (Const.DEV) {
+        if (IS_DEBUGGABLE) {
             require(v == 0)
         }
         false

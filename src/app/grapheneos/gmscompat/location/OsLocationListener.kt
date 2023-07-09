@@ -79,9 +79,7 @@ class OsLocationListener(val client: Client, val provider: OsLocationProvider,
 
         val locationsToForward = locations.map { provider.maybeFudge(it) }
 
-        if (Const.DEV
-            && false
-        ) {
+        if (false) {
             // simulate movement
             locationsToForward.forEach {
                 val off = (SystemClock.uptimeMillis() % 10_000) / 1_000_000.0
