@@ -9,10 +9,12 @@ import android.util.ArrayMap
 import android.util.ArraySet
 import androidx.core.content.edit
 import app.grapheneos.gmscompat.App.MainProcessPrefs
+import app.grapheneos.gmscompat.location.GLocationService
 import com.android.internal.gmscompat.GmsInfo
 import com.android.internal.gmscompat.GmcBinderDefs.BinderDefStateListener
 
 enum class BinderDefGroup(val services: Array<BinderDefSupplier>) {
+    LOCATION(arrayOf(GLocationService.BinderDef()))
 }
 
 object BinderDefs {
@@ -55,14 +57,28 @@ object BinderDefs {
     fun isEnabled(group: BinderDefGroup, callerPkg: String? = null): Boolean {
         val prefs = App.preferences()
         return when (group) {
-            else -> false
+            BinderDefGroup.LOCATION -> {
+                val k = MainProcessPrefs.LOCATION_REQUEST_REDIRECTION_ENABLED
+                // getLong is used for compatibility with historical setting key
+                val v = prefs.getLong(k, -1L)
+                if (v == -1L) {
+                    val isEnabledByDefault = !gmsCoreHasPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                    prefs.edit {
+                        putLong(k, if (isEnabledByDefault) 1 else 0)
+                    }
+                    return isEnabledByDefault
+                }
+                v == 1L
+            }
         }
     }
 
     fun setEnabled(group: BinderDefGroup, enabled: Boolean) {
         App.preferences().edit {
             when (group) {
-                else -> {}
+                BinderDefGroup.LOCATION ->
+                    // putLong is used for compatibility with historical setting key
+                    putLong(MainProcessPrefs.LOCATION_REQUEST_REDIRECTION_ENABLED, if (enabled) 1 else 0)
             }
         }
 
@@ -74,7 +90,7 @@ object BinderDefs {
         App.ctx().sendBroadcast(intent)
     }
 
-    val binderDefsForNonGmsCoreClients: Set<String> = emptySet()
+    val binderDefsForNonGmsCoreClients: Set<String> = getIfaceNames(BinderDefGroup.LOCATION)
     val notableIfaceNames: Map<String, NotableInterface> = NotableInterface.values().associateBy { it.ifaceName }
 
     fun maybeGetBinderDef(callerPkg: String, processState: Int, ifaceName: String, isFromGms2Gca: Boolean): BinderDef? {

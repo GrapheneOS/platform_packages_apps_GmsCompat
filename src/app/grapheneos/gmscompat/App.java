@@ -70,8 +70,8 @@ public class App extends Application {
     private static final String MAIN_PROCESS_PREFS_FILE = "prefs";
 
     public interface MainProcessPrefs {
-        String ENABLED_REDIRECTIONS = "enabled_redirections";
-        String INITED_REDIRECTIONS = "inited_redirections";
+        String LOCATION_REQUEST_REDIRECTION_ENABLED = "enabled_redirections"; // historical name
+
         String GmsCore_POWER_EXEMPTION_PROMPT_DISMISSED = "GmsCore_power_exemption_prompt_dismissed";
         String NOTIFICATION_DO_NOT_SHOW_AGAIN_PREFIX = "do_not_show_notification_";
 
