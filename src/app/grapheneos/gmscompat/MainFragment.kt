@@ -394,8 +394,5 @@ private fun intToBool(v: Int) =
     if (v == 1) {
         true
     } else {
-        if (IS_DEBUGGABLE) {
-            require(v == 0)
-        }
         false
     }
