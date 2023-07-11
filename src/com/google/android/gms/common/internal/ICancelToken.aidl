@@ -1,5 +1,5 @@
 package com.google.android.gms.common.internal;
 
 interface ICancelToken {
-    void cancel() = 1;
+    oneway void cancel() = 1;
 }
