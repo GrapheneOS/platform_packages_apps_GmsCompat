@@ -130,6 +130,7 @@ public class GmsCompatConfigParser {
         final int SECTION_FORCE_DEFAULT_FLAGS = 3;
         final int SECTION_SPOOF_SELF_PERMISSION_CHECKS = 4;
         final int SECTION_GmsServiceBroker_SELF_PERMISSION_BYPASS = 5;
+        final int SECTION_force_ComponentEnabledSettings = 6;
 
         final long selfVersionCode = App.ctx().getApplicationInfo().longVersionCode;
 
@@ -175,6 +176,9 @@ public class GmsCompatConfigParser {
                 case "GmsServiceBroker_self_permission_bypass":
                     section2Type = SECTION_GmsServiceBroker_SELF_PERMISSION_BYPASS;
                     break;
+                case "force_ComponentEnabledSettings":
+                    section2Type = SECTION_force_ComponentEnabledSettings;
+                    break;
                 default:
                     invalidLine(line);
                     return;
@@ -203,6 +207,7 @@ public class GmsCompatConfigParser {
                 long targetGmsCompatVersion = 0L;
                 ArrayList<String> forceDefaultFlags = null;
                 ArrayList<String> spoofSelfPermissionChecks = null;
+                ArrayMap<String, Integer> forceCes = null;
 
                 if (section2Type == SECTION_FLAGS) {
                     String ns = sectionL1;
@@ -231,6 +236,10 @@ public class GmsCompatConfigParser {
                 } else if (section2Type == SECTION_GmsServiceBroker_SELF_PERMISSION_BYPASS) {
                     targetGmsCompatVersion = Long.parseLong(sectionL1);
                     res.gmsServiceBrokerPermissionBypasses.clear();
+                } else if (section2Type == SECTION_force_ComponentEnabledSettings) {
+                    String packageName = sectionL1;
+                    forceCes = new ArrayMap<>();
+                    res.forceComponentEnabledSettingsMap.put(packageName, forceCes);
                 }
 
                 sectionL0Loop:
@@ -308,6 +317,26 @@ public class GmsCompatConfigParser {
                             String[] permissions = lineParser.next().split(",");
                             res.gmsServiceBrokerPermissionBypasses.put(serviceId, new ArraySet<>(permissions));
                         }
+                    } else if (section2Type == SECTION_force_ComponentEnabledSettings) {
+                        String modeStr = lineParser.next();
+                        int mode;
+                        switch (modeStr) {
+                            case "disable":
+                                mode = PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+                                break;
+                            case "enable":
+                                mode = PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
+                                break;
+                            case "default":
+                                mode = PackageManager.COMPONENT_ENABLED_STATE_DEFAULT;
+                                break;
+                            default:
+                                Log.d(TAG, "unknown component enabled setting " + modeStr);
+                                invalidLine(line);
+                                continue;
+                        }
+                        String className = lineParser.next();
+                        forceCes.put(className, Integer.valueOf(mode));
                     }
                 }
             }
