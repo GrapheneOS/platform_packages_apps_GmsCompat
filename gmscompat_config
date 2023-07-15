@@ -112,6 +112,7 @@ queryValidVerificationPackageNames emptyList
 
 [android.hardware.usb.UsbManager]
 getPorts emptyList
+grantPermission void
 
 [android.location.LocationManager]
 setExtraLocationControllerPackage void
