@@ -45,7 +45,7 @@ object Notifications {
             ch(CH_MISSING_PERMISSION, R.string.missing_permission, IMPORTANCE_HIGH),
             ch(CH_MISSING_OPTIONAL_PERMISSION, R.string.missing_optional_permission),
             ch(CH_MISSING_APP, R.string.missing_app, IMPORTANCE_HIGH),
-            ch(CH_MISSING_PLAY_GAMES_APP, R.string.missing_play_games_app, IMPORTANCE_HIGH),
+            ch(CH_MISSING_PLAY_GAMES_APP, R.string.notif_ch_missing_play_games_app, IMPORTANCE_HIGH),
             ch(CH_BACKGROUND_ACTIVITY_START, R.string.notif_channel_bg_activity_start, IMPORTANCE_HIGH),
             ch(CH_GMS_CRASHED, R.string.notif_gms_crash_title, IMPORTANCE_HIGH),
         )
