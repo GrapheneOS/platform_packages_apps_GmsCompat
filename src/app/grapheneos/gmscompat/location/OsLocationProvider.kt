@@ -40,6 +40,8 @@ class OsLocationProvider(val name: String, val properties: ProviderProperties?, 
             val fudger: LocationFudger? = when (client.permission) {
                 Permission.COARSE -> {
                     when (granularity) {
+                        LocationRequest.GRANULARITY_COARSE,
+                        LocationRequest.GRANULARITY_PERMISSION_LEVEL, -> null
                         LocationRequest.GRANULARITY_FINE -> throw SecurityException()
                         else -> throw IllegalArgumentException()
                     }
