@@ -57,6 +57,7 @@ metadata_enabled false
 BugFixFeatures__fix_frp_in_r false
 
 [com.google.android.location]
+enable_app_importance_listener false
 # these flags are needed to prevent GmsCore from ignoring results of the legacy WifiManager#startScan()
 # method, which doesn't have an unprivileged modern version. It's used for location estimation based
 # on nearby Wi-Fi access points
