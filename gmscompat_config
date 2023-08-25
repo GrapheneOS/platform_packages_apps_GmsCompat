@@ -70,6 +70,9 @@ finsky.kill_switch_phenotype_gservices_check set-string 0
 
 [[stubs]]
 
+[android.app.ActivityManager]
+addOnUidImportanceListener void
+
 [android.app.admin.DevicePolicyManager]
 isDeviceProvisioned true
 isDeviceProvisioningConfigApplied true
