@@ -50,7 +50,7 @@ class PendingAction private constructor(val action: () -> Unit, val oneShot: Boo
         val piFlags = PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
         pendingIntent = PendingIntent.getBroadcast(ctx, 0, Intent(intentAction), piFlags)
 
-        ctx.registerReceiver(this, IntentFilter(intentAction))
+        ctx.registerReceiver(this, IntentFilter(intentAction), Context.RECEIVER_NOT_EXPORTED)
 
         logd{"registered $id"}
     }
