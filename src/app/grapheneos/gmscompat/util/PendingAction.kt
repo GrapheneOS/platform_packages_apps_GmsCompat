@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import app.grapheneos.gmscompat.App
 import app.grapheneos.gmscompat.logd
 import app.grapheneos.gmscompat.logw
+import com.android.internal.gmscompat.GmsCompatApp
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
@@ -50,7 +51,8 @@ class PendingAction private constructor(val action: () -> Unit, val oneShot: Boo
         val piFlags = PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
         pendingIntent = PendingIntent.getBroadcast(ctx, 0, Intent(intentAction), piFlags)
 
-        ctx.registerReceiver(this, IntentFilter(intentAction), Context.RECEIVER_NOT_EXPORTED)
+        ctx.registerReceiver(this, IntentFilter(intentAction),
+            GmsCompatApp.SIGNATURE_PROTECTED_PERMISSION, null, Context.RECEIVER_EXPORTED)
 
         logd{"registered $id"}
     }
