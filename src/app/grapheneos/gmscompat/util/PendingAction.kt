@@ -48,7 +48,7 @@ class PendingAction private constructor(val action: () -> Unit, val oneShot: Boo
         // CANCEL_CURRENT to make sure PendingActions from previous process launches are never launched
         // (same id can be used for a different PendingAction in the current process)
         val piFlags = PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        pendingIntent = PendingIntent.getBroadcast(ctx, 0, Intent(intentAction), piFlags)
+        pendingIntent = PendingIntent.getBroadcast(ctx, 0, Intent(intentAction).setPackage(ctx.packageName), piFlags)
 
         ctx.registerReceiver(this, IntentFilter(intentAction), Context.RECEIVER_NOT_EXPORTED)
 
