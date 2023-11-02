@@ -63,7 +63,7 @@ BugFixFeatures__fix_frp_in_r false
 d_psl false
 fwm true
 
-[com.google.android.gms.kidssettings]
+[com.google.android.gms.kidssettings#com.google.android.gms]
 SeparateApkFeature__disable_separate_apk_if_not_used false
 
 [gservices]
