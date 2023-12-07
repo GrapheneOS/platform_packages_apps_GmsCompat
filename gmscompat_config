@@ -66,6 +66,9 @@ fwm true
 [com.google.android.gms.kidssettings#com.google.android.gms]
 SeparateApkFeature__disable_separate_apk_if_not_used false
 
+[com.google.android.gms.gcm]
+GcmFeature__use_prioritized_alarm_api false
+
 [gservices]
 # make sure PhenotypeFlags are overridable by Gservices flags. Overriding Play Store (finsky) PhenotypeFlags
 # directly is much more complex than overriding Gservices flags.
