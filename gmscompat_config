@@ -202,6 +202,9 @@ setSilenceMode false
 registerBluetoothConnectionCallback false
 unregisterBluetoothConnectionCallback false
 
+[android.content.ContextWrapper]
+sendBroadcastAsUser int 0
+
 [[GmsServiceBroker_self_permission_bypass]]
 [1003]
 # DROID_GUARD (25) service can work without the Phone permission, despite requiring it to be granted.
