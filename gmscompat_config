@@ -155,6 +155,7 @@ getNextEntry null
 [android.os.UserManager]
 getSeedAccountOptions null
 getUserName String Owner
+getUserRestrictionSources emptyList
 
 [android.safetycenter.SafetyCenterManager]
 isSafetyCenterEnabled false
