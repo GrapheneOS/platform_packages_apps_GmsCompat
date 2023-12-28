@@ -423,7 +423,7 @@ object BinderGms2Gca : IGms2Gca.Stub() {
         }
 
         Notifications.builder(Notifications.CH_GMS_CRASHED).run {
-            setContentTitle(ctx.getText(R.string.notif_gms_crash_title))
+            setContentTitle(ctx.getString(R.string.notif_gms_crash_title, getApplicationLabel(ctx, aer.packageName)))
             setContentText(ctx.getText(R.string.notif_gms_crash_text))
             setContentIntent(activityPendingIntent(intent))
             setShowWhen(true)
