@@ -96,13 +96,14 @@ isBackupServiceActive false
 getAppStandbyBucket int 10
 
 [android.bluetooth.BluetoothAdapter]
+disable false
+enable false
 # 20 is SCAN_MODE_NONE
 getScanMode int 20
 getName nullString
 # 02:00:00:00:00:00 is DEFAULT_MAC_ADDRESS
 getAddress String 02:00:00:00:00:00
 listenUsingInsecureL2capChannel throw java.io.IOException
-disable false
 getProfileProxy false
 registerBluetoothConnectionCallback default
 unregisterBluetoothConnectionCallback default
@@ -122,8 +123,10 @@ queryValidVerificationPackageNames emptyList
 [android.hardware.usb.UsbManager]
 getPorts emptyList
 grantPermission void
+setCurrentFunctions void
 
 [android.location.LocationManager]
+getLastKnownLocation null
 setExtraLocationControllerPackage void
 setExtraLocationControllerPackageEnabled void
 registerGnssStatusCallback false
@@ -162,6 +165,11 @@ isSafetyCenterEnabled false
 
 [android.telecom.TelecomManager]
 getAllPhoneAccountHandles emptyList
+getCallCapablePhoneAccounts emptyList
+getPhoneAccount null
+getSelfManagedPhoneAccounts emptyList
+getUserSelectedOutgoingPhoneAccount null
+placeCall void
 
 [android.telephony.SubscriptionManager]
 getActiveSubscriptionIdList emptyIntArray
@@ -172,6 +180,7 @@ getDeviceId nullString
 getImei nullString
 getMeid nullString
 # 0 is NETWORK_TYPE_UNKNOWN
+getDataNetworkType int 0
 getNetworkType int 0
 getVoiceNetworkType int 0
 # 0 is CALL_STATE_IDLE
@@ -186,6 +195,7 @@ isIccLockEnabled false
 getGroupIdLevel1 nullString
 unregisterTelephonyCallback void
 getServiceState null
+getVoiceMailNumber nullString
 
 [[versionMap]]
 # section name is gmscompat version, section contents are max supported versions of GmsCore and Play Store
@@ -220,3 +230,17 @@ sendBroadcastAsUser int 0
 [com.google.android.gms]
 # causes chain crashes on Pixel Tablet due to the missing Dock Manager app
 disable com.google.android.gms.homegraph.PersistentListenerService
+
+[[spoof_self_permission_checks_v2]]
+
+[com.google.android.projection.gearhead]
+android.permission.ACCESS_COARSE_LOCATION
+android.permission.ACCESS_FINE_LOCATION
+android.permission.ASSOCIATE_COMPANION_DEVICES
+android.permission.BLUETOOTH_CONNECT
+android.permission.BLUETOOTH_SCAN
+android.permission.CALL_PHONE
+android.permission.MANAGE_USB
+android.permission.READ_PHONE_STATE
+android.permission.READ_PRIVILEGED_PHONE_STATE
+android.permission.RECORD_AUDIO
