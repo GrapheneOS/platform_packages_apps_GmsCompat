@@ -96,21 +96,15 @@ public class PersistentFgService extends Service {
             boolean res;
             if (GmsInfo.PACKAGE_GMS_CORE.equals(pkg)) {
                 res = bindGmsCore();
-            } else if (GmsInfo.PACKAGE_PLAY_STORE.equals(pkg)) {
-                res = bindPlayStore();
             } else if (GmsInfo.PACKAGE_GSF.equals(pkg)) {
                 // GSF doesn't need to be bound, but needs GmsCompatApp process to remain running to
                 // be able to use its exported binder
                 res = true;
-            } else if (GmsInfo.PACKAGE_GSA.equals(pkg)) {
+            } else if (GmsCompat.canBeEnabledFor(pkg)) {
                 res = bind(pkg, GmsCompatClientService.class.getName());
             } else {
-                if (Build.isDebuggable() && GmsCompat.isTestPackage(pkg, getUserId(), false)) {
-                    res = true;
-                } else {
-                    // this service is not exported
-                    throw new IllegalStateException("unexpected intent action " + pkg);
-                }
+                // this service is not exported
+                throw new IllegalStateException("unexpected intent action " + pkg);
             }
 
             notifyCaller(intent, res);

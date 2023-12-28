@@ -50,14 +50,14 @@ class MainFragment : PreferenceFragmentCompat() {
         }
         screen.addPref().apply {
             title = getString(R.string.component_system_settings, getString(R.string.play_services))
-            intent = appSettingsIntent(PACKAGE_GMS_CORE)
+            intent = appSettingsIntent(PackageId.GMS_CORE_NAME)
         }
 
-        if (isPkgInstalled(PACKAGE_PLAY_STORE)) {
+        if (checkPackageId(PackageId.PLAY_STORE_NAME, PackageId.PLAY_STORE)) {
             val playStore = getString(R.string.play_store)
             screen.addPref().apply {
                 title = getString(R.string.component_system_settings, playStore)
-                intent = appSettingsIntent(PACKAGE_PLAY_STORE)
+                intent = appSettingsIntent(PackageId.PLAY_STORE_NAME)
             }
         }
         screen.addPref().apply {

@@ -140,7 +140,7 @@ object Notifications {
 
         val ctx = App.ctx()
 
-        if (!GmsCompat.isGmsApp(GmsInfo.PACKAGE_PLAY_STORE, ctx.userId)) {
+        if (!GmsCompat.isEnabledFor(GmsInfo.PACKAGE_PLAY_STORE, ctx.userId)) {
             return
         }
 
