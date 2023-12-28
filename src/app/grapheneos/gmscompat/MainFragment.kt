@@ -3,13 +3,14 @@ package app.grapheneos.gmscompat
 import android.Manifest.permission
 import android.app.AlertDialog
 import android.app.AppOpsManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.pm.PackageManager.PackageInfoFlags
+import android.ext.KnownSystemPackages
+import android.ext.PackageId
 import android.location.LocationManager
 import android.net.Uri
-import android.os.Build.IS_DEBUGGABLE
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
@@ -29,7 +30,6 @@ import androidx.preference.SwitchPreference
 import com.android.internal.gmscompat.GmsCompatApp
 import com.android.internal.gmscompat.GmsInfo.PACKAGE_GMS_CORE
 import com.android.internal.gmscompat.GmsInfo.PACKAGE_PLAY_STORE
-import java.lang.StringBuilder
 import java.util.Collections
 import java.util.concurrent.Executors
 
@@ -60,6 +60,17 @@ class MainFragment : PreferenceFragmentCompat() {
                 intent = appSettingsIntent(PackageId.PLAY_STORE_NAME)
             }
         }
+
+        if (checkPackageId(PackageId.ANDROID_AUTO_NAME, PackageId.ANDROID_AUTO)) {
+            screen.addPref().apply {
+                setTitle(R.string.android_auto)
+                intent = Intent().apply {
+                    component = ComponentName(KnownSystemPackages.PERMISSION_CONTROLLER,
+                        "com.android.permissioncontroller.ext.aauto.AndroidAutoConfigActivity")
+                }
+            }
+        }
+
         screen.addPref().apply {
             title = getString(R.string.google_settings)
             intent = freshActivity(Intent().setClassName(PACKAGE_GMS_CORE, PACKAGE_GMS_CORE +

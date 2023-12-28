@@ -4,6 +4,7 @@ import android.app.AppOpsManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
@@ -114,6 +115,22 @@ fun isPkgInstalled(pkg: String): Boolean {
     try {
         App.ctx().packageManager.getPackageInfo(pkg, PackageManager.PackageInfoFlags.of(0))
         return true
+    } catch (e: PackageManager.NameNotFoundException) {
+        return false
+    }
+}
+
+fun PackageManager.getAppInfoOrNull(pkgName: String, flags: Long = 0L): ApplicationInfo? {
+    return try {
+        getApplicationInfo(pkgName, PackageManager.ApplicationInfoFlags.of(flags))
+    } catch (e: PackageManager.NameNotFoundException) {
+        null
+    }
+}
+
+fun checkPackageId(pkg: String, id: Int): Boolean {
+    try {
+        return App.ctx().packageManager.getApplicationInfo(pkg, 0).ext().packageId == id
     } catch (e: PackageManager.NameNotFoundException) {
         return false
     }
