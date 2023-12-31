@@ -162,8 +162,7 @@ public class PersistentFgService extends Service {
         Intent i = new Intent();
         i.setClassName(pkg, cls);
 
-        // BIND_INCLUDE_CAPABILITIES isn't needed, at least for now
-        int flags = BIND_AUTO_CREATE | BIND_IMPORTANT;
+        int flags = BIND_AUTO_CREATE | BIND_IMPORTANT | BIND_INCLUDE_CAPABILITIES;
         boolean r = bindService(i, new Connection(pkg, this), flags);
         if (r) {
             boundPackages.add(pkg);
