@@ -78,6 +78,7 @@ To receive them quicker, set “Battery usage” to “Unrestricted” in Play s
 
     <string name="notif_missing_nofications_perm">%1$s tried to show a notification</string>
 
+    <string name="notif_ch_gms_crash">Sandboxed Google Play crashed</string>
     <string name="notif_gms_crash_title">%1$s has crashed</string>
     <string name="notif_gms_crash_text">Tap to see the details</string>
     <string name="notif_gms_crash_report">Report to developers</string>

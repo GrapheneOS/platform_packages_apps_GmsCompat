@@ -47,7 +47,7 @@ object Notifications {
             ch(CH_MISSING_APP, R.string.missing_app, IMPORTANCE_HIGH),
             ch(CH_MISSING_PLAY_GAMES_APP, R.string.notif_ch_missing_play_games_app, IMPORTANCE_HIGH),
             ch(CH_BACKGROUND_ACTIVITY_START, R.string.notif_channel_bg_activity_start, IMPORTANCE_HIGH),
-            ch(CH_GMS_CRASHED, R.string.notif_gms_crash_title, IMPORTANCE_HIGH),
+            ch(CH_GMS_CRASHED, R.string.notif_ch_gms_crash, IMPORTANCE_HIGH),
         )
 
         App.notificationManager().createNotificationChannels(list)
