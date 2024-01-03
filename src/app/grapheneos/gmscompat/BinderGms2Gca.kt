@@ -312,6 +312,7 @@ object BinderGms2Gca : IGms2Gca.Stub() {
             val perm = android.Manifest.permission.REQUEST_COMPANION_PROFILE_AUTOMOTIVE_PROJECTION
             if (ctx.checkCallingPermission(perm) != PackageManager.PERMISSION_GRANTED) {
                 Log.d(TAG, "skipped Android Auto crash report: baseline permissions are not granted")
+                showAndroidAutoMissingBaselinePermsNotif()
                 return
             }
         }
@@ -366,6 +367,16 @@ object BinderGms2Gca : IGms2Gca.Stub() {
 
         if (showNotification) {
             showGmsCrashNotification(aer)
+        }
+    }
+
+    private fun showAndroidAutoMissingBaselinePermsNotif() {
+        Notifications.builder(Notifications.CH_GMS_CRASHED).run {
+            setContentTitle(ctx.getText(R.string.notif_android_auto_needs_baseline_perms_title))
+            setContentText(ctx.getText(R.string.notif_android_auto_needs_baseline_perms_text))
+            setShowWhen(true)
+            setSmallIcon(R.drawable.ic_configuration_required)
+            show(Notifications.ID_ANDROID_AUTO_NEEDS_BASELINE_PERMS)
         }
     }
 
