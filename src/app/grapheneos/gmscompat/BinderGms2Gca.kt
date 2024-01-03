@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.IContentObserver
+import android.ext.PackageId
 import android.net.Uri
 import android.os.Binder
 import android.os.BinderDef
@@ -306,6 +307,15 @@ object BinderGms2Gca : IGms2Gca.Stub() {
 
     override fun onUncaughtException(aer: ApplicationErrorReport) {
         val TAG = "onGmsUncaughtException"
+
+        if (aer.packageName == PackageId.ANDROID_AUTO_NAME) {
+            val perm = android.Manifest.permission.REQUEST_COMPANION_PROFILE_AUTOMOTIVE_PROJECTION
+            if (ctx.checkCallingPermission(perm) != PackageManager.PERMISSION_GRANTED) {
+                Log.d(TAG, "skipped Android Auto crash report: baseline permissions are not granted")
+                return
+            }
+        }
+
         val ts = SystemClock.elapsedRealtime()
         val stackTrace = aer.crashInfo.stackTrace
 
