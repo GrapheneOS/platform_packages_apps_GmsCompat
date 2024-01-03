@@ -105,4 +105,7 @@ Update to an unknown version may cause crashes and errors in sandboxed Google Pl
     <string name="notif_screen_capture_is_running">Screen capture is running</string>
 
     <string name="notif_GmsCore_missing_nearby_devices_perm_generic">%1$s requires Play services to have the “Nearby devices” permission</string>
+
+    <string name="notif_android_auto_needs_baseline_perms_title">Android Auto needs setup</string>
+    <string name="notif_android_auto_needs_baseline_perms_text">Go to Settings ➔ Apps ➔ Sandboxed Google Play ➔ Android Auto</string>
 </resources>

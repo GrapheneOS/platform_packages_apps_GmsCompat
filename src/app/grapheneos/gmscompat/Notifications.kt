@@ -33,6 +33,7 @@ object Notifications {
     const val ID_GmsCore_POWER_EXEMPTION_PROMPT = 7
     const val ID_CONTACTS_SYNC_PROMPT = 8
     const val ID_MISSING_POST_NOTIFICATIONS_PERM = 9;
+    const val ID_ANDROID_AUTO_NEEDS_BASELINE_PERMS = 10
 
     private val uniqueNotificationId = AtomicInteger(10_000)
     fun generateUniqueNotificationId() = uniqueNotificationId.getAndIncrement()
