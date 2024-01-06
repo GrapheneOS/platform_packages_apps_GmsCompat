@@ -434,6 +434,7 @@ object BinderGms2Gca : IGms2Gca.Stub() {
         intent.putExtra(Intent.EXTRA_BUG_REPORT, aer)
         val configVersion = ctx.packageManager.getPackageInfo(ConfigUpdateReceiver.CONFIG_HOLDER_PACKAGE,
                 PackageManager.PackageInfoFlags.of(0L)).longVersionCode
+        intent.putExtra(LogViewerApp.EXTRA_SHOW_REPORT_BUTTON, true)
         intent.putExtra(Intent.EXTRA_TEXT, "GmsCompatConfig version: $configVersion")
         intent.setPackage(LogViewerApp.getPackageName());
 
