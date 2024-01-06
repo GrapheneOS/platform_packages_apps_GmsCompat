@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.IContentObserver
+import android.ext.LogViewerApp
 import android.ext.PackageId
 import android.net.Uri
 import android.os.Binder
@@ -434,7 +435,7 @@ object BinderGms2Gca : IGms2Gca.Stub() {
         val configVersion = ctx.packageManager.getPackageInfo(ConfigUpdateReceiver.CONFIG_HOLDER_PACKAGE,
                 PackageManager.PackageInfoFlags.of(0L)).longVersionCode
         intent.putExtra(Intent.EXTRA_TEXT, "GmsCompatConfig version: $configVersion")
-        intent.setComponent(ComponentName.createRelative("com.android.systemui", ".ErrorReportActivity"))
+        intent.setPackage(LogViewerApp.getPackageName());
 
         val reportAction = run {
             val url = "https://github.com/GrapheneOS/os-issue-tracker/issues"
