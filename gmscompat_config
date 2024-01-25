@@ -200,7 +200,7 @@ getVoiceMailNumber nullString
 [[versionMap]]
 # section name is gmscompat version, section contents are max supported versions of GmsCore and Play Store
 [1000]
-240299999 83929999
+240399999 83939999
 
 [[stubs_12.1]]
 
