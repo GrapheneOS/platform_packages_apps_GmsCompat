@@ -155,6 +155,9 @@ disable false
 [android.os.DropBoxManager]
 getNextEntry null
 
+[android.os.SystemVibratorManager$SingleVibrator]
+addVibratorStateListener void
+
 [android.os.UserManager]
 getSeedAccountOptions null
 getUserName String Owner
