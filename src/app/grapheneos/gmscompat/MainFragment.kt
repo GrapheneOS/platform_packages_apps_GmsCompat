@@ -26,7 +26,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceGroup
-import androidx.preference.SwitchPreference
+import androidx.preference.SwitchPreferenceCompat
 import com.android.internal.gmscompat.GmsCompatApp
 import com.android.internal.gmscompat.GmsInfo.PACKAGE_GMS_CORE
 import com.android.internal.gmscompat.GmsInfo.PACKAGE_PLAY_STORE
@@ -82,7 +82,7 @@ class MainFragment : PreferenceFragmentCompat() {
             title = getString(R.string.geolocation)
             screen.addPreference(this)
 
-            SwitchPreference(ctx).apply {
+            SwitchPreferenceCompat(ctx).apply {
                 title = getString(R.string.reroute_location_requests_to_os_apis)
                 isSingleLineTitle = false
                 isChecked = BinderDefs.isEnabled(BinderDefGroup.LOCATION)
@@ -155,7 +155,7 @@ class MainFragment : PreferenceFragmentCompat() {
                 title = getString(R.string.geolocation)
             }
         }
-        if (!ctx.getSystemService(PowerManager::class.java).isIgnoringBatteryOptimizations(PACKAGE_GMS_CORE)) {
+        if (!ctx.getSystemService(PowerManager::class.java)!!.isIgnoringBatteryOptimizations(PACKAGE_GMS_CORE)) {
             val d = AlertDialog.Builder(ctx).apply {
                 setMessage(R.string.play_services_no_battery_exemption)
                 setPositiveButton(R.string.play_services_settings) { _, _ ->
@@ -181,7 +181,7 @@ class MainFragment : PreferenceFragmentCompat() {
     private fun geolocationIssues(ctx: Context): AlertDialog.Builder? {
         val sb = StringBuilder(1000)
         var addEnableLocationButton = false
-        if (!ctx.getSystemService(LocationManager::class.java).isLocationEnabled) {
+        if (!ctx.getSystemService(LocationManager::class.java)!!.isLocationEnabled) {
             sb.separator()
             sb.resString(R.string.location_access_is_off_for_all_apps)
             addEnableLocationButton = true
