@@ -18,6 +18,11 @@
         android:name="app.grapheneos.gmscompat.SHOW_UI"
         android:protectionLevel="signature|privileged" />
 
+    <!-- held only by GMS components that use GmsCompat -->
+    <permission
+        android:name="app.grapheneos.gmscompat.permission.CLIENT"
+        android:protectionLevel="internal" />
+
     <!-- held only by our package -->
     <permission
         android:name="app.grapheneos.gmscompat.permission.SELF"
