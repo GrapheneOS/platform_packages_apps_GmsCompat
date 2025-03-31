@@ -18,11 +18,12 @@
         android:name="app.grapheneos.gmscompat.SHOW_UI"
         android:protectionLevel="signature|privileged" />
 
+    <!-- held only by our package -->
     <permission
-        android:name="app.grapheneos.gmscompat.SIGNATURE_PROTECTED_PERMISSION"
+        android:name="app.grapheneos.gmscompat.permission.SELF"
         android:protectionLevel="signature" />
 
-    <uses-permission android:name="app.grapheneos.gmscompat.SIGNATURE_PROTECTED_PERMISSION" />
+    <uses-permission android:name="app.grapheneos.gmscompat.permission.SELF" />
 
     <!-- These permissions are normally declared in GSF and GmsCore. They were moved here because
     of an issue with permissions that have "normal" protectionLevel. If the app that declares a
