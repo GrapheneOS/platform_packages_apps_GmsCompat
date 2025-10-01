@@ -63,6 +63,10 @@ enable_telecom_feature false
 service_enabled false
 update_install_enable_resume_on_reboot false
 
+[com.google.android.gms.wallet]
+# hiding overlay windows requires a privileged permission
+BenderLaunchFeatures__enable_set_hide_overlay_windows false
+
 [com.google.android.westworld]
 # seems to be an OS stats/analytics service, requires privileged permissions to function
 enabled false
