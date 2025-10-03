@@ -88,6 +88,10 @@ fwm true
 [com.google.android.gms.kidssettings#com.google.android.gms]
 SeparateApkFeature__disable_separate_apk_if_not_used false
 
+[com.google.android.projection.gearhead]
+# prevent Android Auto from trying to query a nonexistent Assistant service in the Google app
+Assistant__dodgeboost_initial_handshake_enabled true
+
 [gservices]
 # make sure PhenotypeFlags are overridable by Gservices flags. Overriding Play Store (finsky) PhenotypeFlags
 # directly is much more complex than overriding Gservices flags.
