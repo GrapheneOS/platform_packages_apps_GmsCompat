@@ -15,6 +15,7 @@ import android.util.ArrayMap;
 import java.util.function.Function;
 
 import app.grapheneos.gmscompat.lib.GmsCompatLibImpl;
+import app.grapheneos.gmscompat.lib.sysservice.client.ClientServiceOverridesRegistry;
 
 public class SystemServiceOverridesRegistry {
 
@@ -30,6 +31,8 @@ public class SystemServiceOverridesRegistry {
 
         if (GmsCompat.isEnabled()) {
             registry.put(IActivityManager.Stub.DESCRIPTOR, GmcActivityManager::new);
+        } else if (appContext.getApplicationInfo().ext().hasFlag(AppInfoExtFlag.HAS_GMSCORE_CLIENT_LIBRARY)) {
+            ClientServiceOverridesRegistry.init(registry);
         }
     }
 }
