@@ -1,5 +1,7 @@
 package app.grapheneos.gmscompat.lib.sysservice.client;
 
+import android.app.ActivityThread;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.IPackageManager;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -38,6 +40,17 @@ class GclPackageManager extends IPackageManager.Stub.Proxy {
             //noinspection deprecation
             pkgInfo.signatures = new Signature[] { Certs.gmsCore() };
             return pkgInfo;
+        }
+        return res;
+    }
+
+    @Override
+    public ApplicationInfo getApplicationInfo(String packageName, long flags, int userId) throws RemoteException {
+        ApplicationInfo res = super.getApplicationInfo(packageName, flags, userId);
+        if (res == null && PackageId.GMS_CORE_NAME.equals(packageName) && flags == PackageManager.GET_META_DATA) {
+            Log.d(TAG, "getApplicationInfo: providing empty GmsCore ApplicationInfo");
+            /* see font preloading sequence in */ /** @see ActivityThread#handleBindApplication */
+            res = new ApplicationInfo();
         }
         return res;
     }
