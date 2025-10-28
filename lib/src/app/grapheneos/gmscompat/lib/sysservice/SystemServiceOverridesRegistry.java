@@ -2,11 +2,12 @@ package app.grapheneos.gmscompat.lib.sysservice;
 
 import android.app.ActivityManager;
 import android.app.ActivityThread;
+import android.app.AppGlobals;
 import android.app.IActivityManager;
 import android.app.SystemServiceRegistry;
 import android.app.compat.gms.GmsCompat;
 import android.content.Context;
-import android.ext.AppInfoExtFlag;
+import android.ext.PackageId;
 import android.hardware.display.DisplayManagerGlobal;
 import android.os.IBinder;
 import android.os.IInterface;
@@ -31,7 +32,7 @@ public class SystemServiceOverridesRegistry {
 
         if (GmsCompat.isEnabled()) {
             registry.put(IActivityManager.Stub.DESCRIPTOR, GmcActivityManager::new);
-        } else if (appContext.getApplicationInfo().ext().hasFlag(AppInfoExtFlag.HAS_GMSCORE_CLIENT_LIBRARY)) {
+        } else if (AppGlobals.getInitialPackageId() == PackageId.G_CAMERA) {
             ClientServiceOverridesRegistry.init(registry);
         }
     }
