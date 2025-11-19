@@ -20,6 +20,7 @@ android_app {
         "androidx.preference_preference",
         // needed by framework-appsearch-safeparcel-sources
         "appsearch_flags_java_exported_lib",
+        "SettingsLibCategory",
         "SettingsLibCollapsingToolbarBaseActivity",
     ],
     jarjar_rules: "jarjar-rules.txt",

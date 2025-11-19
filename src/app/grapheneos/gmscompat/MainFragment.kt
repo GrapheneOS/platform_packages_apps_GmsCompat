@@ -17,16 +17,16 @@ import android.provider.Settings
 import android.view.View
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
-import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceGroup
 import androidx.preference.SwitchPreferenceCompat
 import com.android.internal.gmscompat.GmsCompatApp
 import com.android.internal.gmscompat.GmsInfo.PACKAGE_GMS_CORE
+import com.android.settingslib.preference.PreferenceFragment
 import java.util.concurrent.Executors
 
 private val bgExecutor = Executors.newSingleThreadExecutor()
 
-class MainFragment : PreferenceFragmentCompat() {
+class MainFragment : PreferenceFragment() {
     lateinit var potentialIssuesCategory: PreferenceCategory
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
