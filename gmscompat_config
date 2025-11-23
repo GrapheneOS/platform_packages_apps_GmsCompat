@@ -155,6 +155,7 @@ registerCallback void
 unregisterCallback void
 
 [android.bluetooth.BluetoothLeBroadcastAssistant]
+getConnectedDevices emptyList
 registerCallback void
 unregisterCallback void
 
