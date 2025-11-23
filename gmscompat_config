@@ -3,6 +3,9 @@
 [com.google.android.gms]
 # disable AnomalyConfigIntentOperation, which crashes due to unavailable StatsManager
 45681197 false
+# DeviceDoctor kills GmsCore process from an UncaughtExceptionHandler, which hides the crash from
+# the GmsCompat crash reporting system
+DeviceDoctor__devicedoctor_enabled false
 
 [com.google.android.gms.enpromo]
 # enpromo is a GmsCore module that shows a notification that prompts the user to enable
