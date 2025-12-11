@@ -128,6 +128,9 @@ isSupervisionEnabled false
 # 10 is STANDBY_BUCKET_ACTIVE
 getAppStandbyBucket int 10
 
+[android.bluetooth.BluetoothA2dp]
+setConnectionPolicy false
+
 [android.bluetooth.BluetoothAdapter]
 disable false
 enable false
