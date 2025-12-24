@@ -3,13 +3,14 @@ package app.grapheneos.gmscompat
 import android.Manifest
 import android.app.ActivityManager
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.ext.PackageId
 import android.os.BinderDef
 import android.util.ArrayMap
 import android.util.ArraySet
 import android.util.Log
 import androidx.core.content.edit
 import app.grapheneos.gmscompat.App.MainProcessPrefs
-import app.grapheneos.gmscompat.Const.IS_DEV_BUILD
 import app.grapheneos.gmscompat.location.GLocationService
 import com.android.internal.gmscompat.GmsInfo
 import com.android.internal.gmscompat.GmcBinderDefs.BinderDefStateListener
@@ -59,6 +60,15 @@ object BinderDefs {
         val prefs = App.preferences()
         return when (group) {
             BinderDefGroup.LOCATION -> {
+                if (callerPkg == PackageId.GMS_CORE_NAME || callerPkg == PackageId.ANDROID_AUTO_NAME) {
+                    if (App.ctx().packageManager.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, callerPkg) != PackageManager.PERMISSION_GRANTED) {
+                        // GmsCore and Android Auto crash in some cases when the GmsCore location
+                        // service is used without holding any location permission.
+                        //
+                        // Usage of the GmsCompat location service reimplementation avoid this issue.
+                        return true
+                    }
+                }
                 val k = MainProcessPrefs.LOCATION_REQUEST_REDIRECTION_ENABLED
                 // getLong is used for compatibility with historical setting key
                 val v = prefs.getLong(k, -1L)
@@ -91,7 +101,7 @@ object BinderDefs {
         App.ctx().sendBroadcast(intent)
     }
 
-    val binderDefsForNonGmsCoreClients: Set<String> = getIfaceNames(BinderDefGroup.LOCATION)
+    val binderDefs: Set<String> = getIfaceNames(BinderDefGroup.LOCATION)
     val notableIfaceNames: Map<String, NotableInterface> = NotableInterface.values().associateBy { it.ifaceName }
 
     fun maybeGetBinderDef(callerPkg: String, processState: Int, ifaceName: String, isFromGms2Gca: Boolean): BinderDef? {
@@ -112,12 +122,7 @@ object BinderDefs {
             }
         }
 
-        if (callerPkg == GmsInfo.PACKAGE_GMS_CORE) {
-            check(isFromGms2Gca)
-            return null
-        }
-
-        if (binderDefsForNonGmsCoreClients.contains(ifaceName)) {
+        if (binderDefs.contains(ifaceName)) {
             verifyCallerPkg(callerPkg)
 
             return getFromIfaceNameIfEnabled(callerPkg, ifaceName)
