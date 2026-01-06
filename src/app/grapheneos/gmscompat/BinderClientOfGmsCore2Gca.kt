@@ -18,7 +18,7 @@ import android.provider.Settings
 import android.util.Log
 import androidx.core.content.getSystemService
 import com.android.internal.gmscompat.IClientOfGmsCore2Gca
-import com.android.internal.gmscompat.dynamite.server.IFileProxyService
+import com.android.internal.gmscompat.fileservice.IFileProxyService
 
 object BinderClientOfGmsCore2Gca : IClientOfGmsCore2Gca.Stub() {
 
@@ -26,7 +26,7 @@ object BinderClientOfGmsCore2Gca : IClientOfGmsCore2Gca.Stub() {
         return BinderDefs.maybeGetBinderDef(callerPkg, processState, ifaceName, false)
     }
 
-    override fun getDynamiteFileProxyService(): IFileProxyService = BinderGms2Gca.dynamiteFileProxyService!!
+    override fun getGmsCoreFileProxyService(): IFileProxyService = BinderGms2Gca.gmsCoreFileProxyService!!
 
     override fun showMissingAppNotification(pkgName: String) {
         val prompt = when (pkgName) {

@@ -30,7 +30,7 @@ import com.android.internal.gmscompat.GmsInfo.PACKAGE_GMS_CORE
 import com.android.internal.gmscompat.GmsInfo.PACKAGE_PLAY_STORE
 import com.android.internal.gmscompat.IGca2Gms
 import com.android.internal.gmscompat.IGms2Gca
-import com.android.internal.gmscompat.dynamite.server.IFileProxyService
+import com.android.internal.gmscompat.fileservice.IFileProxyService
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.function.Consumer
@@ -183,11 +183,11 @@ object BinderGms2Gca : IGms2Gca.Stub() {
     }
 
     @Volatile
-    var dynamiteFileProxyService: IFileProxyService? = null
+    var gmsCoreFileProxyService: IFileProxyService? = null
 
     override fun connectGmsCore(processName: String, iGca2Gms: IGca2Gms, fileProxyService: IFileProxyService?): GmsCompatConfig {
         if (fileProxyService != null) {
-            dynamiteFileProxyService = fileProxyService
+            gmsCoreFileProxyService = fileProxyService
         }
 
         if (processName == GmsHooks.PERSISTENT_GmsCore_PROCESS) {
