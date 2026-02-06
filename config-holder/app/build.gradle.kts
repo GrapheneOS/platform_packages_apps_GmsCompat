@@ -26,8 +26,8 @@ android {
 
     sourceSets.getByName("main") {
         manifest.srcFile("AndroidManifest.xml")
-        res.srcDir("res")
-        resources.srcDir("../../gmscompat_config")
+        res.directories.add("res")
+        resources.directories.add("../../gmscompat_config")
     }
 
     val keystorePropertiesFile = rootProject.file("keystore.properties")
