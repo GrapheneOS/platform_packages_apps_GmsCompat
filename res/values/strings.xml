@@ -8,6 +8,7 @@
 
     <string name="usage_guide">Usage guide</string>
     <string name="play_services">Play services</string>
+    <string name="play_services_special_permissions">Play services special permissions</string>
     <string name="play_store">Play Store</string>
     <string name="android_auto">Android Auto</string>
 <!--    <string name="google_settings">Google services &amp; preferences</string>-->
