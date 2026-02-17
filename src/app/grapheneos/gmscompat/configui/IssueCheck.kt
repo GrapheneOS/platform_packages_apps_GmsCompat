@@ -112,3 +112,8 @@ sealed class IssueCheck {
         }
     }
 }
+
+fun Collection<IssueCheck>.getAllIssueRes(context: Context) =
+    flatMap {
+        it.getStringResOfIssues(context, context.packageManager)
+    }

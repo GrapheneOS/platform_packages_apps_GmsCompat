@@ -1,0 +1,3 @@
+# Needed to avoid conflicts with the framework safeparcel instance. Using it directly is possible,
+# but that requires extensive changes to AppSearch module
+rule android.app.appsearch.safeparcel.* app.grapheneos.gmscompat.safeparcel.lib.@1

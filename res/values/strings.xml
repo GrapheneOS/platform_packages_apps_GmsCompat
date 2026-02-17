@@ -9,6 +9,7 @@
     <string name="usage_guide">Usage guide</string>
     <string name="play_services">Play services</string>
     <string name="play_services_special_permissions">Play services special permissions</string>
+    <string name="play_services_special_permissions_summary">ICC authentication, RCS activation</string>
     <string name="play_store">Play Store</string>
     <string name="android_auto">Android Auto</string>
 <!--    <string name="google_settings">Google services &amp; preferences</string>-->
@@ -219,4 +220,11 @@ Some carriers require an entitlement check (GSMA TS.43 with EAP-AKA authenticati
     <string name="rcs_issue_bugle_not_sms_app">Google Messages needs to be set as the default SMS app</string>
     <string name="rcs_issue_bugle_no_internet_perm">Google Messages needs the Network permission</string>
     <string name="rcs_issue_not_owner_user">RCS in Google Messages currently only works in the Owner user</string>
+
+    <string name="notif_rcs_needs_baseline_perms_title">RCS may require permissions</string>
+    <string name="notif_rcs_not_owner_user_title">RCS may not work</string>
+    <string name="notif_rcs_not_owner_user_text">RCS is currently only known to work in the Owner user.</string>
+    <string name="notif_rcs_needs_baseline_perms_text">Some apps are missing permissions for RCS, and activation might not complete. Go to Settings ➔ Apps ➔ Sandboxed Google Play ➔ Play services special permissions for more information.</string>
+    <string name="notif_rcs_needs_baseline_perms_text_icc">Your carrier may require ICC authentication for RCS setup. Go to Settings ➔ Apps ➔ Sandboxed Google Play ➔ Play services special permissions for more information.</string>
+    <string name="notif_rcs_needs_baseline_perms_text_icc_and_other_perms">Your carrier may require ICC authentication for RCS setup, and other permissions may be needed. Go to Settings ➔ Apps ➔ Sandboxed Google Play ➔ Play services special permissions for more information.</string>
 </resources>

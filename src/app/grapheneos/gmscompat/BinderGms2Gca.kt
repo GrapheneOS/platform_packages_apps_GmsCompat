@@ -553,4 +553,8 @@ object BinderGms2Gca : IGms2Gca.Stub() {
     override fun maybeShowGmsCoreRestrictedBackgroundDataNotif() {
         Notifications.handleGmsCoreRestrictedBackgroundDataNotif()
     }
+
+    override fun maybeShowRcsRequirementsNotification(isTs43Verification: Boolean) {
+        Notifications.handleRcsNotification(isTs43Verification)
+    }
 }

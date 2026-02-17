@@ -1,19 +1,24 @@
 package app.grapheneos.gmscompat.lib;
 
 import android.annotation.Nullable;
+import android.app.appsearch.safeparcel.SafeParcelReader;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.BinderProxy;
 import android.os.IBinder;
 import android.os.IInterface;
+import android.os.Parcel;
 import android.os.UserHandle;
 import android.util.ArrayMap;
 import android.util.Log;
 
 import com.android.internal.gmscompat.IGmsCompatLib;
 
+import com.google.android.gms.constellation.VerifyPhoneNumberRequest;
+
 import java.io.FileDescriptor;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.function.Function;
 
@@ -67,6 +72,24 @@ public class GmsCompatLibImpl implements IGmsCompatLib {
             Log.d(TAG_BINDER, "maybeInterceptBinderProxyDump: " + BinderUtils.getInterfaceDescriptor(binderProxy) + " " + Arrays.toString(args), maybeStackTrace(TAG_BINDER));
         }
         return false;
+    }
+
+    @Nullable
+    @Override
+    public String parseVerifyPhoneNumberRequestForPolicy(Parcel data) throws ParseException {
+        // Note: VerifyPhoneNumberRequest may contain sensitive information (IMSIs), but
+        // we're only reading the policy ID.
+        try {
+            final VerifyPhoneNumberRequest request = VerifyPhoneNumberRequest.CREATOR
+                    .createFromParcel(data);
+            return request.policyId;
+        } catch (Exception e) {
+            Log.w(TAG, "failed to parse VerifyPhoneNumberRequest", e);
+            if (e instanceof SafeParcelReader.ParseException) {
+                throw new ParseException(e.getMessage(), data.dataPosition());
+            }
+            throw e;
+        }
     }
 
     @Nullable

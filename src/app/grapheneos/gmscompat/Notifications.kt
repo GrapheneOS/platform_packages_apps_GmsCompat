@@ -11,7 +11,10 @@ import android.ext.PackageId
 import android.net.Uri
 import android.os.PowerManager
 import android.provider.Settings
+import android.util.Log
 import app.grapheneos.gmscompat.App.MainProcessPrefs
+import app.grapheneos.gmscompat.configui.getAllIssueRes
+import app.grapheneos.gmscompat.configui.gmscore.rcsIssueChecks
 import com.android.internal.gmscompat.GmsInfo
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -40,6 +43,7 @@ object Notifications {
     const val ID_GmsCore_BACKGROUND_DATA_EXEMPTION_PROMPT = 11
     const val ID_MANAGE_PLAY_INTEGRITY_API = 12
     const val ID_ENABLE_GOOGLE_CREDENTIAL_PROVIDER = 13
+    const val ID_MISSING_RCS_PERMISSIONS = 14
 
     private val uniqueNotificationId = AtomicInteger(10_000)
     fun generateUniqueNotificationId() = uniqueNotificationId.getAndIncrement()
@@ -244,6 +248,66 @@ object Notifications {
             setStyle(Notification.BigTextStyle())
             setContentIntent(appSettingsPendingIntent(GmsInfo.PACKAGE_GMS_CORE, APP_INFO_ITEM_PERMISSIONS))
             setAutoCancel(true)
+            addAction(doNotShowAgainAction)
+            show(id)
+        }
+    }
+
+    private var handledRcsNotification = false
+
+    fun handleRcsNotification(isTs43Verification: Boolean) {
+        if (handledRcsNotification) {
+            return
+        }
+        handledRcsNotification = true
+
+        val ctx = App.ctx()
+        val pm = ctx.packageManager
+        // TODO: Examine new Manifest.permission.USE_ICC_AUTH in Android 17
+        val needsIccAuth = isTs43Verification && pm.checkPermission(
+            android.Manifest.permission.USE_ICC_AUTH_WITH_DEVICE_IDENTIFIER,
+            PackageId.GMS_CORE_NAME) != PackageManager.PERMISSION_GRANTED
+
+        val tag = "GmsCompat/RCS"
+
+        val needsBaselinePerms = rcsIssueChecks.getAllIssueRes(ctx).any()
+        val isOwnerUser = ctx.userId == 0
+        Log.d(tag, "needsIccAuth $needsIccAuth needsBaselinePerms $needsBaselinePerms isOwnerUser $isOwnerUser")
+        if (!needsIccAuth && !needsBaselinePerms && isOwnerUser) {
+            return
+        }
+
+        val id = ID_MISSING_RCS_PERMISSIONS
+        val doNotShowAgainAction = doNotShowAgainAction(id)
+        if (doNotShowAgainAction == null) {
+            return
+        }
+
+        builder(CH_MISSING_PERMISSION).apply {
+            setSmallIcon(R.drawable.ic_configuration_required)
+            setContentTitle(
+                if (isOwnerUser) {
+                    R.string.notif_rcs_needs_baseline_perms_title
+                } else {
+                    R.string.notif_rcs_not_owner_user_title
+                }
+            )
+            setContentText(
+                if (isOwnerUser) {
+                    if (needsIccAuth) {
+                        if (needsBaselinePerms) {
+                            R.string.notif_rcs_needs_baseline_perms_text_icc_and_other_perms
+                        } else {
+                            R.string.notif_rcs_needs_baseline_perms_text_icc
+                        }
+                    } else {
+                        R.string.notif_rcs_needs_baseline_perms_text
+                    }
+                } else {
+                    R.string.notif_rcs_not_owner_user_text
+                }
+            )
+            setStyle(Notification.BigTextStyle())
             addAction(doNotShowAgainAction)
             show(id)
         }
