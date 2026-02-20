@@ -10,6 +10,10 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.navOptions
 import app.grapheneos.gmscompat.Const.ENABLE_LOGGING
 import com.android.internal.gmscompat.GmsInfo
 import java.lang.reflect.Modifier
@@ -189,4 +193,31 @@ fun activityPendingIntent(i: Intent, flags: Int = PendingIntent.FLAG_IMMUTABLE):
     i.setIdentifier(UUID.randomUUID().toString())
     i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
     return PendingIntent.getActivity(App.ctx(), 0, i, flags)
+}
+
+/** Press back and close the activity if this is the last fragment. */
+fun Fragment.pressBack() {
+    val wasBackExecuted = findNavController().popBackStack()
+    if (!wasBackExecuted) {
+        activity?.let { it.finishAfterTransition() }
+    }
+}
+
+fun <T : NavRoute> NavController.navigateWithAnimation(route: T) {
+    navigate(
+        route,
+        navOptions {
+            // ASfP doesn't resolve this, doesn't seem to play well with Kotlin mutliplatform.
+            // See https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:navigation/navigation-common/src/androidMain/kotlin/androidx/navigation/NavOptionsBuilder.android.kt
+            anim {
+                enter = R.anim.activity_open_enter
+                popEnter = R.anim.activity_open_enter
+                popExit = R.anim.activity_close_exit
+            }
+        }
+    )
+}
+
+fun <T : NavRoute> Fragment.navigateWithAnimation(route: T) {
+    findNavController().navigateWithAnimation(route)
 }

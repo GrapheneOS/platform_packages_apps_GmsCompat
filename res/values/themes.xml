@@ -1,0 +1,25 @@
+<resources>
+    <style name="Settings" parent="Theme.SubSettingsBase.Expressive">
+        <!--<item name="preferenceCategoryTitleTextAppearance">@style/TextAppearance.CategoryTitle</item>-->
+    </style>
+    <!--
+    <style name="TextAppearance.CategoryTitle"
+        parent="@android:style/TextAppearance.DeviceDefault.Medium">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">11sp</item>
+        &lt;!&ndash; 0.8 Spacing, 0.8/11 = 0.072727273 &ndash;&gt;
+        <item name="android:letterSpacing">0.072727273</item>
+    </style>
+    -->
+
+    <style name="Theme.GmsCompat.Settings" parent="Settings">
+        <!-- These two attributes are required when using Toolbar as ActionBar. -->
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="Theme.GmsCompat.Settings.FilterTouches">
+        <item name="android:filterTouchesWhenObscured">true</item>
+    </style>
+</resources>

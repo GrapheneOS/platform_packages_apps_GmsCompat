@@ -3,11 +3,9 @@ package app.grapheneos.gmscompat
 import android.Manifest.permission
 import android.app.AlertDialog
 import android.app.AppOpsManager
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager.PackageInfoFlags
-import android.ext.KnownSystemPackages
 import android.ext.PackageId
 import android.location.LocationManager
 import android.net.Uri
@@ -17,16 +15,20 @@ import android.provider.Settings
 import android.view.View
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
+import com.android.settingslib.widget.SettingsBasePreferenceFragment
 import androidx.preference.PreferenceGroup
 import androidx.preference.SwitchPreferenceCompat
 import com.android.internal.gmscompat.GmsCompatApp
 import com.android.internal.gmscompat.GmsInfo.PACKAGE_GMS_CORE
-import com.android.settingslib.preference.PreferenceFragment
 import java.util.concurrent.Executors
 
 private val bgExecutor = Executors.newSingleThreadExecutor()
 
-class MainFragment : PreferenceFragment() {
+class MainWrapperFragment : BaseCollapsingToolbarFragment() {
+    override fun createPreferenceFragment() = MainFragment()
+}
+
+class MainFragment : SettingsBasePreferenceFragment() {
     lateinit var potentialIssuesCategory: PreferenceCategory
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -45,9 +47,10 @@ class MainFragment : PreferenceFragment() {
         if (checkPackageId(PackageId.GMS_CORE_NAME, PackageId.GMS_CORE)) {
             screen.addPref().apply {
                 setTitle(R.string.play_services_special_permissions)
-                intent = Intent().apply {
-                    component = ComponentName(KnownSystemPackages.get(ctx).permissionController,
-                        "com.android.permissioncontroller.ext.gmscore.GmsCoreConfigActivity")
+                setSummary(R.string.play_services_special_permissions_summary)
+                setOnPreferenceClickListener {
+                    navigateWithAnimation(NavRoute.PlayServicesConfig)
+                    true
                 }
             }
         }
@@ -63,9 +66,9 @@ class MainFragment : PreferenceFragment() {
         if (checkPackageId(PackageId.ANDROID_AUTO_NAME, PackageId.ANDROID_AUTO)) {
             screen.addPref().apply {
                 setTitle(R.string.android_auto)
-                intent = Intent().apply {
-                    component = ComponentName(KnownSystemPackages.get(ctx).permissionController,
-                        "com.android.permissioncontroller.ext.aauto.AndroidAutoConfigActivity")
+                setOnPreferenceClickListener {
+                    navigateWithAnimation(NavRoute.AndroidAutoConfig)
+                    true
                 }
             }
         }

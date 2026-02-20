@@ -11,7 +11,8 @@
   <!-- needed to be able to create TempServiceBinding to any package-->
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
     <uses-permission android:name="app.grapheneos.logviewer.SHOW_ERROR_REPORT" />
-    <uses-permission android:name="com.android.permissioncontroller.permission.LAUNCH_GMSCOMPAT_ACTIVITIES" />
+    <!-- needed for config fragments for updating permissions for Android Auto, etc. -->
+    <uses-permission android:name="android.permission.GRANT_RUNTIME_PERMISSIONS" />
 
     <permission
         android:name="app.grapheneos.gmscompat.SHOW_UI"
@@ -73,6 +74,7 @@
             android:exported="true"
             android:launchMode="singleInstance"
             android:permission="app.grapheneos.gmscompat.SHOW_UI"
+            android:theme="@style/Theme.GmsCompat.Settings.FilterTouches"
             android:label="@string/activity_name"
         >
             <intent-filter>

@@ -13,15 +13,25 @@ android_app {
     plugins: [
         "safeparcel-annotation-processor",
     ],
+    kotlin_plugins: [
+        "kotlin-serialize-compiler-plugin",
+    ],
     resource_dirs: [
         "res",
     ],
     static_libs: [
+        // needed by androidx.navigation
+        "kotlinx_serialization_core",
+        "androidx.navigation_navigation-common-ktx",
+        "androidx.navigation_navigation-fragment-ktx",
+        "androidx.navigation_navigation-runtime-ktx",
+        "androidx.navigation_navigation-ui-ktx",
         "androidx.preference_preference",
         // needed by framework-appsearch-safeparcel-sources
         "appsearch_flags_java_exported_lib",
         "SettingsLibCategory",
         "SettingsLibCollapsingToolbarBaseActivity",
+        "SettingsLibFooterPreference",
     ],
     jarjar_rules: "jarjar-rules.txt",
 
