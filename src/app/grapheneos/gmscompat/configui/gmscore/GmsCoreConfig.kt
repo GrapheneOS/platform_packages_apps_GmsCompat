@@ -7,6 +7,7 @@ import android.ext.PackageId
 import androidx.preference.Preference
 import androidx.preference.PreferenceScreen
 import app.grapheneos.gmscompat.BaseCollapsingToolbarFragment
+import app.grapheneos.gmscompat.Notifications
 import app.grapheneos.gmscompat.R
 import app.grapheneos.gmscompat.configui.BaseGosConfigFragment
 import app.grapheneos.gmscompat.configui.IssueCheck
@@ -76,5 +77,7 @@ class GmsCoreConfigFragment : BaseGosConfigFragment(
 
     override fun updateNonPkgStateUi(applicationInfo: ApplicationInfo) {
         rcsPotentialIssues.updateWithIssues(R.string.rcs_issue_header, rcsIssueChecks)
+
+        Notifications.unmarkRcsNotificationHandled()
     }
 }

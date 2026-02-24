@@ -255,6 +255,10 @@ object Notifications {
 
     private var handledRcsNotification = false
 
+    fun unmarkRcsNotificationHandled() {
+        handledRcsNotification = false
+    }
+
     fun handleRcsNotification(isTs43Verification: Boolean) {
         if (handledRcsNotification) {
             return
