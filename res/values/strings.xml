@@ -208,4 +208,15 @@ The network permission will also be allowed, it’s needed for communication wit
 Some carriers require an entitlement check (GSMA TS.43 with EAP-AKA authentication) to verify your phone number and activate RCS in Google Messages. This permission allows Google Play services to use your SIM to complete the EAP-AKA challenge-response from the carrier's entitlement server.
 "
 </string>
+
+    <string name="rcs_potential_issues">Potential issues with RCS activation</string>
+    <string name="rcs_issue_header">These are the minimum requirements for RCS activation:</string>
+    <string name="rcs_issue_gmscore_no_phone_perm">Google Play services needs the Phone permission</string>
+    <string name="rcs_issue_gmscore_no_internet_perm">Google Play services needs the Network permission</string>
+    <string name="rcs_issue_bugle_not_installed">Google Messages needs to be installed from the Play Store</string>
+    <string name="rcs_issue_bugle_disabled">Google Messages needs to be enabled</string>
+    <string name="rcs_issue_bugle_not_from_play_store">Google Messages is not installed from the Play Store. Although RCS can work, installing this way may not be stable.</string>
+    <string name="rcs_issue_bugle_not_sms_app">Google Messages needs to be set as the default SMS app</string>
+    <string name="rcs_issue_bugle_no_internet_perm">Google Messages needs the Network permission</string>
+    <string name="rcs_issue_not_owner_user">RCS in Google Messages currently only works in the Owner user</string>
 </resources>

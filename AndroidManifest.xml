@@ -95,5 +95,8 @@
         <package android:name="app.grapheneos.gmscompat.config.dev" />
         <package android:name="app.grapheneos.apps" />
         <package android:name="com.google.android.tts" />
+        <intent>
+            <action android:name="android.provider.Telephony.SMS_DELIVER"/>
+        </intent>
     </queries>
 </manifest>
