@@ -13,8 +13,8 @@ class GmsCoreConfigWrapperFragment : BaseCollapsingToolbarFragment() {
     override fun createPreferenceFragment() = GmsCoreConfigFragment()
 }
 
-class GmsCoreConfigFragment : BaseGosPkgStateConfigFragment(
-    packageName = PackageId.GMS_CORE_NAME,
+class GmsCoreConfigFragment : BaseGosConfigFragment(
+    configuringPkgName = CONFIG_PKG_NAME,
     titleStringRes = R.string.gmscore_settings
 ) {
     override fun configurePreferenceScreen(screen: PreferenceScreen) {

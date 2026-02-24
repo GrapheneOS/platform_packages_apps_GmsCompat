@@ -1,5 +1,6 @@
-package app.grapheneos.gmscompat.config
+package app.grapheneos.gmscompat.configui
 
+import android.app.compat.gms.GmsUtils
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -7,9 +8,12 @@ import android.content.IntentFilter
 import android.content.pm.ApplicationInfo
 import android.content.pm.GosPackageState
 import android.content.pm.PackageManager
+import android.ext.PackageId
+import android.net.Uri
 import android.os.Bundle
 import android.os.PatternMatcher
 import android.permission.PermissionManager
+import android.provider.Settings
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
 import androidx.annotation.StringRes
@@ -24,16 +28,19 @@ import app.grapheneos.gmscompat.pressBack
 
 /**
  * Base fragment for specifying a configuration fragment for the given [packageName] with handling
- * for [GosPackageState] preferences.
+ * for [GosPackageState] preferences and app dependency preferences. App dependency preferences
+ * either direct the user to the Play Store if not installed, or directs the user to configure it.
  *
  * Use [addPkgFlagPerm] to create a switch preference that will toggle a flag for a package flag in
  * [GosPackageState]. These switch preferences are updated automatically and added to [pkgFlagPrefs]
  *
- * Use [packagePrefs] to preferences for packages that should be listening for
- * package updates.
+ * To display potential issues, create a Preference and then use [updateWithIssues] with a list of
+ * issue checks in the [updateNonPkgStateUi] function on the Preference.
+ *
+ * Use [packagePrefs] to add preferences for packages that should be listening for package updates.
  */
-abstract class BaseGosPkgStateConfigFragment(
-    protected val packageName: String,
+abstract class BaseGosConfigFragment(
+    val configuringPkgName: String,
     @StringRes val titleStringRes: Int,
 ) : SettingsBasePreferenceFragment() {
     protected val pkgFlagPrefs = mutableMapOf<Int, SwitchPreferenceCompat>()
@@ -70,7 +77,7 @@ abstract class BaseGosPkgStateConfigFragment(
             packagePrefs.keys.forEach {
                 addDataSchemeSpecificPart(it, PatternMatcher.PATTERN_LITERAL)
             }
-            addDataSchemeSpecificPart(packageName, PatternMatcher.PATTERN_LITERAL)
+            addDataSchemeSpecificPart(configuringPkgName, PatternMatcher.PATTERN_LITERAL)
             ctx.registerReceiver(pkgChangeReceiver, this)
         }
 
@@ -135,47 +142,122 @@ abstract class BaseGosPkgStateConfigFragment(
 
     private fun updatePackageFlag(ctx: Context, flag: Int, flagValue: Boolean) {
         val userId = android.os.Process.myUserHandle().identifier
-        GosPackageState.edit(packageName, userId).run {
+        GosPackageState.edit(configuringPkgName, userId).run {
             setPackageFlagState(flag, flagValue)
             applyOrPressBack()
         }
 
         val permManager = ctx.getSystemService(PermissionManager::class.java)!!
-        permManager.updatePermissionState(packageName, userId)
+        permManager.updatePermissionState(configuringPkgName, userId)
 
-        GosPackageState.edit(packageName, userId).run {
+        GosPackageState.edit(configuringPkgName, userId).run {
             killUidAfterApply()
             applyOrPressBack()
         }
 
-        val isPkgEnabled = pkgManager.getApplicationInfo(packageName, 0).enabled
+        val isPkgEnabled = pkgManager.getApplicationInfo(configuringPkgName, 0).enabled
         if (isPkgEnabled) {
             // this is needed to invalidate cached system_server state
-            pkgManager.setApplicationEnabledSetting(packageName, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, 0)
-            pkgManager.setApplicationEnabledSetting(packageName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, 0)
+            pkgManager.setApplicationEnabledSetting(configuringPkgName, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, 0)
+            pkgManager.setApplicationEnabledSetting(configuringPkgName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, 0)
+        }
+    }
+
+    protected fun createAppInfoIntent(pkgName: String): Intent {
+        return Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", pkgName, null)
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        }
+    }
+
+    protected fun PreferenceGroup.addAppDependencyPref(
+        pkgName: String,
+        @StringRes title: Int
+    ): Preference {
+        return addPref(getString(title)).apply {
+            packagePrefs.put(pkgName, this)
         }
     }
 
     /**
-     * Handle updating non-[GosPackageState] UI state here. GosPackageState preferences are already
-     * updated by the base class. The [applicationInfo] corresponds to [packageName].
+     * Updates a preference with issues determined by the given [issueChecks]. If there are issues,
+     * the preference will be visible and dialog will show issues when clicked. If no issues,
+     * preference will not be visible.
+     */
+    protected fun Preference.updateWithIssues(
+        @StringRes dialogHeader: Int,
+        issueChecks: List<IssueCheck>
+    ) {
+        val text = getIssuesText(dialogHeader, issueChecks)
+        isVisible = text != null
+
+        if (text != null) {
+            onPreferenceClickListener = Preference.OnPreferenceClickListener { _ ->
+                AlertDialog.Builder(requireContext()).run {
+                    setMessage(text)
+                    show()
+                }
+                true
+            }
+        }
+    }
+
+    private fun getIssuesText(
+        @StringRes header: Int,
+        issueChecks: List<IssueCheck>
+    ): CharSequence? {
+        val list = issueChecks.flatMap {
+            it.getStringResOfIssues(requireContext(), pkgManager)
+        }
+        if (list.isEmpty()) {
+            return null
+        }
+        return getString(header) + "\n\n" +
+                list.joinToString("\n") { "• " + getString(it) }
+    }
+
+    /**
+     * Handle updating UI state from sources other than [GosPackageState] preferences and app
+     * dependency preferences. Those preferences are already updated by the base class.
+     * The [applicationInfo] corresponds to [configuringPkgName].
+     *
+     * Use [updateWithIssues] to update a preference for displaying issues checked by a list of
+     * [IssueCheck]
      */
     abstract fun updateNonPkgStateUi(applicationInfo: ApplicationInfo)
 
     private fun updateUi() {
-        val gmsCoreAppInfo = pkgManager.getAppInfoOrNull(packageName)
+        val packageAppInfo = pkgManager.getAppInfoOrNull(configuringPkgName)
 
-        if (gmsCoreAppInfo == null) {
+        if (packageAppInfo == null) {
             pressBack()
             return
         }
 
-        val ps = GosPackageState.get(packageName, requireContext().user)
+        val ps = GosPackageState.get(configuringPkgName, requireContext().user)
         pkgFlagPrefs.entries.forEach {
             it.value.isChecked = ps.hasPackageFlag(it.key)
         }
 
-        updateNonPkgStateUi(gmsCoreAppInfo)
+        packagePrefs.entries.forEach { (pkgName, pref) ->
+            val appInfo = pkgManager.getAppInfoOrNull(pkgName)
+
+            if (appInfo == null) {
+                if (pkgManager.getAppInfoOrNull(PackageId.PLAY_STORE_NAME)?.ext()?.packageId == PackageId.PLAY_STORE) {
+                    pref.intent = GmsUtils.createAppPlayStoreIntent(pkgName)
+                    pref.setSummary(R.string.app_dep_missing_summary)
+                } else {
+                    pref.intent = null
+                    pref.setSummary(R.string.app_dep_missing_summary_no_play_store)
+                }
+            } else {
+                pref.intent = createAppInfoIntent(pkgName)
+                pref.setSummary(if (appInfo.enabled) R.string.app_dep_installed
+                else R.string.app_dep_disabled)
+            }
+        }
+
+        updateNonPkgStateUi(packageAppInfo)
     }
 
     protected fun GosPackageState.Editor.applyOrPressBack() {

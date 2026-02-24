@@ -2,33 +2,55 @@ package app.grapheneos.gmscompat.configui.aauto
 
 import android.Manifest
 import android.app.compat.gms.AndroidAutoPackageFlag
-import android.app.compat.gms.GmsUtils
 import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.content.pm.ServiceInfo
 import android.ext.PackageId
-import android.net.Uri
 import android.provider.Settings
 import android.service.notification.NotificationListenerService
-import androidx.appcompat.app.AlertDialog
 import androidx.preference.Preference
 import androidx.preference.PreferenceGroup
 import androidx.preference.PreferenceScreen
-import app.grapheneos.gmscompat.BaseCollapsingToolbarFragment
-import app.grapheneos.gmscompat.getAppInfoOrNull
 import app.grapheneos.gmscompat.R
-import app.grapheneos.gmscompat.configui.BaseGosPkgStateConfigFragment
-import app.grapheneos.gmscompat.configui.addCategory
+import app.grapheneos.gmscompat.BaseCollapsingToolbarFragment
+import app.grapheneos.gmscompat.configui.BaseGosConfigFragment
+import app.grapheneos.gmscompat.configui.IssueCheck
 import app.grapheneos.gmscompat.configui.addPref
+import app.grapheneos.gmscompat.configui.addCategory
+
+private const val CONFIG_PKG_NAME = PackageId.ANDROID_AUTO_NAME
+
+val aautoVoiceIssueChecks: List<IssueCheck> = listOf(
+    IssueCheck.PermissionOnly(
+        packageName = CONFIG_PKG_NAME,
+        permission = Manifest.permission.RECORD_AUDIO,
+        issueStringRes = R.string.aauto_issue_aauto_no_microphone_perm
+    ),
+    IssueCheck.App(
+        packageName = PackageId.G_SEARCH_APP_NAME,
+        packageId = PackageId.G_SEARCH_APP,
+        notInstalledStringRes = R.string.aauto_issue_gsa_not_installed,
+        notEnabledStringRes = R.string.aauto_issue_gsa_disabled,
+        appChecks = listOf(
+            IssueCheck.App.Permission(
+                Manifest.permission.INTERNET,
+                R.string.aauto_issue_gsa_no_network_perm
+            ),
+            IssueCheck.App.Permission(
+                Manifest.permission.RECORD_AUDIO,
+                R.string.aauto_issue_gsa_no_microphone_perm
+            ),
+        )
+    )
+)
 
 class AndroidAutoConfigWrapperFragment : BaseCollapsingToolbarFragment() {
     override fun createPreferenceFragment() = AndroidAutoConfigFragment()
 }
 
-class AndroidAutoConfigFragment : BaseGosPkgStateConfigFragment(
-    packageName = PackageId.ANDROID_AUTO_NAME,
+class AndroidAutoConfigFragment : BaseGosConfigFragment(
+    configuringPkgName = CONFIG_PKG_NAME,
     titleStringRes = R.string.android_auto
 ) {
     lateinit var aautoSettingsPref: Preference
@@ -38,7 +60,7 @@ class AndroidAutoConfigFragment : BaseGosPkgStateConfigFragment(
     override fun configurePreferenceScreen(screen: PreferenceScreen) {
         aautoSettingsPref = screen.addPref(getText(R.string.aauto_settings)).apply {
             intent = Intent(Intent.ACTION_APPLICATION_PREFERENCES).apply {
-                `package` = packageName
+                `package` = configuringPkgName
             }
         }
 
@@ -66,7 +88,7 @@ class AndroidAutoConfigFragment : BaseGosPkgStateConfigFragment(
 
             addPref(getText(R.string.aauto_app_info_title)).apply {
                 setSummary(R.string.aauto_app_info_summary)
-                intent = createAppInfoIntent(packageName)
+                intent = createAppInfoIntent(configuringPkgName)
             }
 
             addPref(getText(R.string.notif_listener_settings_title)).apply {
@@ -82,22 +104,9 @@ class AndroidAutoConfigFragment : BaseGosPkgStateConfigFragment(
         }
 
         screen.addCategory(R.string.optional_deps_category).apply {
-            addAppPref("com.google.android.apps.maps", getText(R.string.google_maps_app))
-            addAppPref("com.google.android.tts", getText(R.string.speech_services_app))
-            addAppPref(PackageId.G_SEARCH_APP_NAME, getText(R.string.google_search_app))
-        }
-    }
-
-    private fun createAppInfoIntent(pkgName: String): Intent {
-        return Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-            data = Uri.fromParts("package", pkgName, null)
-            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        }
-    }
-
-    private fun PreferenceGroup.addAppPref(pkgName: String, title: CharSequence): Preference {
-        return addPref(title).apply {
-            packagePrefs.put(pkgName, this)
+            addAppDependencyPref("com.google.android.apps.maps", R.string.google_maps_app)
+            addAppDependencyPref("com.google.android.tts", R.string.speech_services_app)
+            addAppDependencyPref(PackageId.G_SEARCH_APP_NAME, R.string.google_search_app)
         }
     }
 
@@ -111,89 +120,11 @@ class AndroidAutoConfigFragment : BaseGosPkgStateConfigFragment(
             }
         }
 
-        aautoVoiceCommandIssues.apply {
-            val text = getVoiceCommandIssuesText()
-            isVisible = text != null
-
-            if (text != null) {
-                onPreferenceClickListener = Preference.OnPreferenceClickListener { _ ->
-                    AlertDialog.Builder(requireContext()).run {
-                        setMessage(text)
-                        show()
-                    }
-                    true
-                }
-            }
-        }
-
+        aautoVoiceCommandIssues.updateWithIssues(
+            R.string.aauto_issue_voice_commands_header,
+            aautoVoiceIssueChecks
+        )
         potentialIssues.isVisible = aautoVoiceCommandIssues.isVisible
-
-        packagePrefs.entries.forEach { e ->
-            val pkgName = e.key
-            val pref = e.value
-
-            val appInfo = pkgManager.getAppInfoOrNull(pkgName)
-
-            if (appInfo == null) {
-                if (pkgManager.getAppInfoOrNull(PackageId.PLAY_STORE_NAME)?.ext()?.packageId == PackageId.PLAY_STORE) {
-                    pref.intent = GmsUtils.createAppPlayStoreIntent(pkgName)
-                    pref.setSummary(R.string.app_dep_missing_summary)
-                } else {
-                    pref.intent = null
-                    pref.setSummary(R.string.app_dep_missing_summary_no_play_store)
-                }
-            } else {
-                pref.intent = createAppInfoIntent(pkgName)
-                pref.setSummary(if (appInfo.enabled) R.string.app_dep_installed
-                        else R.string.app_dep_disabled)
-            }
-        }
-    }
-
-    private fun getVoiceCommandIssuesText(): CharSequence? {
-        val list = getVoiceCommandIssues()
-        if (list.isEmpty()) {
-            return null
-        }
-        return getString(R.string.aauto_issue_voice_commands_header) + "\n\n" +
-                list.map {"• " + getString(it) }.joinToString("\n")
-    }
-
-    private fun getVoiceCommandIssues(): List<Int> {
-        val list = arrayListOf<Int>()
-
-        if (pkgManager.checkPermission(Manifest.permission.RECORD_AUDIO, PackageId.ANDROID_AUTO_NAME) != PERMISSION_GRANTED) {
-            list += R.string.aauto_issue_aauto_no_microphone_perm
-        }
-
-        val gsaName = PackageId.G_SEARCH_APP_NAME
-        val gsaAppInfo = pkgManager.getAppInfoOrNull(gsaName)
-
-        var gsaInstalled = false
-
-        if (gsaAppInfo != null && gsaAppInfo.ext().packageId == PackageId.G_SEARCH_APP) {
-            val src = pkgManager.getInstallSourceInfo(gsaName)
-            gsaInstalled = src.initiatingPackageName == PackageId.PLAY_STORE_NAME
-        }
-
-        if (!gsaInstalled) {
-            list += R.string.aauto_issue_gsa_not_installed
-            return list
-        }
-
-        if (!gsaAppInfo!!.enabled) {
-            list += R.string.aauto_issue_gsa_disabled
-        }
-
-        if (pkgManager.checkPermission(Manifest.permission.INTERNET, gsaName) != PERMISSION_GRANTED) {
-            list += R.string.aauto_issue_gsa_no_network_perm
-        }
-
-        if (pkgManager.checkPermission(Manifest.permission.RECORD_AUDIO, gsaName) != PERMISSION_GRANTED) {
-            list += R.string.aauto_issue_gsa_no_microphone_perm
-        }
-
-        return list
     }
 
     private fun getNotifListenerSettingsIntent(): Intent? {
