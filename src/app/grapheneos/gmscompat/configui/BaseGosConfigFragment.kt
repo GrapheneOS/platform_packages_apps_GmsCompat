@@ -148,19 +148,7 @@ abstract class BaseGosConfigFragment(
         }
 
         val permManager = ctx.getSystemService(PermissionManager::class.java)!!
-        permManager.updatePermissionState(configuringPkgName, userId)
-
-        GosPackageState.edit(configuringPkgName, userId).run {
-            killUidAfterApply()
-            applyOrPressBack()
-        }
-
-        val isPkgEnabled = pkgManager.getApplicationInfo(configuringPkgName, 0).enabled
-        if (isPkgEnabled) {
-            // this is needed to invalidate cached system_server state
-            pkgManager.setApplicationEnabledSetting(configuringPkgName, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, 0)
-            pkgManager.setApplicationEnabledSetting(configuringPkgName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, 0)
-        }
+        permManager.updatePermissionStateAndInvalidateCache(configuringPkgName, userId)
     }
 
     protected fun createAppInfoIntent(pkgName: String): Intent {
