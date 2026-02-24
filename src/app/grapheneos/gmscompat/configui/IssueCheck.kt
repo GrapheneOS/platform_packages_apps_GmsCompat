@@ -1,9 +1,9 @@
 package app.grapheneos.gmscompat.configui
 
 import android.content.Context
-import android.content.pm.PackageManager
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.ext.PackageId
+import android.os.Bundle
 import android.provider.Telephony
 import android.os.Process
 import androidx.annotation.StringRes
@@ -11,13 +11,10 @@ import app.grapheneos.gmscompat.getAppInfoOrNull
 
 sealed class IssueCheck {
 
-    abstract fun getStringResOfIssues(context: Context, packageManager: PackageManager): List<Int>
+    abstract fun getStringResOfIssues(context: Context, options: Bundle): List<Int>
 
     class OwnerUser(private val issueStringRes: Int) : IssueCheck() {
-        override fun getStringResOfIssues(
-            context: Context,
-            packageManager: PackageManager
-        ): List<Int> {
+        override fun getStringResOfIssues(context: Context, options: Bundle): List<Int> {
             return if (Process.myUserHandle().identifier != 0) {
                 listOf(issueStringRes)
             } else {
@@ -35,9 +32,9 @@ sealed class IssueCheck {
         private val permission: String,
         @StringRes private val issueStringRes: Int,
     ) : IssueCheck() {
-        override fun getStringResOfIssues(context: Context, packageManager: PackageManager): List<Int> {
+        override fun getStringResOfIssues(context: Context, options: Bundle): List<Int> {
             return if (
-                packageManager.checkPermission(permission, packageName)
+                context.packageManager.checkPermission(permission, packageName)
                 != PERMISSION_GRANTED
             ) {
                 listOf(issueStringRes)
@@ -67,13 +64,14 @@ sealed class IssueCheck {
         class Permission(val permission: String, override val issueStringRes: Int) : Check
         class SmsRole(override val issueStringRes: Int) : Check
 
-        override fun getStringResOfIssues(context: Context, packageManager: PackageManager): List<Int> {
-            val appInfo = packageManager.getAppInfoOrNull(packageName)
+        override fun getStringResOfIssues(context: Context, options: Bundle): List<Int> {
+            val pm = context.packageManager
+            val appInfo = pm.getAppInfoOrNull(packageName)
                 ?: return listOf(notInstalledStringRes)
 
             val isInstalledFromPlayStore: Boolean
             if (appInfo.ext().packageId == packageId) {
-                val src = packageManager.getInstallSourceInfo(packageName)
+                val src = pm.getInstallSourceInfo(packageName)
                 isInstalledFromPlayStore = src.initiatingPackageName == PackageId.PLAY_STORE_NAME
             } else {
                 return listOf(notInstalledStringRes)
@@ -88,14 +86,20 @@ sealed class IssueCheck {
                     add(notEnabledStringRes)
                 }
                 if (notFromPlayStoreStringRes != 0 && !isInstalledFromPlayStore) {
-                    add(notFromPlayStoreStringRes)
+                    val skipWarning = options.getBoolean(
+                        OPTION_KEY_SKIP_PLAY_STORE_INSTALL_SOURCE_WARNING,
+                        false
+                    )
+                    if (!skipWarning) {
+                        add(notFromPlayStoreStringRes)
+                    }
                 }
 
                 for (permCheck in appChecks) {
                     when (permCheck) {
                         is Permission -> {
                             if (
-                                packageManager.checkPermission(permCheck.permission, packageName)
+                                pm.checkPermission(permCheck.permission, packageName)
                                 != PERMISSION_GRANTED
                             ) {
                                 add(permCheck.issueStringRes)
@@ -110,10 +114,19 @@ sealed class IssueCheck {
                 }
             }
         }
+
+        companion object {
+            private const val OPTION_KEY_SKIP_PLAY_STORE_INSTALL_SOURCE_WARNING =
+                "skip_playstore_install_warning"
+
+            fun addSkipPlayStoreInstallSourceWarning(options: Bundle) {
+                options.putBoolean(OPTION_KEY_SKIP_PLAY_STORE_INSTALL_SOURCE_WARNING, true)
+            }
+        }
     }
 }
 
-fun Collection<IssueCheck>.getAllIssueRes(context: Context) =
+fun Collection<IssueCheck>.getAllIssueRes(context: Context, options: Bundle = Bundle.EMPTY) =
     flatMap {
-        it.getStringResOfIssues(context, context.packageManager)
+        it.getStringResOfIssues(context, options)
     }

@@ -9,10 +9,12 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.ext.PackageId
 import android.net.Uri
+import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
 import android.util.Log
 import app.grapheneos.gmscompat.App.MainProcessPrefs
+import app.grapheneos.gmscompat.configui.IssueCheck
 import app.grapheneos.gmscompat.configui.getAllIssueRes
 import app.grapheneos.gmscompat.configui.gmscore.rcsIssueChecks
 import com.android.internal.gmscompat.GmsInfo
@@ -274,7 +276,8 @@ object Notifications {
 
         val tag = "GmsCompat/RCS"
 
-        val needsBaselinePerms = rcsIssueChecks.getAllIssueRes(ctx).any()
+        val options = Bundle().also { IssueCheck.App.addSkipPlayStoreInstallSourceWarning(it) }
+        val needsBaselinePerms = rcsIssueChecks.getAllIssueRes(ctx, options).any()
         val isOwnerUser = ctx.userId == 0
         Log.d(tag, "needsIccAuth $needsIccAuth needsBaselinePerms $needsBaselinePerms isOwnerUser $isOwnerUser")
         if (!needsIccAuth && !needsBaselinePerms && isOwnerUser) {
