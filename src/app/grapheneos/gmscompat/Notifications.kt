@@ -283,6 +283,10 @@ object Notifications {
             return
         }
 
+        val deepLinkPendingIntent = activityPendingIntent(
+            NavRoute.PlayServicesConfig.createIntent()
+        )
+
         builder(CH_MISSING_PERMISSION).apply {
             setSmallIcon(R.drawable.ic_configuration_required)
             setContentTitle(
@@ -308,6 +312,7 @@ object Notifications {
                 }
             )
             setStyle(Notification.BigTextStyle())
+            setContentIntent(deepLinkPendingIntent)
             addAction(doNotShowAgainAction)
             show(id)
         }

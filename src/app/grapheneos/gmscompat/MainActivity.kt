@@ -23,6 +23,30 @@ class MainActivity : SettingsTransitionActivity() {
         return navHostFragment.navController
     }
 
+    private val Intent.isLaunchedFromHistory: Boolean
+        get() = flags and Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY != 0
+
+    override fun onNewIntent(intent: Intent) {
+        // This is possibly used as we have android:launchMode="singleInstance".
+        // However, for PendingIntents of the MainActivity, we generally use
+        // Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK, so this is likely not
+        // called. If Intent.FLAG_ACTIVITY_CLEAR_TASK wasn't there, this would be relevant.
+        // This is for completeness purposes.
+        super.onNewIntent(intent)
+        setIntent(intent)
+        val navController = getNavController() ?: return
+        val route = NavRoute.findRoute(intent.extras) ?: return
+        navController.apply {
+            val startRoute = graph.startDestinationRoute
+            if (startRoute != null) {
+                popBackStack(startRoute, inclusive = false)
+            } else {
+                popBackStack<NavRoute.Main>(inclusive = false)
+            }
+            navigateWithAnimation(route)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         EdgeToEdgeUtils.enable(this)
         super.onCreate(savedInstanceState)
@@ -51,6 +75,12 @@ class MainActivity : SettingsTransitionActivity() {
                 AppBarConfiguration(graph, null),
             )
             */
+        }
+
+        if (savedInstanceState == null && !intent.isLaunchedFromHistory) {
+            NavRoute.findRoute(intent.extras)?.let { route ->
+                navController.navigateWithAnimation(route)
+            }
         }
     }
 

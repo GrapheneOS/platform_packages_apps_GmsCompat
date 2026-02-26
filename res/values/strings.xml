@@ -224,7 +224,7 @@ Some carriers require an entitlement check (GSMA TS.43 with EAP-AKA authenticati
     <string name="notif_rcs_needs_baseline_perms_title">RCS may require permissions</string>
     <string name="notif_rcs_not_owner_user_title">RCS may not work</string>
     <string name="notif_rcs_not_owner_user_text">RCS is currently only known to work in the Owner user.</string>
-    <string name="notif_rcs_needs_baseline_perms_text">Some apps are missing permissions for RCS, and activation might not complete. Go to Settings ➔ Apps ➔ Sandboxed Google Play ➔ Play services special permissions for more information.</string>
-    <string name="notif_rcs_needs_baseline_perms_text_icc">Your carrier may require ICC authentication for RCS setup. Go to Settings ➔ Apps ➔ Sandboxed Google Play ➔ Play services special permissions for more information.</string>
-    <string name="notif_rcs_needs_baseline_perms_text_icc_and_other_perms">Your carrier may require ICC authentication for RCS setup, and other permissions may be needed. Go to Settings ➔ Apps ➔ Sandboxed Google Play ➔ Play services special permissions for more information.</string>
+    <string name="notif_rcs_needs_baseline_perms_text">Some apps are missing permissions for RCS, and activation might not complete. Tap to open Play services special permissions for more information.</string>
+    <string name="notif_rcs_needs_baseline_perms_text_icc">Your carrier may require ICC authentication for RCS setup. Tap to open Play services special permissions for more information.</string>
+    <string name="notif_rcs_needs_baseline_perms_text_icc_and_other_perms">Your carrier may require ICC authentication for RCS setup, and other permissions are needed. Tap to open Play services special permissions for more information.</string>
 </resources>
