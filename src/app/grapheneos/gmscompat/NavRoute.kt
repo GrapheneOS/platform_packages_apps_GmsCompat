@@ -21,18 +21,26 @@ sealed class NavRoute {
     }
 
     @Serializable
-    data object PlayServicesConfig : NavRoute(), DeepLink {
-        const val basePath = "gmscompat://playservicesconfig"
+    data class PlayServicesConfig(
+        val isIccAuthPotentialIssue: Boolean = false
+    ) : NavRoute(), DeepLink {
+
         override fun createIntent() = Intent().apply {
             setClass(App.ctx(), MainActivity::class.java)
             putExtra(EXTRA_KEY_ROUTE, basePath)
+            putExtra(EXTRA_KEY_ICC_AUTH_ISSUE, isIccAuthPotentialIssue)
         }
 
-        fun parseRoute(extras: Bundle?): PlayServicesConfig? {
-            return if (extras?.getString(EXTRA_KEY_ROUTE, "") == basePath) {
-                PlayServicesConfig
-            } else {
-                null
+        companion object {
+            const val basePath = "gmscompat://playservicesconfig"
+            private const val EXTRA_KEY_ICC_AUTH_ISSUE = "key_icc_auth_show_issue"
+
+            fun parseRoute(extras: Bundle?): PlayServicesConfig? {
+                return if (extras?.getString(EXTRA_KEY_ROUTE, "") == basePath) {
+                    PlayServicesConfig(extras.getBoolean(EXTRA_KEY_ICC_AUTH_ISSUE, false))
+                } else {
+                    null
+                }
             }
         }
     }

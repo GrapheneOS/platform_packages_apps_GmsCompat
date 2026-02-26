@@ -220,6 +220,7 @@ Some carriers require an entitlement check (GSMA TS.43 with EAP-AKA authenticati
     <string name="rcs_issue_bugle_not_sms_app">Google Messages needs to be set as the default SMS app</string>
     <string name="rcs_issue_bugle_no_internet_perm">Google Messages needs the Network permission</string>
     <string name="rcs_issue_not_owner_user">RCS in Google Messages currently only works in the Owner user</string>
+    <string name="rcs_issue_gmscore_no_icc_auth_perm">Google Play services may need permission to do ICC authentication with device identifiers</string>
 
     <string name="notif_rcs_needs_baseline_perms_title">RCS may require permissions</string>
     <string name="notif_rcs_not_owner_user_title">RCS may not work</string>

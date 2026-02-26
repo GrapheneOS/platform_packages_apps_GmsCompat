@@ -49,7 +49,9 @@ class MainFragment : SettingsBasePreferenceFragment() {
                 setTitle(R.string.play_services_special_permissions)
                 setSummary(R.string.play_services_special_permissions_summary)
                 setOnPreferenceClickListener {
-                    navigateWithAnimation(NavRoute.PlayServicesConfig)
+                    val route = NavRoute.PlayServicesConfig.parseRoute(activity?.intent?.extras)
+                        ?: NavRoute.PlayServicesConfig()
+                    navigateWithAnimation(route)
                     true
                 }
             }

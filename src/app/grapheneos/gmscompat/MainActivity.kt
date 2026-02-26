@@ -5,7 +5,6 @@ import android.content.Intent
 import android.ext.PackageId
 import android.net.Uri
 import android.os.Bundle
-import android.os.Build
 import com.android.settingslib.collapsingtoolbar.EdgeToEdgeUtils
 import com.android.settingslib.collapsingtoolbar.SettingsTransitionActivity
 import androidx.navigation.NavController

@@ -291,7 +291,7 @@ object Notifications {
         }
 
         val deepLinkPendingIntent = activityPendingIntent(
-            NavRoute.PlayServicesConfig.createIntent()
+            NavRoute.PlayServicesConfig(isIccAuthPotentialIssue = needsIccAuth).createIntent()
         )
 
         builder(CH_MISSING_PERMISSION).apply {

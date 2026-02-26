@@ -4,9 +4,13 @@ import android.Manifest
 import android.app.compat.gms.GmsCorePackageFlag
 import android.content.pm.ApplicationInfo
 import android.ext.PackageId
+import android.util.Log
 import androidx.preference.Preference
 import androidx.preference.PreferenceScreen
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.toRoute
 import app.grapheneos.gmscompat.BaseCollapsingToolbarFragment
+import app.grapheneos.gmscompat.NavRoute
 import app.grapheneos.gmscompat.Notifications
 import app.grapheneos.gmscompat.R
 import app.grapheneos.gmscompat.configui.BaseGosConfigFragment
@@ -14,9 +18,11 @@ import app.grapheneos.gmscompat.configui.IssueCheck
 import app.grapheneos.gmscompat.configui.addCategory
 import app.grapheneos.gmscompat.configui.addPref
 
+private const val TAG = "GmsCoreConfig"
+
 private const val CONFIG_PKG_NAME = PackageId.GMS_CORE_NAME
 
-val rcsIssueChecks = listOf(
+val rcsIssueChecks = sequenceOf(
     IssueCheck.OwnerUser(R.string.rcs_issue_not_owner_user),
     IssueCheck.PermissionOnly(
         CONFIG_PKG_NAME,
@@ -42,6 +48,14 @@ val rcsIssueChecks = listOf(
             )
         )
     )
+)
+
+private val rcsIssueChecksWithIcc = rcsIssueChecks + sequenceOf(
+    IssueCheck.PermissionOnly(
+        CONFIG_PKG_NAME,
+        Manifest.permission.USE_ICC_AUTH_WITH_DEVICE_IDENTIFIER,
+        R.string.rcs_issue_gmscore_no_icc_auth_perm,
+    ),
 )
 
 class GmsCoreConfigWrapperFragment : BaseCollapsingToolbarFragment() {
@@ -76,7 +90,24 @@ class GmsCoreConfigFragment : BaseGosConfigFragment(
     }
 
     override fun updateNonPkgStateUi(applicationInfo: ApplicationInfo) {
-        rcsPotentialIssues.updateWithIssues(R.string.rcs_issue_header, rcsIssueChecks)
+        val issueCheckToUse = try {
+            val route = findNavController()
+                .getBackStackEntry<NavRoute.PlayServicesConfig>()
+                .toRoute<NavRoute.PlayServicesConfig>()
+            if (route.isIccAuthPotentialIssue) {
+                rcsIssueChecksWithIcc
+            } else {
+                rcsIssueChecks
+            }
+        } catch (e: Exception) {
+            Log.d(TAG, "failed to parse route", e)
+            rcsIssueChecks
+        }
+
+        rcsPotentialIssues.updateWithIssues(
+            R.string.rcs_issue_header,
+            issueCheckToUse
+        )
 
         Notifications.unmarkRcsNotificationHandled()
     }

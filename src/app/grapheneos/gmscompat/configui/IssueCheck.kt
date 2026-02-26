@@ -126,7 +126,10 @@ sealed class IssueCheck {
     }
 }
 
-fun Collection<IssueCheck>.getAllIssueRes(context: Context, options: Bundle = Bundle.EMPTY) =
+fun Iterable<IssueCheck>.getAllIssueRes(context: Context, options: Bundle = Bundle.EMPTY) =
     flatMap {
         it.getStringResOfIssues(context, options)
     }
+
+fun Sequence<IssueCheck>.getAllIssueRes(context: Context, options: Bundle = Bundle.EMPTY) =
+    asIterable().getAllIssueRes(context, options)
