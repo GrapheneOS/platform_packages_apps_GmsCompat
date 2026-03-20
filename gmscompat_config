@@ -237,6 +237,9 @@ getAdvancedProtectionFeatures emptyList
 setAdvancedProtectionEnabled void
 logDialogShown void
 
+[android.security.intrusiondetection.IntrusionDetectionManager]
+disable void
+
 [android.security.keystore.recovery.RecoveryController]
 initRecoveryService void
 setServerParams void
