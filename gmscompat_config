@@ -130,6 +130,8 @@ getAppStandbyBucket int 10
 
 [android.bluetooth.BluetoothA2dp]
 setConnectionPolicy false
+# -1 is CONNECTION_POLICY_UNKNOWN
+getConnectionPolicy int -1
 
 [android.bluetooth.BluetoothAdapter]
 disable false
