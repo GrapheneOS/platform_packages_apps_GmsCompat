@@ -10,6 +10,7 @@ import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationRequest
 import java.util.Collections
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import kotlin.math.max
 import kotlin.math.min
 
@@ -107,24 +108,46 @@ class OsLocationListener(val client: Client, val provider: OsLocationProvider,
         onLocationAvailabilityChanged(false)
     }
 
+    private val flushLock = Any()
+    private var nextFlushRequestCode = 0
+    @Volatile
+    private var activeFlushRequestCode = 0
+    @Volatile
     private var flushLatch: CountDownLatch? = null
 
     fun flush() {
-        val l = CountDownLatch(1)
-        synchronized(this) {
+        // flushLock serializes flushes on the same listener; the request code lets
+        // onFlushComplete() ignore late callbacks from a previous timed-out flush
+        synchronized(flushLock) {
+            val l = CountDownLatch(1)
+            val code = ++nextFlushRequestCode
+            // publish before requestFlush() so a fast callback sees them
             flushLatch = l
+            activeFlushRequestCode = code
             try {
-                client.locationManager.requestFlush(provider.name, this, 0)
+                client.locationManager.requestFlush(provider.name, this, code)
             } catch (e: IllegalStateException) {
                 // may get thrown if other thread unregisters this listener
+                flushLatch = null
                 return
             }
-            l.await()
-            flushLatch = null
+            try {
+                // bounded wait: a flush callback is not guaranteed to arrive if this listener
+                // gets unregistered concurrently
+                if (!l.await(5, TimeUnit.SECONDS)) {
+                    logd{"flush timed out"}
+                }
+            } catch (e: InterruptedException) {
+                Thread.currentThread().interrupt()
+            } finally {
+                flushLatch = null
+            }
         }
     }
 
     override fun onFlushComplete(requestCode: Int) {
-        flushLatch!!.countDown()
+        if (requestCode == activeFlushRequestCode) {
+            flushLatch?.countDown()
+        }
     }
 }
