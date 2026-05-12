@@ -13,6 +13,8 @@ import android.os.IBinder;
 import android.os.IInterface;
 import android.util.ArrayMap;
 
+import com.android.internal.telephony.ICarrierConfigLoader;
+
 import java.util.function.Function;
 
 import app.grapheneos.gmscompat.lib.GmsCompatLibImpl;
@@ -32,6 +34,9 @@ public class SystemServiceOverridesRegistry {
 
         if (GmsCompat.isEnabled()) {
             registry.put(IActivityManager.Stub.DESCRIPTOR, GmcActivityManager::new);
+            if (GmsCompat.isAndroidAuto()) {
+                registry.put(ICarrierConfigLoader.Stub.DESCRIPTOR, GmcCarrierConfigLoader::new);
+            }
         } else if (AppGlobals.getInitialPackageId() == PackageId.G_CAMERA) {
             ClientServiceOverridesRegistry.init(registry);
         }
