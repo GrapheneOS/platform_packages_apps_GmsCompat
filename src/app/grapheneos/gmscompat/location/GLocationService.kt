@@ -8,7 +8,6 @@ import android.location.LocationManager
 import android.os.CancellationSignal
 import android.os.DeadObjectException
 import android.os.IBinder
-import android.os.RemoteException
 import android.util.Log
 import androidx.annotation.Keep
 import app.grapheneos.gmscompat.BinderDefSupplier
@@ -256,8 +255,8 @@ class GLocationService(val ctx: Context) : IGoogleLocationManagerService.Stub() 
             try {
                 // client code expects Status.SUCCESS even when the result is null
                 callback.onResult(Status.SUCCESS, result)
-            } catch (e: RemoteException) {
-                logd{e}
+            } catch (e: DeadObjectException) {
+                Log.d(TAG, "getCurrentLocation callback", e)
             }
         }
 

@@ -3,9 +3,9 @@ package app.grapheneos.gmscompat.location
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.os.DeadObjectException
 import android.os.SystemClock
 import android.util.Log
-import android.util.SparseArray
 import androidx.collection.IntObjectMap
 import androidx.collection.MutableIntObjectMap
 import app.grapheneos.gmscompat.Const
@@ -13,7 +13,6 @@ import app.grapheneos.gmscompat.logd
 import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationRequest
 import java.util.Collections
-import java.util.concurrent.CountDownLatch
 import kotlin.math.max
 import kotlin.math.min
 
@@ -58,6 +57,10 @@ class OsLocationListener(val client: Client, val provider: OsLocationProvider,
                          val request: android.location.LocationRequest,
                          val forwarder: GLocationForwarder
 ) : LocationListener {
+    companion object {
+        const val TAG = "OsLocationListener"
+    }
+
     override fun onLocationChanged(location: Location) {
         onLocationChanged(Collections.singletonList(location))
     }
@@ -78,23 +81,15 @@ class OsLocationListener(val client: Client, val provider: OsLocationProvider,
                 it.longitude += off
             }
         }
-        var unregister = true
-        try {
-            forwarder.forwardLocations(client.ctx, locationsToForward)
-            unregister = false
-        } catch (e: Exception) {
-            logd{e}
-        }
-        if (unregister) {
+        if (!forwarder.forwardLocations(client.ctx, locationsToForward)) {
+            Log.w(TAG, "forwardLocations failed, unregistering")
             forwarder.unregister()
         }
     }
 
     private fun onLocationAvailabilityChanged(available: Boolean) {
-        try {
-            forwarder.onLocationAvailabilityChanged(client.ctx, LocationAvailability.get(available))
-        } catch (e: Exception) {
-            logd{e}
+        if (!forwarder.onLocationAvailabilityChanged(client.ctx, LocationAvailability.get(available))) {
+            Log.w(TAG, "onLocationAvailabilityChanged failed, unregistering")
             forwarder.unregister()
         }
     }
