@@ -28,7 +28,7 @@ fun updateListener(gls: GLocationService, client: Client, key: Any, listener: Os
 
         val curIdx = listeners.indexOfKey(key)
         if (curIdx >= 0) {
-            removeInternal(listeners.valueAt(curIdx))
+            listeners.valueAt(curIdx).unregister()
             listeners.setValueAt(curIdx, listener)
         } else {
             listeners.put(key, listener)
@@ -42,23 +42,13 @@ fun updateListener(gls: GLocationService, client: Client, key: Any, listener: Os
     }
 }
 
-private fun removeInternal(listener: OsLocationListener) {
-    try {
-        listener.client.locationManager.removeUpdates(listener)
-    } catch (e: Throwable) {
-        Log.e("Listeners", "listener removal should never fail", e)
-        System.exit(1)
-    }
-}
-
 fun removeListener(listeners: Listeners, key: Any) {
     synchronized(listeners) {
         val idx = listeners.indexOfKey(key)
         if (idx < 0) {
             return
         }
-        val listener = listeners.valueAt(idx)
-        removeInternal(listener)
+        listeners.valueAt(idx).unregister()
         listeners.removeAt(idx)
         logd{"removed listener ${key.javaClass}, listenerCount ${listeners.size}"}
     }

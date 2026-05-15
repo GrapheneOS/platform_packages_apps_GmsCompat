@@ -4,6 +4,10 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.SystemClock
+import android.util.Log
+import android.util.SparseArray
+import androidx.collection.IntObjectMap
+import androidx.collection.MutableIntObjectMap
 import app.grapheneos.gmscompat.Const
 import app.grapheneos.gmscompat.logd
 import com.google.android.gms.location.LocationAvailability
@@ -107,24 +111,60 @@ class OsLocationListener(val client: Client, val provider: OsLocationProvider,
         onLocationAvailabilityChanged(false)
     }
 
-    private var flushLatch: CountDownLatch? = null
+    private var isUnregistered = false
 
-    fun flush() {
-        val l = CountDownLatch(1)
+    fun unregister() {
+        var flushCallbacks: MutableIntObjectMap<Runnable>? = null
         synchronized(this) {
-            flushLatch = l
-            try {
-                client.locationManager.requestFlush(provider.name, this, 0)
-            } catch (e: IllegalStateException) {
-                // may get thrown if other thread unregisters this listener
+            if (isUnregistered) {
+                logd{"listener is already unregistered, skipping"};
                 return
             }
-            l.await()
-            flushLatch = null
+            client.locationManager.removeUpdates(this)
+            isUnregistered = true
+            flushCallbacks = this.flushCallbacks
+            this.flushCallbacks = null
+        }
+        // flush completion callbacks might not get delivered through onFlushComplete() after
+        // removeUpdates()
+        flushCallbacks?.forEachValue {
+            it.run()
         }
     }
 
+    private var flushCounter = 0
+    private var flushCallbacks: MutableIntObjectMap<Runnable>? = null
+
+    fun flush(onCompletion: Runnable) {
+        var action: (() -> Unit)? = null
+        synchronized(this) {
+            if (isUnregistered) {
+                action = {
+                    logd{"listener is no longer registered, skipping"}
+                    onCompletion.run()
+                }
+            } else {
+                val listeners = flushCallbacks ?: MutableIntObjectMap<Runnable>().also { flushCallbacks = it }
+                val flushId = flushCounter++
+                check(!listeners.containsKey(flushId))
+                listeners[flushId] = onCompletion
+                action = {
+                    client.locationManager.requestFlush(provider.name, this, flushId)
+                }
+            }
+        }
+        action!!.invoke()
+    }
+
     override fun onFlushComplete(requestCode: Int) {
-        flushLatch!!.countDown()
+        var callback: Runnable? = null
+        synchronized(this) {
+            callback = flushCallbacks?.remove(requestCode)
+        }
+        if (callback == null) {
+            logd{"no completion callback"}
+        } else {
+            callback.run()
+        }
     }
 }

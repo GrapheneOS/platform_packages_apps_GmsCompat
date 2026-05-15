@@ -6,8 +6,10 @@ import android.content.Intent
 import android.location.Location
 import android.location.LocationManager
 import android.os.CancellationSignal
+import android.os.DeadObjectException
 import android.os.IBinder
 import android.os.RemoteException
+import android.util.Log
 import androidx.annotation.Keep
 import app.grapheneos.gmscompat.BinderDefSupplier
 import app.grapheneos.gmscompat.logd
@@ -36,7 +38,10 @@ import com.google.android.gms.location.internal.ISettingsCallbacks
 import com.google.android.gms.location.internal.LocationReceiver
 import com.google.android.gms.location.internal.LocationRequestUpdateData
 import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.function.Consumer
+
+private const val TAG = "GLocationService"
 
 @Keep
 class GLocationService(val ctx: Context) : IGoogleLocationManagerService.Stub() {
@@ -151,10 +156,30 @@ class GLocationService(val ctx: Context) : IGoogleLocationManagerService.Stub() 
         Client(this)
         logd{}
 
-        getAllOsLocationListeners(listeners).forEach {
-            it.flush()
+        val allListeners = getAllOsLocationListeners(listeners)
+        if (allListeners.isEmpty()) {
+            callback.onFusedLocationProviderResult(FusedLocationProviderResult.SUCCESS)
+            return
         }
-        callback.onFusedLocationProviderResult(FusedLocationProviderResult.SUCCESS)
+
+        val numFlushedListeners = AtomicInteger()
+
+        val onFlushCompleted = Runnable {
+            val numFlushed = numFlushedListeners.incrementAndGet()
+            val total = allListeners.size
+            check(numFlushed <= total)
+            if (numFlushed == total) {
+                try {
+                    callback.onFusedLocationProviderResult(FusedLocationProviderResult.SUCCESS)
+                } catch (e: DeadObjectException) {
+                    Log.d(TAG, "onFusedLocationProviderResult", e)
+                }
+            }
+        }
+
+        allListeners.forEach {
+            it.flush(onFlushCompleted)
+        }
     }
 
     // https://developers.google.com/android/reference/com/google/android/gms/location/FusedLocationProviderClient#getLastLocation()
