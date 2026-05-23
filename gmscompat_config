@@ -20,6 +20,9 @@ PromoFeature__enabled perms-none-of android.permission.ACCESS_COARSE_LOCATION fa
 # below for increased stability
 Passkeys__client_data_hash_override_for_security_keys true
 
+[com.google.android.gms.auth.api.credentials]
+GisPasswordAndPasskeyProvider__no_cross_platform_create false
+
 [com.google.android.metrics]
 # controls access to privileged StatsManager#getRegisteredExperimentIds()
 add_external_experiment_ids false
@@ -243,8 +246,21 @@ logDialogShown void
 disable void
 
 [android.security.keystore.recovery.RecoveryController]
+isRecoverableKeyStoreEnabled false
 initRecoveryService void
+getKeyChainSnapshot null
+setSnapshotCreatedPendingIntent void
 setServerParams void
+getAliases emptyList
+setRecoveryStatus void
+# RecoveryController.RECOVERY_STATUS_PERMANENT_FAILURE = 3
+getRecoveryStatus int 3
+setRecoverySecretTypes void
+getRecoverySecretTypes emptyIntArray
+generateKey throw android.security.keystore.recovery.InternalRecoveryServiceException
+importKey throw android.security.keystore.recovery.InternalRecoveryServiceException
+getKey throw java.security.UnrecoverableKeyException
+removeKey throw android.security.keystore.recovery.InternalRecoveryServiceException
 
 [android.telecom.TelecomManager]
 getAllPhoneAccountHandles emptyList
