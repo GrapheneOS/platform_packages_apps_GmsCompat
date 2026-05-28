@@ -279,6 +279,7 @@ getGroupIdLevel1 nullString
 unregisterTelephonyCallback void
 getServiceState null
 getVoiceMailNumber nullString
+getIccAuthentication nullString
 
 [com.android.internal.gmscompat.sysservice.GmcPackageManager]
 getPackagesForUid nullArray
