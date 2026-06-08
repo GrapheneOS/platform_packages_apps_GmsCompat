@@ -1,5 +1,15 @@
 [[flags]]
 
+[com.google.android.apps.wearables.maestro.companion#com.google.android.apps.wearables.maestro.companion]
+# Force Maestro's standalone UI path. On Pixel devices, Maestro normally
+# redirects Pixel Buds controls to Android's Bluetooth device details page when this
+# flag is false. That Settings path depends on Play services having completed the
+# Fast Pair flow, stored Fast Pair account-key state for the Buds, and written
+# Bluetooth metadata key 25 (METADATA_FAST_PAIR_CUSTOMIZED_FIELDS) so Settings can
+# bind GmsCore's DeviceSettings config provider and then the returned per-setting
+# provider endpoints. Bluetooth metadata + pairing management is currently privileged
+MaestroApp__standalone_mode true
+
 [com.google.android.gms]
 # disable AnomalyConfigIntentOperation, which crashes due to unavailable StatsManager
 45681197 false
