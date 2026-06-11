@@ -93,6 +93,14 @@
         </activity>
 
         <activity
+            android:name=".configui.gmscore.GmsCoreRecoverableKeystoreActivity"
+            android:exported="false"
+            android:label="@string/gmscore_recover_keystore_access_title"
+            android:launchMode="singleTask"
+            android:taskAffinity="app.grapheneos.gmscompat.recoverable_keystore"
+            android:theme="@style/Theme.GmsCompat.SetupFlow" />
+
+        <activity
             android:name=".location.StubResolutionActivity"
             android:exported="true" />
 

@@ -9,7 +9,7 @@
     <string name="usage_guide">Usage guide</string>
     <string name="play_services">Play services</string>
     <string name="play_services_special_permissions">Play services special permissions</string>
-    <string name="play_services_special_permissions_summary">ICC authentication, RCS activation</string>
+    <string name="play_services_special_permissions_summary">ICC authentication, RCS activation, recovery keystore access</string>
     <string name="play_store">Play Store</string>
     <string name="android_auto">Android Auto</string>
 <!--    <string name="google_settings">Google services &amp; preferences</string>-->
@@ -210,6 +210,74 @@ The network permission will also be allowed, it’s needed for communication wit
 Some carriers require an entitlement check (GSMA TS.43 with EAP-AKA authentication) to verify your phone number and activate RCS in Google Messages. This permission allows Google Play services to use your SIM to complete the EAP-AKA challenge-response from the carrier's entitlement server.
 "
 </string>
+
+    <string name="gmscore_recover_keystore_access_title">Recovery keystore access</string>
+    <string name="gmscore_recover_keystore_access_summary">On. Your screen lock can help protect recovery of keys owned by Play services for Find Hub and Google Password Manager.</string>
+    <string name="gmscore_recover_keystore_access_none_summary">Off. Play services cannot set up or recover its Google account keychain.</string>
+    <string name="gmscore_recover_keystore_access_intro_summary">This permission lets Google Play services access the recovery keystore for its Google account keychain. The recovery keystore uses your screen lock as part of the encryption protecting that keychain.</string>
+    <string name="gmscore_recover_keystore_how_it_works_category">How it works</string>
+    <string name="gmscore_recover_keystore_keys_encrypted_title">Keys are encrypted on your device</string>
+    <string name="gmscore_recover_keystore_keys_encrypted_summary">An account keychain contains encryption keys owned by Play services and synchronized between your devices. The recovery keystore encrypts them with a separate recovery key.</string>
+    <string name="gmscore_recover_keystore_screen_lock_title">Your screen lock protects recovery</string>
+    <string name="gmscore_recover_keystore_screen_lock_summary">After Play services sets up recovery, the recovery keystore waits until you next enter your screen lock. It uses a key derived from a hash of your screen lock to encrypt the recovery key.</string>
+    <string name="gmscore_recover_keystore_public_key_title">A verified public key adds another layer</string>
+    <string name="gmscore_recover_keystore_public_key_summary">Play services downloads Google\'s signed list of Trusted Hardware Module public keys. The recovery keystore verifies the list, selects one and adds a second layer of encryption around the recovery key. Play services then uploads the encrypted account keychain, with the recovery key protected by both layers, to Google\'s Cloud Key Vault Service.</string>
+    <string name="gmscore_recover_keystore_thm_title">Trusted Hardware Modules limit recovery attempts</string>
+    <string name="gmscore_recover_keystore_thm_summary">The matching private key stays inside Google\'s Trusted Hardware Modules (THMs). During recovery, a THM opens the second layer and limits incorrect screen lock attempts. Reaching the limit makes the encrypted keychain permanently unrecoverable.</string>
+    <string name="gmscore_recover_keystore_google_features_category">How Google features use it</string>
+    <string name="gmscore_recover_keystore_find_hub_locations_title">Find Hub protects locations for devices and tracker tags</string>
+    <string name="gmscore_recover_keystore_find_hub_locations_summary">Find Hub uses account keychain keys for devices and supported tracker tags linked to your Google Account. When a phone in the Find Hub network detects a nearby item, it encrypts its location for the item\'s owner before upload. If the item belongs to you, Find Hub on your devices uses your account keychain to read the location report.</string>
+    <string name="gmscore_recover_keystore_passkeys_title">Google Password Manager protects synchronized passkeys</string>
+    <string name="gmscore_recover_keystore_passkeys_summary">Google Password Manager encrypts synchronized passkeys with account keychain keys. These keys may need recovery after clearing Play services storage, reinstalling it, or setting up your Google Account on another device or profile.</string>
+    <string name="gmscore_recover_keystore_google_access_category">What Google can access</string>
+    <string name="gmscore_recover_keystore_on_device_title">On your device</string>
+    <string name="gmscore_recover_keystore_on_device_summary">Play services can use the keys it owns and see feature data before encryption or after decryption, including Find Hub locations and synchronized passkeys. It cannot access keys owned by other apps.</string>
+    <string name="gmscore_recover_keystore_on_servers_title">On Google\'s servers</string>
+    <string name="gmscore_recover_keystore_on_servers_summary">Google receives the encrypted account keychain, encrypted feature data, and information needed to synchronize them. Google does not receive your current screen lock or the unencrypted recovery key when recovery is set up.</string>
+    <string name="gmscore_recover_keystore_during_recovery_title">During recovery</string>
+    <string name="gmscore_recover_keystore_during_recovery_summary">Clearing Play services storage, reinstalling it, or setting up your Google Account on another device or profile may start account keychain recovery. Play services may then show a recovery screen where you enter the screen lock that protected the keychain.</string>
+    <string name="gmscore_recover_keystore_keep_in_mind_category">Keep in mind</string>
+    <string name="gmscore_recover_keystore_clear_storage_title">Clearing storage removes local keys</string>
+    <string name="gmscore_recover_keystore_clear_storage_summary">On GrapheneOS, clearing Play services storage or uninstalling it removes local recovery data and related keys. Encrypted account keychain data already synchronized to Google remains available for recovery through Play services.</string>
+    <string name="gmscore_recover_keystore_access_dialog_title">Recovery keystore access</string>
+    <string name="gmscore_recover_keystore_access_dialog_message">
+"Allow Google Play services to access the recovery keystore for its account keychain?
+
+The recovery keystore uses your screen lock and Google\'s Trusted Hardware Modules to protect recovery of keys owned by Play services.
+
+To recover this account keychain after reinstalling Play services or setting up your Google Account on another device or profile, you will need to enter the screen lock that protected the keychain into Play services.
+"
+    </string>
+    <string name="gmscore_recover_keystore_restart_dialog_title">Restart required</string>
+    <string name="gmscore_recover_keystore_restart_dialog_message">A device restart is required for Play services to initialize account keychain recovery.</string>
+    <string name="gmscore_recover_keystore_restart_dialog_close">Close</string>
+    <string name="gmscore_recover_keystore_more_button">More</string>
+    <string name="gmscore_recover_keystore_dont_allow_button">Don\'t allow</string>
+    <string name="gmscore_recover_keystore_cancel_button">Cancel</string>
+    <string name="gmscore_recover_keystore_turn_off_button">Turn off access</string>
+    <string name="gmscore_recover_keystore_access_on_title">Recovery keystore access is on</string>
+    <string name="gmscore_recover_keystore_access_on_intro_summary">Play services can use the recovery keystore for its Google account keychain.</string>
+    <string name="gmscore_recover_keystore_what_access_does_category">What this access does</string>
+    <string name="gmscore_recover_keystore_protects_feature_keys_title">Protects keys used by Google features</string>
+    <string name="gmscore_recover_keystore_protects_feature_keys_summary">Play services\' account keychain contains encryption keys for Find Hub and synchronized passkeys in Google Password Manager. The recovery keystore encrypts the keys before Play services uploads the encrypted keychain to Google.</string>
+    <string name="gmscore_recover_keystore_uses_screen_lock_title">Uses your screen lock to protect recovery</string>
+    <string name="gmscore_recover_keystore_uses_screen_lock_summary">The recovery keystore uses your screen lock and a public key for Google\'s Trusted Hardware Modules as part of the encryption. Play services uploads only the encrypted result, not your current screen lock.</string>
+    <string name="gmscore_recover_keystore_if_turned_off_category">If you turn it off</string>
+    <string name="gmscore_recover_keystore_new_requests_blocked_title">New recovery keystore requests are blocked</string>
+    <string name="gmscore_recover_keystore_new_requests_blocked_summary">Play services can no longer set up or recover its account keychain. Find Hub may be unable to add supported devices or tracker tags to your Google Account, and Google Password Manager may be unable to create or use synchronized passkeys when recovery is needed.</string>
+    <string name="gmscore_recover_keystore_existing_data_not_deleted_title">Existing data is not deleted</string>
+    <string name="gmscore_recover_keystore_existing_data_not_deleted_summary">Turning off access does not delete local recovery data or encrypted account keychain data already synchronized to Google.</string>
+    <string name="gmscore_recover_keystore_can_turn_on_again_title">You can turn it on again</string>
+    <string name="gmscore_recover_keystore_can_turn_on_again_summary">After turning access on again, restart your device so Play services can initialize account keychain recovery.</string>
+    <string name="gmscore_recover_keystore_disable_dialog_title">Turn off recovery keystore access?</string>
+    <string name="gmscore_recover_keystore_disable_dialog_message">Turning this off blocks new recovery keystore requests. Find Hub and synchronized passkeys may stop working when account keychain recovery is needed. Existing local recovery data and data already synchronized to Google will remain.</string>
+    <string name="gmscore_recover_keystore_disable_dialog_button">Turn off</string>
+    <string name="gmscore_recover_keystore_more_info_category">More information</string>
+    <string name="gmscore_recover_keystore_whitepaper_title">Google Cloud Key Vault Service whitepaper</string>
+    <string name="gmscore_recover_keystore_whitepaper_summary">Learn more about account keychain recovery at &lt;a href=\'https://developer.android.com/about/versions/pie/security/ckv-whitepaper\'>developer.android.com/about/versions/pie/security/ckv-whitepaper&lt;/a>.</string>
+    <string name="gmscore_recover_keystore_access_footer_title">Only enable recovery keystore access if you trust Play services and Google\'s recovery system</string>
+    <string name="gmscore_recover_keystore_access_footer">Turning recovery keystore access off blocks future requests, but does not delete data already synchronized to Google.</string>
+    <string name="notif_gmscore_missing_recoverable_keystore_access_perm">Play services may need recovery keystore access to create or use synchronized passkeys in Google Password Manager.</string>
 
     <string name="rcs_potential_issues">Potential issues with RCS activation</string>
     <string name="rcs_issue_header">These are the minimum requirements for RCS activation:</string>

@@ -2,10 +2,12 @@ package app.grapheneos.gmscompat
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph
+import androidx.navigation.activity
 import androidx.navigation.createGraph
 import androidx.navigation.fragment.fragment
 import app.grapheneos.gmscompat.configui.aauto.AndroidAutoConfigWrapperFragment
 import app.grapheneos.gmscompat.configui.gmscore.GmsCoreConfigWrapperFragment
+import app.grapheneos.gmscompat.configui.gmscore.GmsCoreRecoverableKeystoreActivity
 
 object GmsCompatNavGraph {
     fun create(
@@ -22,6 +24,10 @@ object GmsCompatNavGraph {
             }
             fragment<GmsCoreConfigWrapperFragment, NavRoute.PlayServicesConfig> {
                 label = ctx.getString(R.string.gmscore_settings)
+            }
+            activity<NavRoute.PlayServicesRecoverableKeystoreConfig> {
+                activityClass = GmsCoreRecoverableKeystoreActivity::class
+                label = ctx.getString(R.string.gmscore_recover_keystore_access_title)
             }
         }
     }

@@ -45,6 +45,9 @@ sealed class NavRoute {
         }
     }
 
+    @Serializable
+    data object PlayServicesRecoverableKeystoreConfig : NavRoute()
+
     companion object {
         private const val EXTRA_KEY_ROUTE = "gmscompat.route"
 
