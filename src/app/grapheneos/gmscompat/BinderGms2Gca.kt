@@ -279,6 +279,7 @@ object BinderGms2Gca : IGms2Gca.Stub() {
     }
 
     override fun startActivityFromTheBackground(callerPkg: String, intent: PendingIntent) {
+        verifyCallerPkg(callerPkg)
         val ctx = App.ctx()
         Notifications.builder(Notifications.CH_BACKGROUND_ACTIVITY_START)
                 .setSmallIcon(R.drawable.ic_configuration_required)
@@ -522,6 +523,7 @@ object BinderGms2Gca : IGms2Gca.Stub() {
     val missingPostNotifsNotifIds = ArrayMap<String, Int>()
 
     override fun showMissingPostNotifsPermissionNotification(callerPkg: String) {
+        verifyCallerPkg(callerPkg)
         val notifId = synchronized(missingPostNotifsNotifIds) {
             missingPostNotifsNotifIds.getOrPut(callerPkg) {
                 Notifications.generateUniqueNotificationId()
