@@ -54,6 +54,7 @@ object BinderGms2Gca : IGms2Gca.Stub() {
         Log.d(TAG, "connect from $pkg|$processName, pid ${boundProcess.pid}")
 
         val deathRecipient = DeathRecipient(iGca2Gms)
+        val persistentFgServiceLatch = PersistentFgService.requestStart()
         try {
             // important to add before linkToDeath() to avoid race with binderDied() callback
             addBoundProcess(iGca2Gms, boundProcess)
@@ -63,7 +64,6 @@ object BinderGms2Gca : IGms2Gca.Stub() {
             deathRecipient.binderDied()
             throw e
         }
-        val persistentFgServiceLatch = PersistentFgService.requestStart()
 
         // Config holder update event might be delivered after GMS process starts if both
         // GMS component and GmsCompatConfig holder are updated together, atomically.
