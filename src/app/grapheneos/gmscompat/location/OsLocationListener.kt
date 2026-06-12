@@ -10,6 +10,7 @@ import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationRequest
 import java.util.Collections
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import kotlin.math.max
 import kotlin.math.min
 
@@ -107,24 +108,30 @@ class OsLocationListener(val client: Client, val provider: OsLocationProvider,
         onLocationAvailabilityChanged(false)
     }
 
-    private var flushLatch: CountDownLatch? = null
+    private class FlushRequest(val code: Int, val latch: CountDownLatch)
+
+    @Volatile
+    private var activeFlush: FlushRequest? = null
+    private var flushRequestCode = 0
 
     fun flush() {
-        val l = CountDownLatch(1)
         synchronized(this) {
-            flushLatch = l
+            val f = FlushRequest(++flushRequestCode, CountDownLatch(1))
+            activeFlush = f
             try {
-                client.locationManager.requestFlush(provider.name, this, 0)
+                client.locationManager.requestFlush(provider.name, this, f.code)
+                if (!f.latch.await(5, TimeUnit.SECONDS)) {
+                    logd{"flush timed out"}
+                }
+            } catch (e: IllegalArgumentException) {
             } catch (e: IllegalStateException) {
-                // may get thrown if other thread unregisters this listener
-                return
+            } finally {
+                activeFlush = null
             }
-            l.await()
-            flushLatch = null
         }
     }
 
     override fun onFlushComplete(requestCode: Int) {
-        flushLatch!!.countDown()
+        activeFlush?.let { if (it.code == requestCode) it.latch.countDown() }
     }
 }
