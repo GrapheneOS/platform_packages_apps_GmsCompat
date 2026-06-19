@@ -30,6 +30,11 @@ PromoFeature__enabled perms-none-of android.permission.ACCESS_COARSE_LOCATION fa
 # below for increased stability
 Passkeys__client_data_hash_override_for_security_keys true
 
+[com.google.android.gms.personalsafety]
+# requires privileged LOCK_DEVICE permission, though other Phenotype flags can also make it fallback
+# to DevicePolicyManager lockNow
+AutoLockSettings__enable_theft_protection_default_on_notification false
+
 [com.google.android.metrics]
 # controls access to privileged StatsManager#getRegisteredExperimentIds()
 add_external_experiment_ids false
