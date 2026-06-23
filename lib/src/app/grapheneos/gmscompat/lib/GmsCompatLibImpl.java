@@ -68,9 +68,7 @@ public class GmsCompatLibImpl implements IGmsCompatLib {
 
     @Override
     public boolean maybeInterceptBinderProxyDump(BinderProxy binderProxy, FileDescriptor fd, String[] args, boolean async) {
-        if (Log.isLoggable(TAG_BINDER, Log.DEBUG)) {
-            Log.d(TAG_BINDER, "maybeInterceptBinderProxyDump: " + BinderUtils.getInterfaceDescriptor(binderProxy) + " " + Arrays.toString(args), maybeStackTrace(TAG_BINDER));
-        }
+        Log.i(TAG_BINDER, "maybeInterceptBinderProxyDump: " + BinderUtils.getInterfaceDescriptor(binderProxy) + " " + Arrays.toString(args), maybeStackTrace(TAG_BINDER));
         return false;
     }
 
