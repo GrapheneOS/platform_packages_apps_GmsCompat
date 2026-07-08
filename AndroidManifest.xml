@@ -64,6 +64,15 @@
             tools:ignore="ExportedContentProvider"
         />
 
+        <provider
+            android:name=".GservicesProvider"
+            android:authorities="app.grapheneos.gmscompat.gservices"
+            android:exported="true"
+            android:directBootAware="true"
+            android:permission="com.google.android.providers.gsf.permission.READ_GSERVICES"
+            tools:ignore="ExportedContentProvider"
+        />
+
         <receiver
             android:name=".PendingActionReceiver"
             android:exported="false"
