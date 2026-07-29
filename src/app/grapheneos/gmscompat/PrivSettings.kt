@@ -69,8 +69,12 @@ class PrivSettings : IBinder.DeathRecipient {
         }
     }
 
-    fun putStrings(ns: String, keys: Array<String>, values: Array<String>): Boolean {
-        if (DBG) logd{"$ns keys " + Arrays.toString(keys) + " values " + Arrays.toString(values)}
+    fun putStrings(ns: String, keys: List<String>, values: List<String>): Boolean {
+        if (DBG) {
+            for (i in 0 until keys.size) {
+                logd{"$ns ${keys[i]} = ${values[i]}"}
+            }
+        }
 
         val storage = storage(ns)
 

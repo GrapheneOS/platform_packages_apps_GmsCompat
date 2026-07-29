@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.StringParceledListSlice
 import android.database.IContentObserver
 import android.ext.LogViewerApp
 import android.ext.PackageId
@@ -499,8 +500,8 @@ object BinderGms2Gca : IGms2Gca.Stub() {
         return privSettings.putString(ns, key, value)
     }
 
-    override fun privSettingsPutStrings(ns: String, keys: Array<String>, values: Array<String>): Boolean {
-        return privSettings.putStrings(ns, keys, values)
+    override fun privSettingsPutStrings(ns: String, keys: StringParceledListSlice, values: StringParceledListSlice): Boolean {
+        return privSettings.putStrings(ns, keys.list, values.list)
     }
 
     override fun privSettingsRegisterObserver(ns: String, key: String, observer: IContentObserver) {
