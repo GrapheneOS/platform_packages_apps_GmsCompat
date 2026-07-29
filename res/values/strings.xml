@@ -278,6 +278,7 @@ To recover this account keychain after reinstalling Play services or setting up 
     <string name="gmscore_recover_keystore_access_footer_title">Only enable recovery keystore access if you trust Play services and Google\'s recovery system</string>
     <string name="gmscore_recover_keystore_access_footer">Turning recovery keystore access off blocks future requests, but does not delete data already synchronized to Google.</string>
     <string name="notif_gmscore_missing_recoverable_keystore_access_perm">Play services may need recovery keystore access to create or use synchronized passkeys in Google Password Manager.</string>
+    <string name="notif_gmscore_missing_find_hub_account_keychain_perm">Find Hub may need Play services to have recovery keystore access to add supported devices and trackers to your Google Account.</string>
 
     <string name="rcs_potential_issues">Potential issues with RCS activation</string>
     <string name="rcs_issue_header">These are the minimum requirements for RCS activation:</string>

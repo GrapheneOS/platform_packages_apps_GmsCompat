@@ -260,15 +260,29 @@ object Notifications {
     fun handleGmsCoreMissingRecoverableKeystorePermission() {
         Log.d("GmsCompat/RecoverableKeystore", "missing recovery keystore access")
 
+        showGmsCoreMissingRecoverableKeystorePermission(
+            R.string.notif_gmscore_missing_recoverable_keystore_access_perm
+        )
+    }
+
+    fun handleGmsCoreMissingFindHubAccountKeychainPermission() {
+        Log.d("GmsCompat/RecoverableKeystore", "Find Hub needs recovery keystore access")
+
+        showGmsCoreMissingRecoverableKeystorePermission(
+            R.string.notif_gmscore_missing_find_hub_account_keychain_perm
+        )
+    }
+
+    private fun showGmsCoreMissingRecoverableKeystorePermission(
+        textResId: Int
+    ) {
         val ctx = App.ctx()
         val intent = GmsCoreRecoverableKeystoreActivity.createIntent()
 
         configurationRequired(
             CH_MISSING_PERMISSION,
             ctx.getText(R.string.missing_permission),
-            ctx.getText(
-                R.string.notif_gmscore_missing_recoverable_keystore_access_perm
-            ),
+            ctx.getText(textResId),
             ctx.getText(R.string.open_settings),
             intent,
         ).apply {
