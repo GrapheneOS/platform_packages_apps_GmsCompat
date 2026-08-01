@@ -32,6 +32,8 @@ android_app {
         "SettingsLibCategory",
         "SettingsLibCollapsingToolbarBaseActivity",
         "SettingsLibFooterPreference",
+        "SettingsLibSettingsTheme",
+        "setupdesign",
     ],
     jarjar_rules: "jarjar-rules.txt",
 
