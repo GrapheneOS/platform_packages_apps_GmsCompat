@@ -8,9 +8,12 @@ import app.grapheneos.gmscompat.configui.aauto.AndroidAutoConfigWrapperFragment
 import app.grapheneos.gmscompat.configui.gmscore.GmsCoreConfigWrapperFragment
 
 object GmsCompatNavGraph {
-    fun create(controller: NavController): NavGraph {
+    fun create(
+        controller: NavController,
+        startDestination: NavRoute = NavRoute.Main,
+    ): NavGraph {
         val ctx = App.ctx()
-        return controller.createGraph(startDestination = NavRoute.Main) {
+        return controller.createGraph(startDestination = startDestination) {
             fragment<MainWrapperFragment, NavRoute.Main> {
                 label = ctx.getString(R.string.activity_name)
             }
