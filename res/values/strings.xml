@@ -105,6 +105,7 @@ To receive them quicker, set “Battery usage” to “Unrestricted” in Play s
 
     <string name="notif_android_auto_needs_baseline_perms_title">Android Auto needs setup</string>
     <string name="notif_android_auto_needs_baseline_perms_text">Go to Settings ➔ Apps ➔ Sandboxed Google Play ➔ Android Auto</string>
+    <string name="notif_android_auto_car_connection_lost">Android Auto car connection was unexpectedly lost</string>
 
     <string name="notif_ch_manage_play_integrity_api">Play Integrity API usage</string>
     <string name="notif_app_used_play_integrity_api_title">Play Integrity API usage</string>

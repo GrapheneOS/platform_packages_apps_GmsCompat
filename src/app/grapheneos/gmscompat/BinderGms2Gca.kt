@@ -317,6 +317,8 @@ object BinderGms2Gca : IGms2Gca.Stub() {
     override fun onUncaughtException(aer: ApplicationErrorReport) {
         val TAG = "onGmsUncaughtException"
 
+        val stackTrace = aer.crashInfo.stackTrace
+
         if (aer.packageName == PackageId.ANDROID_AUTO_NAME) {
             val perm = android.Manifest.permission.REQUEST_COMPANION_PROFILE_AUTOMOTIVE_PROJECTION
             if (ctx.checkCallingPermission(perm) != PackageManager.PERMISSION_GRANTED) {
@@ -324,10 +326,13 @@ object BinderGms2Gca : IGms2Gca.Stub() {
                 showAndroidAutoMissingBaselinePermsNotif()
                 return
             }
+            if (stackTrace.contains("java.lang.IllegalStateException: OutOfCarLifecycle")) {
+                showAndroidAutoCarConnectionLossNotif()
+                return
+            }
         }
 
         val ts = SystemClock.elapsedRealtime()
-        val stackTrace = aer.crashInfo.stackTrace
 
         // Don't spam notifications if GMS chain-crashes with similar stack traces.
 
@@ -376,6 +381,15 @@ object BinderGms2Gca : IGms2Gca.Stub() {
 
         if (showNotification) {
             showGmsCrashNotification(aer)
+        }
+    }
+
+    private fun showAndroidAutoCarConnectionLossNotif() {
+        Notifications.builder(Notifications.CH_APP_CRASHED).run {
+            setContentTitle(ctx.getText(R.string.notif_android_auto_car_connection_lost))
+            setShowWhen(true)
+            setSmallIcon(R.drawable.ic_info)
+            show(Notifications.generateUniqueNotificationId())
         }
     }
 
