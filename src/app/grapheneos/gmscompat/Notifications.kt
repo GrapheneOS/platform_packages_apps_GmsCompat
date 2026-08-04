@@ -29,7 +29,7 @@ object Notifications {
     // separate channel to allow silencing it without impacting other missing app prompts
     const val CH_MISSING_PLAY_GAMES_APP = "missing_play_games_app"
     const val CH_BACKGROUND_ACTIVITY_START = "bg_activity_start"
-    const val CH_GMS_CRASHED = "gms_crashed"
+    const val CH_APP_CRASHED = "gms_crashed"
     const val CH_MANAGE_PLAY_INTEGRITY_API = "app_used_play_integrity_api"
     const val CH_SIGN_IN_WITH_GOOGLE = "sign_in_with_google"
 
@@ -60,7 +60,7 @@ object Notifications {
             ch(CH_MISSING_APP, R.string.missing_app, IMPORTANCE_HIGH),
             ch(CH_MISSING_PLAY_GAMES_APP, R.string.notif_ch_missing_play_games_app, IMPORTANCE_HIGH),
             ch(CH_BACKGROUND_ACTIVITY_START, R.string.notif_channel_bg_activity_start, IMPORTANCE_HIGH),
-            ch(CH_GMS_CRASHED, R.string.notif_ch_gms_crash, IMPORTANCE_HIGH),
+            ch(CH_APP_CRASHED, R.string.notif_ch_app_crash, IMPORTANCE_HIGH),
             ch(CH_MANAGE_PLAY_INTEGRITY_API, R.string.notif_ch_manage_play_integrity_api, IMPORTANCE_HIGH).apply { isBlockable = true },
             ch(CH_SIGN_IN_WITH_GOOGLE, R.string.sign_in_with_google_notif_ch, IMPORTANCE_HIGH).apply { isBlockable = true },
         )

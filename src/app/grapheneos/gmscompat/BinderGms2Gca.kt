@@ -380,7 +380,7 @@ object BinderGms2Gca : IGms2Gca.Stub() {
     }
 
     private fun showAndroidAutoMissingBaselinePermsNotif() {
-        Notifications.builder(Notifications.CH_GMS_CRASHED).run {
+        Notifications.builder(Notifications.CH_APP_CRASHED).run {
             setContentTitle(ctx.getText(R.string.notif_android_auto_needs_baseline_perms_title))
             setContentText(ctx.getText(R.string.notif_android_auto_needs_baseline_perms_text))
             setShowWhen(true)
@@ -473,7 +473,7 @@ object BinderGms2Gca : IGms2Gca.Stub() {
             Notification.Action.Builder(null, label, activityPendingIntent(urlIntent)).build()
         }
 
-        Notifications.builder(Notifications.CH_GMS_CRASHED).run {
+        Notifications.builder(Notifications.CH_APP_CRASHED).run {
             setContentTitle(ctx.getString(R.string.notif_gms_crash_title, getApplicationLabel(ctx, aer.packageName)))
             setContentText(ctx.getText(R.string.notif_gms_crash_text))
             setContentIntent(activityPendingIntent(intent))
