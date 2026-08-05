@@ -25,8 +25,9 @@ public class TempServiceBinding implements ServiceConnection, Runnable {
 
     private TempServiceBinding() {}
 
-    public static void create(String targetPkg, long durationMs, @Nullable String reason, int reasonCode) {
-        if (durationMs <= 0) {
+    public static void create(String targetPkg, long durationMs, @Nullable String reason, int reasonCode,
+                              @Nullable String serviceClassName) {
+        if (durationMs < 0) {
             throw new IllegalArgumentException(Long.toString(durationMs));
         }
 
@@ -39,7 +40,8 @@ public class TempServiceBinding implements ServiceConnection, Runnable {
             + ", reasonCode: " + PowerExemptionManager.reasonCodeToString(reasonCode));
 
         var intent = new Intent();
-        intent.setClassName(targetPkg, GmsCompatClientService.class.getName());
+        intent.setClassName(targetPkg, serviceClassName != null ?
+                serviceClassName : GmsCompatClientService.class.getName());
 
         Context appContext = App.ctx();
         if (!appContext.bindService(intent, Context.BIND_AUTO_CREATE, BackgroundThread.getExecutor(), instance)) {
@@ -48,7 +50,10 @@ public class TempServiceBinding implements ServiceConnection, Runnable {
             return;
         }
 
-        BackgroundThread.getHandler().postDelayed(instance, durationMs);
+        if (durationMs > 0) {
+            // unbind the service after timeout, see run() below
+            BackgroundThread.getHandler().postDelayed(instance, durationMs);
+        }
 
         try {
             Boolean res = instance.connectionResult.get(5, TimeUnit.SECONDS);
