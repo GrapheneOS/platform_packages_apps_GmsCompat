@@ -7,6 +7,7 @@ import androidx.navigation.createGraph
 import androidx.navigation.fragment.fragment
 import app.grapheneos.gmscompat.configui.aauto.AndroidAutoConfigWrapperFragment
 import app.grapheneos.gmscompat.configui.gmscore.GmsCoreConfigWrapperFragment
+import app.grapheneos.gmscompat.configui.gmscore.GmsCoreFindHubSetupActivity
 import app.grapheneos.gmscompat.configui.gmscore.GmsCoreRecoverableKeystoreActivity
 
 object GmsCompatNavGraph {
@@ -19,6 +20,9 @@ object GmsCompatNavGraph {
             fragment<MainWrapperFragment, NavRoute.Main> {
                 label = ctx.getString(R.string.activity_name)
             }
+            fragment<UsageGuideWrapperFragment, NavRoute.UsageGuide> {
+                label = ctx.getString(R.string.usage_guide)
+            }
             fragment<AndroidAutoConfigWrapperFragment, NavRoute.AndroidAutoConfig> {
                 label = ctx.getString(R.string.android_auto)
             }
@@ -28,6 +32,10 @@ object GmsCompatNavGraph {
             activity<NavRoute.PlayServicesRecoverableKeystoreConfig> {
                 activityClass = GmsCoreRecoverableKeystoreActivity::class
                 label = ctx.getString(R.string.gmscore_recover_keystore_access_title)
+            }
+            activity<NavRoute.FindHubSetup> {
+                activityClass = GmsCoreFindHubSetupActivity::class
+                label = ctx.getString(R.string.find_hub_setup_title)
             }
         }
     }

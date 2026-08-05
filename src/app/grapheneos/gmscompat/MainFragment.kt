@@ -37,7 +37,11 @@ class MainFragment : SettingsBasePreferenceFragment() {
 
         screen.addPref().apply {
             title = getString(R.string.usage_guide)
-            intent = Intent(Intent.ACTION_VIEW, Uri.parse(USAGE_GUIDE_URL))
+            setSummary(R.string.usage_guide_summary)
+            setOnPreferenceClickListener {
+                navigateWithAnimation(NavRoute.UsageGuide)
+                true
+            }
         }
         screen.addPref().apply {
             title = getString(R.string.component_system_settings, getString(R.string.play_services))

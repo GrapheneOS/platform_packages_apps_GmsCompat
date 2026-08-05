@@ -15,10 +15,10 @@ import com.google.android.setupdesign.util.ThemeHelper
 abstract class BaseSetupFlowActivity : FragmentActivity(), ExpressiveDesignEnabledProvider {
     protected abstract fun createNavigationGraph(controller: NavController): NavGraph
 
-    // SettingsBaseActivity uses this provider to let SettingsLib apply expressive preference
-    // grouping during SetupWizard flows.
-    final override fun isExpressiveDesignEnabled(): Boolean =
-        ThemeHelper.shouldApplyGlifExpressiveStyle(applicationContext)
+    // These activities always use the expressive SettingsLib preference theme. Tell its
+    // preference adapter to add the rounded groups even when SetupWizard partner configuration is
+    // unavailable to this standalone flow.
+    final override fun isExpressiveDesignEnabled(): Boolean = true
 
     protected override fun onApplyThemeResource(
         theme: Resources.Theme,

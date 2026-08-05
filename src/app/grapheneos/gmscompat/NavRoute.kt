@@ -16,6 +16,12 @@ sealed class NavRoute {
     data object Main : NavRoute()
 
     @Serializable
+    data object UsageGuide : NavRoute()
+
+    @Serializable
+    data object FindHubSetup : NavRoute()
+
+    @Serializable
     data object AndroidAutoConfig : NavRoute() {
         const val basePath = "gmscompat://aautoconfig"
     }

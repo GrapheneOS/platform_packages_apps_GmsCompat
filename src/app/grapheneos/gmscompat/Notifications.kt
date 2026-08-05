@@ -16,6 +16,7 @@ import android.util.Log
 import app.grapheneos.gmscompat.App.MainProcessPrefs
 import app.grapheneos.gmscompat.configui.IssueCheck
 import app.grapheneos.gmscompat.configui.getAllIssueRes
+import app.grapheneos.gmscompat.configui.gmscore.GmsCoreFindHubSetupActivity
 import app.grapheneos.gmscompat.configui.gmscore.GmsCoreRecoverableKeystoreActivity
 import app.grapheneos.gmscompat.configui.gmscore.rcsIssueChecks
 import com.android.internal.gmscompat.GmsInfo
@@ -261,7 +262,9 @@ object Notifications {
         Log.d("GmsCompat/RecoverableKeystore", "missing recovery keystore access")
 
         showGmsCoreMissingRecoverableKeystorePermission(
-            R.string.notif_gmscore_missing_recoverable_keystore_access_perm
+            R.string.notif_gmscore_missing_recoverable_keystore_access_perm,
+            GmsCoreRecoverableKeystoreActivity.createIntent(),
+            R.string.open_settings,
         )
     }
 
@@ -269,21 +272,24 @@ object Notifications {
         Log.d("GmsCompat/RecoverableKeystore", "Find Hub needs recovery keystore access")
 
         showGmsCoreMissingRecoverableKeystorePermission(
-            R.string.notif_gmscore_missing_find_hub_account_keychain_perm
+            R.string.notif_gmscore_missing_find_hub_account_keychain_perm,
+            Intent(App.ctx(), GmsCoreFindHubSetupActivity::class.java),
+            R.string.find_hub_setup_title,
         )
     }
 
     private fun showGmsCoreMissingRecoverableKeystorePermission(
-        textResId: Int
+        textResId: Int,
+        intent: Intent,
+        resolutionTextResId: Int,
     ) {
         val ctx = App.ctx()
-        val intent = GmsCoreRecoverableKeystoreActivity.createIntent()
 
         configurationRequired(
             CH_MISSING_PERMISSION,
             ctx.getText(R.string.missing_permission),
             ctx.getText(textResId),
-            ctx.getText(R.string.open_settings),
+            ctx.getText(resolutionTextResId),
             intent,
         ).apply {
             setContentIntent(activityPendingIntent(intent))

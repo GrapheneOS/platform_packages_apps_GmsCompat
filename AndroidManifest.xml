@@ -101,6 +101,14 @@
             android:theme="@style/Theme.GmsCompat.SetupFlow" />
 
         <activity
+            android:name=".configui.gmscore.GmsCoreFindHubSetupActivity"
+            android:exported="false"
+            android:label="@string/find_hub_setup_title"
+            android:launchMode="singleTask"
+            android:taskAffinity="app.grapheneos.gmscompat.find_hub"
+            android:theme="@style/Theme.GmsCompat.SetupFlow" />
+
+        <activity
             android:name=".location.StubResolutionActivity"
             android:exported="true" />
 
