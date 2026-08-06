@@ -98,6 +98,14 @@ Background checks also require Bluetooth and Location to be turned on. Network a
     <string name="find_hub_network_status_summary">Needed to complete Find Hub setup and use online Find Hub services.</string>
     <string name="find_hub_open_play_services_app_info">Open Play services app info</string>
     <string name="find_hub_open_play_services_app_info_summary">Choose which Find Hub permissions Play services can use. Play services notifications are also needed for unknown tracker alerts.</string>
+    <string name="find_hub_bluetooth_off_warning_title">Bluetooth is off</string>
+    <string name="find_hub_bluetooth_off_warning_summary">Turn on Bluetooth to use Find Hub features that rely on nearby devices, including adding trackers and accessories.</string>
+    <string name="find_hub_bluetooth_auto_off_warning_title">Bluetooth may turn off automatically</string>
+    <string name="find_hub_bluetooth_auto_off_warning_summary">Bluetooth is set to turn off when no devices are connected. This can prevent this phone from being found through Find Hub or detecting nearby devices. Set “Turn off Bluetooth automatically” to “Never” in Settings.</string>
+    <string name="find_hub_bluetooth_auto_off_warning_secondary_user_summary">Bluetooth is set to turn off when no devices are connected. This can prevent this phone from being found through Find Hub or detecting nearby devices. Set “Turn off Bluetooth automatically” to “Never” in the owner user’s Settings.</string>
+    <string name="find_hub_check_settings_category">Check these settings</string>
+    <string name="find_hub_location_off_warning_title">Location is off</string>
+    <string name="find_hub_location_off_warning_summary">Turn on Location for location reports, background Find Hub scans, and finding a tracker tag registered to your Google Account while it signals that it is away from its owner.</string>
     <string name="find_hub_finish_setup_title">Continue with Find Hub</string>
     <string name="find_hub_finish_setup_summary">Use Find Hub and Play services to finish setting up the features you want.</string>
     <string name="find_hub_open_play_store_title">Open Find Hub in Play Store</string>

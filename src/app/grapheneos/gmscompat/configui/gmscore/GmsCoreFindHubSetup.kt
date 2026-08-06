@@ -3,16 +3,22 @@ package app.grapheneos.gmscompat.configui.gmscore
 import android.Manifest
 import android.app.compat.gms.GmsCorePackageFlag
 import android.app.compat.gms.GmsUtils
+import android.bluetooth.BluetoothManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.GosPackageState
 import android.ext.PackageId
+import android.ext.settings.ExtSettings
+import android.location.LocationManager
 import android.os.Bundle
+import android.provider.Settings
 import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.navigation.NavController
 import androidx.navigation.createGraph
 import androidx.navigation.fragment.fragment
 import androidx.preference.Preference
+import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceGroup
 import app.grapheneos.gmscompat.APP_INFO_ITEM_PERMISSIONS
 import app.grapheneos.gmscompat.BaseGlifFragment
@@ -426,6 +432,11 @@ class GmsCoreFindHubAdditionalPermissionsFragment : BaseGlifPreferenceFragment()
 }
 
 class GmsCoreFindHubFinishSetupFragment : BaseGlifPreferenceFragment() {
+    private lateinit var warningsCategory: PreferenceCategory
+    private lateinit var bluetoothOffWarningPreference: Preference
+    private lateinit var bluetoothAutoOffWarningPreference: Preference
+    private lateinit var locationOffWarningPreference: Preference
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         val context = preferenceManager.context
         val screen = preferenceManager.createPreferenceScreen(context)
@@ -439,6 +450,43 @@ class GmsCoreFindHubFinishSetupFragment : BaseGlifPreferenceFragment() {
             }
         )
 
+        warningsCategory = PreferenceCategory(context).apply {
+            setTitle(R.string.find_hub_check_settings_category)
+            isVisible = false
+        }
+        screen.addPreference(warningsCategory)
+        bluetoothOffWarningPreference = Preference(context).apply {
+            setTitle(R.string.find_hub_bluetooth_off_warning_title)
+            setSummary(R.string.find_hub_bluetooth_off_warning_summary)
+            setIcon(R.drawable.ic_configuration_required)
+            intent = Intent(Settings.ACTION_BLUETOOTH_SETTINGS)
+            isVisible = false
+        }
+        warningsCategory.addPreference(bluetoothOffWarningPreference)
+
+        bluetoothAutoOffWarningPreference = Preference(context).apply {
+            setTitle(R.string.find_hub_bluetooth_auto_off_warning_title)
+            setSummary(
+                if (context.user.isSystem) {
+                    R.string.find_hub_bluetooth_auto_off_warning_summary
+                } else {
+                    R.string.find_hub_bluetooth_auto_off_warning_secondary_user_summary
+                }
+            )
+            setIcon(R.drawable.ic_configuration_required)
+            isSelectable = false
+            isVisible = false
+        }
+        warningsCategory.addPreference(bluetoothAutoOffWarningPreference)
+
+        locationOffWarningPreference = Preference(context).apply {
+            setTitle(R.string.find_hub_location_off_warning_title)
+            setSummary(R.string.find_hub_location_off_warning_summary)
+            setIcon(R.drawable.ic_configuration_required)
+            intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+            isVisible = false
+        }
+        warningsCategory.addPreference(locationOffWarningPreference)
         screen.addPreference(
             SetupDesignBulletPreference(
                 context,
@@ -460,6 +508,11 @@ class GmsCoreFindHubFinishSetupFragment : BaseGlifPreferenceFragment() {
         preferenceScreen = screen
     }
 
+    override fun onResume() {
+        super.onResume()
+        updateState()
+    }
+
     override fun onGlifPreferenceViewCreated(
         layout: GlifPreferenceLayout,
         savedInstanceState: Bundle?,
@@ -475,6 +528,28 @@ class GmsCoreFindHubFinishSetupFragment : BaseGlifPreferenceFragment() {
             FooterButton.ButtonType.CLEAR,
             { pressBack() },
         )
+        updateState()
+    }
+
+    private fun updateState() {
+        val context = requireContext()
+        val hasNearbyDevices = gmsCoreHasFindHubNearbyDevicesPermission()
+        val bluetoothAdapter = context.getSystemService(BluetoothManager::class.java)?.adapter
+        // GmsCore cannot scan in BLE-only mode while Bluetooth is off. That mode requires full
+        // BLUETOOTH_PRIVILEGED.
+        bluetoothOffWarningPreference.isVisible =
+            hasNearbyDevices && bluetoothAdapter != null && !bluetoothAdapter.isEnabled
+        bluetoothAutoOffWarningPreference.isVisible =
+            hasNearbyDevices && ExtSettings.BLUETOOTH_AUTO_OFF.get(context) != 0
+
+        val locationManager = context.getSystemService(LocationManager::class.java)
+        locationOffWarningPreference.isVisible =
+            locationManager?.isLocationEnabled == false
+
+        warningsCategory.isVisible =
+            bluetoothOffWarningPreference.isVisible ||
+                bluetoothAutoOffWarningPreference.isVisible ||
+                locationOffWarningPreference.isVisible
     }
 }
 
