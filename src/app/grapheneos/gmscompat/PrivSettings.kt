@@ -80,6 +80,8 @@ class PrivSettings : IBinder.DeathRecipient {
 
         val res = synchronized(storage) {
             val ed = storage.edit()
+            /** @see android.provider.DeviceConfig#setProperties */
+            ed.clear()
             for (i in 0 until keys.size) {
                 ed.putString(keys[i], values[i])
             }
