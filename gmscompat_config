@@ -145,6 +145,7 @@ isSupervisionEnabled false
 [android.app.usage.UsageStatsManager]
 # 10 is STANDBY_BUCKET_ACTIVE
 getAppStandbyBucket int 10
+queryEvents null
 
 [android.bluetooth.BluetoothA2dp]
 setConnectionPolicy false
