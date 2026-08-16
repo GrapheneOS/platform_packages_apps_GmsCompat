@@ -272,6 +272,9 @@ getSelfManagedPhoneAccounts emptyList
 getUserSelectedOutgoingPhoneAccount null
 placeCall void
 
+[android.telephony.SmsManager]
+injectSmsPdu void
+
 [android.telephony.SubscriptionManager]
 getActiveSubscriptionIdList emptyIntArray
 getPhoneNumber emptyString
