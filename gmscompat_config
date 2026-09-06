@@ -30,6 +30,12 @@ PromoFeature__enabled perms-none-of android.permission.ACCESS_COARSE_LOCATION fa
 # below for increased stability
 Passkeys__client_data_hash_override_for_security_keys true
 
+[com.google.android.gms.gestureexchange#com.google.android.gms]
+# Gesture Exchange requires privileged NFC, secure settings and process state
+# integration. Disable its master flag to make GmsCore disable every component
+# in the module.
+45751209 false
+
 [com.google.android.gms.personalsafety]
 # requires privileged LOCK_DEVICE permission, though other Phenotype flags can also make it fallback
 # to DevicePolicyManager lockNow
@@ -344,6 +350,9 @@ isUserOfType false
 
 [[force_ComponentEnabledSettings]]
 [com.google.android.gms]
+# GestureExchangeService crashes the persistent GmsCore process when it queries its UID importance
+# without PACKAGE_USAGE_STATS, plus it requires more privileges to even work
+disable com.google.android.gms.gestureexchange.service.GestureExchangeService
 # causes chain crashes on Pixel Tablet due to the missing Dock Manager app
 disable com.google.android.gms.homegraph.PersistentListenerService
 disable com.google.android.gms.update.SystemUpdateGcmTaskService
