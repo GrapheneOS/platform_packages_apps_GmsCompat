@@ -30,6 +30,11 @@ PromoFeature__enabled perms-none-of android.permission.ACCESS_COARSE_LOCATION fa
 # below for increased stability
 Passkeys__client_data_hash_override_for_security_keys true
 
+[com.google.android.gms.findmydevice]
+# Powered off finding requires BLUETOOTH_PRIVILEGED to access NearbyManager APIs.
+# Avoid showing a notification for unavailable Find Hub functionality.
+EnableFindMyDeviceModule__show_power_off_finder_notification false
+
 [com.google.android.gms.gestureexchange#com.google.android.gms]
 # Gesture Exchange requires privileged NFC, secure settings and process state
 # integration. Disable its master flag to make GmsCore disable every component

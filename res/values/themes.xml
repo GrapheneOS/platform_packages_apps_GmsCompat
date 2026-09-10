@@ -22,4 +22,26 @@
     <style name="Theme.GmsCompat.Settings.FilterTouches">
         <item name="android:filterTouchesWhenObscured">true</item>
     </style>
+
+    <style name="Theme.GmsCompat.SetupFlow" parent="SudThemeGlifV4.DayNight">
+        <item name="android:filterTouchesWhenObscured">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="preferenceTheme">@style/PreferenceTheme.SettingsLib.Expressive</item>
+        <item name="preferenceFragmentCompatStyle">
+            @style/GmsCompatSetupFlowPreferenceFragmentStyle
+        </item>
+    </style>
+
+    <style name="GmsCompatSetupFlowPreferenceFragmentStyle" parent="PreferenceFragment.Material">
+        <item name="android:layout">@layout/setup_flow_preference</item>
+    </style>
+
+    <style name="GmsCompatSetupFlowPreferenceThemeOverlay"
+        parent="PreferenceTheme.SettingsLib.Expressive">
+        <item name="preferenceTheme">@style/PreferenceTheme.SettingsLib.Expressive</item>
+        <item name="preferenceFragmentCompatStyle">
+            @style/GmsCompatSetupFlowPreferenceFragmentStyle
+        </item>
+    </style>
 </resources>

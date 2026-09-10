@@ -16,6 +16,8 @@ import android.util.Log
 import app.grapheneos.gmscompat.App.MainProcessPrefs
 import app.grapheneos.gmscompat.configui.IssueCheck
 import app.grapheneos.gmscompat.configui.getAllIssueRes
+import app.grapheneos.gmscompat.configui.gmscore.GmsCoreFindHubSetupActivity
+import app.grapheneos.gmscompat.configui.gmscore.GmsCoreRecoverableKeystoreActivity
 import app.grapheneos.gmscompat.configui.gmscore.rcsIssueChecks
 import com.android.internal.gmscompat.GmsInfo
 import java.util.concurrent.atomic.AtomicInteger
@@ -46,6 +48,7 @@ object Notifications {
     const val ID_MANAGE_PLAY_INTEGRITY_API = 12
     const val ID_ENABLE_GOOGLE_CREDENTIAL_PROVIDER = 13
     const val ID_MISSING_RCS_PERMISSIONS = 14
+    const val ID_GMS_CORE_MISSING_RECOVERABLE_KEYSTORE_PERMISSION = 16
 
     private val uniqueNotificationId = AtomicInteger(10_000)
     fun generateUniqueNotificationId() = uniqueNotificationId.getAndIncrement()
@@ -252,6 +255,45 @@ object Notifications {
             setAutoCancel(true)
             addAction(doNotShowAgainAction)
             show(id)
+        }
+    }
+
+    fun handleGmsCoreMissingRecoverableKeystorePermission() {
+        Log.d("GmsCompat/RecoverableKeystore", "missing recovery keystore access")
+
+        showGmsCoreMissingRecoverableKeystorePermission(
+            R.string.notif_gmscore_missing_recoverable_keystore_access_perm,
+            GmsCoreRecoverableKeystoreActivity.createIntent(),
+            R.string.open_settings,
+        )
+    }
+
+    fun handleGmsCoreMissingFindHubAccountKeychainPermission() {
+        Log.d("GmsCompat/RecoverableKeystore", "Find Hub needs recovery keystore access")
+
+        showGmsCoreMissingRecoverableKeystorePermission(
+            R.string.notif_gmscore_missing_find_hub_account_keychain_perm,
+            Intent(App.ctx(), GmsCoreFindHubSetupActivity::class.java),
+            R.string.find_hub_setup_title,
+        )
+    }
+
+    private fun showGmsCoreMissingRecoverableKeystorePermission(
+        textResId: Int,
+        intent: Intent,
+        resolutionTextResId: Int,
+    ) {
+        val ctx = App.ctx()
+
+        configurationRequired(
+            CH_MISSING_PERMISSION,
+            ctx.getText(R.string.missing_permission),
+            ctx.getText(textResId),
+            ctx.getText(resolutionTextResId),
+            intent,
+        ).apply {
+            setContentIntent(activityPendingIntent(intent))
+            show(ID_GMS_CORE_MISSING_RECOVERABLE_KEYSTORE_PERMISSION)
         }
     }
 
