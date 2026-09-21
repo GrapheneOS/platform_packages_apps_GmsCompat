@@ -115,6 +115,11 @@ fwm true
 [com.google.android.gms.kidssettings#com.google.android.gms]
 SeparateApkFeature__disable_separate_apk_if_not_used false
 
+[com.google.android.gms.octarine]
+# GmsCore 263234035 added a second WebAuthn WebView entry point in OcIdWebView,
+# which also routes security key authentication through Credential Manager
+45823215 false
+
 [com.google.android.projection.gearhead]
 # prevent Android Auto from trying to query a nonexistent Assistant service in the Google app
 Assistant__dodgeboost_initial_handshake_enabled true
