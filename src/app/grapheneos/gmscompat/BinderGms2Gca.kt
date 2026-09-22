@@ -312,6 +312,14 @@ object BinderGms2Gca : IGms2Gca.Stub() {
         ).show(Notifications.ID_GMS_CORE_MISSING_NEARBY_DEVICES_PERMISSION)
     }
 
+    override fun maybeShowGmsCoreMissingRecoverableKeystorePermissionNotification() {
+        Notifications.handleGmsCoreMissingRecoverableKeystorePermission()
+    }
+
+    override fun maybeShowGmsCoreMissingFindHubAccountKeychainPermissionNotification() {
+        Notifications.handleGmsCoreMissingFindHubAccountKeychainPermission()
+    }
+
     override fun maybeShowContactsSyncNotification() {
         Notifications.handleContactsSync()
     }
