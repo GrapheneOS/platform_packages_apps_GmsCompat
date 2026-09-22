@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.function.Function;
 
 import app.grapheneos.gmscompat.lib.playintegrity.PlayIntegrityUtils;
+import app.grapheneos.gmscompat.lib.providerinstaller.ProviderInstallerCompat;
 import app.grapheneos.gmscompat.lib.sysservice.SystemServiceOverridesRegistry;
 import app.grapheneos.gmscompat.lib.util.BinderUtils;
 
@@ -32,16 +33,22 @@ import app.grapheneos.gmscompat.lib.util.BinderUtils;
 public class GmsCompatLibImpl implements IGmsCompatLib {
     private static final String TAG = "GmcLib";
 
+    private Context hostContext;
+
     @Override
     public void init(Context appContext, Context libContext, String processName) {
         Log.d(TAG, "init: pkg: " + appContext.getPackageName() + ", process: " + processName);
+        hostContext = appContext;
         SystemServiceOverridesRegistry.init(appContext, binderProxyOverridesRegistry);
     }
 
     @Override
     public ServiceConnection maybeReplaceServiceConnection(Intent service, long flags, UserHandle user, ServiceConnection orig) {
         ServiceConnection override = PlayIntegrityUtils.maybeReplaceServiceConnection(service, orig);
-        return override;
+        if (override != null) {
+            return override;
+        }
+        return ProviderInstallerCompat.maybeWrap(hostContext, service, user, orig);
     }
 
     private static final String TAG_BINDER = "GmcLibBinder";
