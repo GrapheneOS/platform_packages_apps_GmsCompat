@@ -17,6 +17,9 @@ MaestroApp__standalone_mode true
 # the GmsCompat crash reporting system
 DeviceDoctor__devicedoctor_enabled false
 
+[com.google.android.gms.backup]
+PhotosReliability__log_bbg1_backup_state_from_scheduled_task false
+
 [com.google.android.gms.enpromo]
 # enpromo is a GmsCore module that shows a notification that prompts the user to enable
 # Exposure Notifications (en). It needs location access to determine which location-specific app
