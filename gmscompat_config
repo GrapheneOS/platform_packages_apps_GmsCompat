@@ -61,6 +61,9 @@ FastPairFeature__enable_wearable_service false
 # use PackageManager#getNameForUid() instead of PackageManager#getPackagesForUid(), the latter needs
 # a shim that is currently absent
 FastPairConfig__sass_get_package_name_from_playback_configuration false
+# ReceiveSurfaceChimeraService leaves state change receiver registered after destruction, so
+# read vendor metadata in sync mode to avoid submitting work when its stopped
+45789685 false
 
 [com.google.android.gms.cast]
 # Prevent crashes in GmsCore caused by calling ConnectivityManager#registerNetworkCallback too many
