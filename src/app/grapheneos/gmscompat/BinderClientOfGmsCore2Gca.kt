@@ -26,8 +26,6 @@ object BinderClientOfGmsCore2Gca : IClientOfGmsCore2Gca.Stub() {
         return BinderDefs.maybeGetBinderDef(callerPkg, processState, ifaceName, false)
     }
 
-    override fun getGmsCoreFileProxyService(): IFileProxyService = BinderGms2Gca.gmsCoreFileProxyService!!
-
     override fun showMissingAppNotification(pkgName: String) {
         val prompt = when (pkgName) {
             "com.google.android.tts" -> R.string.missing_speech_services

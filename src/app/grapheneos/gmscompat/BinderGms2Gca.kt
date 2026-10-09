@@ -107,10 +107,10 @@ object BinderGms2Gca : IGms2Gca.Stub() {
             Log.d(TAG, "removeBoundProcess: ${bp.pkgName}|${bp.processName}, pid ${bp.pid}")
 
             when (bp.processName) {
-                GmsInfo.PACKAGE_PLAY_STORE -> {
+                PackageId.PLAY_STORE_NAME -> {
                     Notifications.cancel(Notifications.ID_PLAY_STORE_MISSING_OBB_PERMISSION)
                 }
-                GmsHooks.PERSISTENT_GmsCore_PROCESS -> {
+                PackageId.GMS_CORE_NAME -> {
                     Notifications.cancel(Notifications.ID_GMS_CORE_MISSING_NEARBY_DEVICES_PERMISSION)
                 }
             }
@@ -130,10 +130,6 @@ object BinderGms2Gca : IGms2Gca.Stub() {
             }
             return res
         }
-    }
-
-    fun getPersistentGmsCoreProcess(): IGca2Gms? {
-        return getBoundProcessByName(GmsHooks.PERSISTENT_GmsCore_PROCESS)
     }
 
     fun getBoundProcessByName(name: String): IGca2Gms? {
@@ -163,41 +159,21 @@ object BinderGms2Gca : IGms2Gca.Stub() {
             }
         }
 
-        val p = getPersistentGmsCoreProcess()
-        var invalidated = false
-        if (p != null) {
-            try {
-                p.invalidateConfigCaches()
-                invalidated = true
-            } catch (e: Throwable) {
-                // DeadObjectException if GmsCore racily died, or another exception if actual invalidation
-                // failed
-                logd{e}
-            }
+        val gmsCoreInfo = ctx.packageManager
+            .getAppInfoOrNull(PackageId.GMS_CORE_NAME)
+        if (gmsCoreInfo == null) {
+            return
         }
-
-        if (!invalidated) {
-            logd{"unable to invalidate config caches, restarting to apply config update"}
-            // all bound GMS processes will exit too
-            System.exit(0)
+        val mainProcessName = GmsHooks.mainGmsCoreProcessName(gmsCoreInfo.longVersionCode)
+        val mainProcess = getBoundProcessByName(mainProcessName)
+        if (mainProcess == null) {
+            return
         }
-    }
-
-    @Volatile
-    var gmsCoreFileProxyService: IFileProxyService? = null
-
-    override fun connectGmsCore(processName: String, iGca2Gms: IGca2Gms, fileProxyService: IFileProxyService?): GmsCompatConfig {
-        if (fileProxyService != null) {
-            gmsCoreFileProxyService = fileProxyService
+        try {
+            mainProcess.invalidateConfigCaches()
+        } catch (e: Exception) {
+            Log.e(TAG, "unable to invalidate config caches in main GmsCore process", e)
         }
-
-        if (processName == GmsHooks.PERSISTENT_GmsCore_PROCESS) {
-            App.ctx().mainExecutor.execute {
-                Notifications.handleGmsCorePowerExemption()
-            }
-        }
-
-        return connect(PACKAGE_GMS_CORE, processName, iGca2Gms)
     }
 
     const val MAIN_PLAY_STORE_PROCESS: String = PACKAGE_PLAY_STORE
@@ -564,6 +540,10 @@ object BinderGms2Gca : IGms2Gca.Stub() {
             addAction(doNotShowAgain)
             show(notifId)
         }
+    }
+
+    override fun maybeShowGmsCorePowerExemptionNotification() {
+        Notifications.handleGmsCorePowerExemption()
     }
 
     override fun maybeShowGmsCoreRestrictedBackgroundDataNotif() {
