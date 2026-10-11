@@ -481,7 +481,7 @@ object BinderGms2Gca : IGms2Gca.Stub() {
     private var prevUeNotifTimestamp = 0L
     private var prevConfigUpdateCheckTimestamp = 0L
 
-    private val privSettings = PrivSettings()
+    private val privSettings = PrivSettings(App.ctx())
 
     override fun privSettingsGetString(ns: String, key: String): String? {
         return privSettings.getString(ns, key)
@@ -493,14 +493,6 @@ object BinderGms2Gca : IGms2Gca.Stub() {
 
     override fun privSettingsPutStrings(ns: String, keys: StringParceledListSlice, values: StringParceledListSlice): Boolean {
         return privSettings.putStrings(ns, keys.list, values.list)
-    }
-
-    override fun privSettingsRegisterObserver(ns: String, key: String, observer: IContentObserver) {
-        privSettings.addObserver(ns, key, observer)
-    }
-
-    override fun privSettingsUnregisterObserver(observer: IContentObserver) {
-        privSettings.removeObserver(observer)
     }
 
     override fun getMediaProjectionNotification(): Notification {
