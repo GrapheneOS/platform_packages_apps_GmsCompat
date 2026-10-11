@@ -18,9 +18,8 @@ import android.provider.Settings
 import android.util.Log
 import androidx.core.content.getSystemService
 import com.android.internal.gmscompat.IClientOfGmsCore2Gca
-import com.android.internal.gmscompat.fileservice.IFileProxyService
 
-object BinderClientOfGmsCore2Gca : IClientOfGmsCore2Gca.Stub() {
+class BinderClientOfGmsCore2Gca(val ctx: Context) : IClientOfGmsCore2Gca.Stub() {
 
     override fun maybeGetBinderDef(callerPkg: String, processState: Int, ifaceName: String): BinderDef? {
         return BinderDefs.maybeGetBinderDef(callerPkg, processState, ifaceName, false)
@@ -36,7 +35,6 @@ object BinderClientOfGmsCore2Gca : IClientOfGmsCore2Gca.Stub() {
     }
 
     override fun showPlayIntegrityNotification(pkgName: String, isBlocked: Boolean) {
-        val ctx = App.ctx()
         if (ctx.packageManager.getPackageUid(pkgName, 0) != Binder.getCallingUid()) {
             // this method should be called by app itself
             throw SecurityException()
@@ -80,7 +78,6 @@ object BinderClientOfGmsCore2Gca : IClientOfGmsCore2Gca.Stub() {
     }
 
     override fun onGoogleIdCredentialOptionInit() {
-        val ctx = App.ctx()
         if (!GmsCompat.isEnabledFor(PackageId.GMS_CORE_NAME, ctx.userId)) {
             return
         }

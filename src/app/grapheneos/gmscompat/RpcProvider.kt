@@ -21,10 +21,6 @@ class RpcProvider : AbsContentProvider() {
 
                 wrapBinder(BinderGms2Gca)
             }
-            GmsCompatApp.RPC_GET_BINDER_IClientOfGmsCore2Gca -> {
-                // any client of GMS Core is allowed to access this binder
-                wrapBinder(BinderClientOfGmsCore2Gca)
-            }
             else -> throw IllegalArgumentException(whichStr)
         }
     }

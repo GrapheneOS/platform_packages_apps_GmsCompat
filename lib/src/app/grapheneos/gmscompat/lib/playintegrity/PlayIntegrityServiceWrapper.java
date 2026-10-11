@@ -52,7 +52,8 @@ abstract class PlayIntegrityServiceWrapper extends BinderWrapper {
                 return;
             }
             try {
-                GmsCompatApp.iClientOfGmsCore2Gca().showPlayIntegrityNotification(ctx.getPackageName(), isBlocked);
+                GmsCompatApp.iClientOfGmsCore2Gca().voidCall(i ->
+                        i.showPlayIntegrityNotification(ctx.getPackageName(), isBlocked));
             } catch (RemoteException e) {
                 Log.e(TAG, "", e);
             }
