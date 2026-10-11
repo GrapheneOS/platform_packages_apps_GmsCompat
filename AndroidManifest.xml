@@ -62,6 +62,12 @@
             android:foregroundServiceType="specialUse"
         />
 
+        <!-- intentionally not protected by permission, it's bound by GMS clients -->
+        <service
+            android:name=".GmsClientCompatService"
+            android:exported="true"
+            android:directBootAware="true" />
+
         <provider
             android:name=".RpcProvider"
             android:authorities="app.grapheneos.gmscompat.RpcProvider"
