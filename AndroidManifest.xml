@@ -62,6 +62,12 @@
             android:foregroundServiceType="specialUse"
         />
 
+        <service
+            android:name=".GmsCompatService"
+            android:exported="true"
+            android:permission="app.grapheneos.gmscompat.permission.CLIENT"
+            android:directBootAware="true" />
+
         <!-- intentionally not protected by permission, it's bound by GMS clients -->
         <service
             android:name=".GmsClientCompatService"
