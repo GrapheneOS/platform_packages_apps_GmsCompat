@@ -1,25 +1,15 @@
 package app.grapheneos.gmscompat
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
-import android.database.IContentObserver
-import android.net.Uri
-import android.os.DeadObjectException
-import android.os.IBinder
-import android.os.Process
-import android.os.RemoteException
-import android.provider.Settings
-import android.util.ArraySet
-import android.util.Pair
-import java.util.*
-
-typealias NsKey = Pair<String, String>
+import com.android.internal.gmscompat.GmcPrivSettingsHooks
+import com.android.internal.gmscompat.GmsCompatApp
+import java.util.Arrays
 
 // A partial reimplementation of Settings.{Global,Secure} and DeviceConfig.
-class PrivSettings : IBinder.DeathRecipient {
+class PrivSettings(val context: Context) {
     private val storageMap = HashMap<String, SharedPreferences>()
-    private val observerMap = HashMap<NsKey, ArraySet<IContentObserver>>()
-    private val reverseObserverMap = HashMap<IBinder, ArraySet<NsKey>>()
 
     private val DBG = false
 
@@ -95,95 +85,16 @@ class PrivSettings : IBinder.DeathRecipient {
         return res
     }
 
-    fun addObserver(ns: String, key: String, observer: IContentObserver) {
-        if (DBG) logd{"$ns $key ${observer.asBinder()}"}
-
-        val nsKey = NsKey.create(ns, key)
-        val binder = observer.asBinder()
-
-        synchronized(observerMap) {
-            if (reverseObserverMap[binder] == null) {
-                try {
-                    binder.linkToDeath(this, 0)
-                } catch (e: RemoteException) {
-                    logd{"observer already died " + e}
-                    return
-                }
-            }
-
-            observerMap.getOrPut(nsKey) {
-                ArraySet<IContentObserver>()
-            }.add(observer)
-
-            reverseObserverMap.getOrPut(binder) {
-                ArraySet<NsKey>()
-            }.add(nsKey)
+    private fun notifyObservers(ns: String, key: String) {
+        if (ns.startsWith(GmcPrivSettingsHooks.DEVICE_CONFIG_NAMESPACE)) {
+            // not supported and not used by clients
+            return
         }
-    }
 
-    override fun binderDied() {
-        // should never be reached if binderDied(IBinder) is overriden
-        throw IllegalStateException()
-    }
-
-    override fun binderDied(who: IBinder) {
-        removeObserver(who)
-    }
-
-    fun removeObserver(observer: IContentObserver) {
-        removeObserver(observer.asBinder())
-    }
-
-    private fun removeObserver(observer: IBinder) {
-        if (DBG) logd{"$observer" + Throwable()}
-
-        synchronized(observerMap) {
-            observer.unlinkToDeath(this, 0)
-
-            val nsKeys = reverseObserverMap[observer] ?: return
-            reverseObserverMap.remove(observer)
-
-            nsKeys.forEach { nsKey ->
-                val set = observerMap[nsKey] ?: return@forEach
-
-                var found = false
-
-                for (i in 0 until set.size) {
-                    if (set.valueAt(i).asBinder() === observer) {
-                        set.removeAt(i)
-                        found = true
-                        break
-                    }
-                }
-
-                if (DBG) check(found)
-
-                if (set.size == 0) {
-                    observerMap.remove(nsKey)
-                }
-            }
+        val intent = Intent(GmcPrivSettingsHooks.ACTION_SETTING_CHANGED).apply {
+            putExtra(GmcPrivSettingsHooks.EXTRA_SETTING_NAMESPACE, ns)
+            putExtra(GmcPrivSettingsHooks.EXTRA_SETTING_KEY, key)
         }
-    }
-
-    private fun notifyObservers(ns: String, key: String, flags: Int = 0) {
-        val nsKey = NsKey(ns, key)
-        val namespaceUri = Uri.parse("content://${Settings.AUTHORITY}/$ns")
-        val uri = Settings.NameValueTable.getUriFor(namespaceUri, key)
-        val uriArray = arrayOf(uri)
-        val userId = Process.myUserHandle().identifier
-
-        synchronized(observerMap) {
-            val observers = observerMap[nsKey]?.toTypedArray() ?: return
-
-            if (DBG) logd{"$ns $key to ${observers.size} observers"}
-
-            observers.forEach {
-                try {
-                    it.onChangeEtc(false, uriArray, flags, userId)
-                } catch (doe: DeadObjectException) {
-                    logd{"listener died $doe"}
-                }
-            }
-        }
+        context.sendBroadcast(intent, GmsCompatApp.CLIENT_PERMISSION)
     }
 }
