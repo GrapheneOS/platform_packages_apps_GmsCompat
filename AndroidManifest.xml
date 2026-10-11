@@ -75,14 +75,6 @@
             android:directBootAware="true" />
 
         <provider
-            android:name=".RpcProvider"
-            android:authorities="app.grapheneos.gmscompat.RpcProvider"
-            android:exported="true"
-            android:directBootAware="true"
-            tools:ignore="ExportedContentProvider"
-        />
-
-        <provider
             android:name=".GservicesProvider"
             android:authorities="app.grapheneos.gmscompat.gservices"
             android:exported="true"
