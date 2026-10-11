@@ -109,6 +109,14 @@ object BinderGms2Gca : IGms2Gca.Stub() {
             when (bp.processName) {
                 PackageId.PLAY_STORE_NAME -> {
                     Notifications.cancel(Notifications.ID_PLAY_STORE_MISSING_OBB_PERMISSION)
+                    synchronized(playStorePendingUserActionIntents) {
+                        if (!playStorePendingUserActionIntents.isEmpty()) {
+                            // pending PackageInstaller sessions are cleared on Play Store startup,
+                            // which invalidates pending user actions intents
+                            playStorePendingUserActionIntents.clear()
+                            Notifications.cancel(Notifications.ID_PLAY_STORE_PENDING_USER_ACTION)
+                        }
+                    }
                 }
                 PackageId.GMS_CORE_NAME -> {
                     Notifications.cancel(Notifications.ID_GMS_CORE_MISSING_NEARBY_DEVICES_PERMISSION)
@@ -206,20 +214,30 @@ object BinderGms2Gca : IGms2Gca.Stub() {
             }
         }
 
-        Notifications.builder(Notifications.CH_PLAY_STORE_PENDING_USER_ACTION).run {
-            setSmallIcon(R.drawable.ic_pending_action)
-            setContentTitle(title)
-            if (text != 0) {
-                setContentText(text)
-            }
-            setContentIntent(contentIntent)
-            setAutoCancel(true)
-            show(Notifications.ID_PLAY_STORE_PENDING_USER_ACTION)
-        }
-
         synchronized(playStorePendingUserActionIntents) {
             playStorePendingUserActionIntents.addLast(actionIntent)
         }
+
+        val showNotification = Runnable {
+            synchronized(playStorePendingUserActionIntents) {
+                if (playStorePendingUserActionIntents.isEmpty()) {
+                    return@Runnable
+                }
+            }
+            Notifications.builder(Notifications.CH_PLAY_STORE_PENDING_USER_ACTION).run {
+                setSmallIcon(R.drawable.ic_pending_action)
+                setContentTitle(title)
+                if (text != 0) {
+                    setContentText(text)
+                }
+                setContentIntent(contentIntent)
+                setAutoCancel(true)
+                show(Notifications.ID_PLAY_STORE_PENDING_USER_ACTION)
+            }
+        }
+        // Play Store launches the pending action intent right away if it has a visible activity,
+        // delay the notification to avoid cancelling it in that case
+        ctx.mainThreadHandler.postDelayed(showNotification, 2000)
     }
 
     override fun maybeGetPlayStorePendingUserActionIntent(): Intent? {
