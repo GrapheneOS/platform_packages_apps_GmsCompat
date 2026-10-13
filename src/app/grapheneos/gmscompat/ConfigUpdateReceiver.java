@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 
+import com.android.internal.gmscompat.GmsCompatApp;
+
 import static android.os.PatternMatcher.PATTERN_LITERAL;
 import static app.grapheneos.gmscompat.Const.IS_DEV_BUILD;
 
@@ -29,7 +31,9 @@ public class ConfigUpdateReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d("ConfigUpdateReceiver", "" + intent + " | uri: " + intent.getData());
-        BinderGms2Gca.INSTANCE.parseAndUpdateConfig();
+        Log.d("ConfigUpdateReceiver", intent + " | uri: " + intent.getData());
+        BinderGms2Gca.INSTANCE.updateConfig();
+        var broadcast = new Intent(GmsCompatApp.CONFIG_UPDATED_BROADCAST);
+        App.ctx().sendBroadcast(broadcast, GmsCompatApp.CLIENT_PERMISSION);
     }
 }

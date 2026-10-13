@@ -7,14 +7,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.StringParceledListSlice
-import android.database.IContentObserver
 import android.ext.LogViewerApp
 import android.ext.PackageId
 import android.net.Uri
 import android.os.Binder
 import android.os.BinderDef
 import android.os.Bundle
-import android.os.DeadObjectException
 import android.os.Handler
 import android.os.IBinder
 import android.os.Messenger
@@ -25,44 +23,45 @@ import android.util.ArrayMap
 import android.util.Log
 import app.grapheneos.gmscompat.GmsCompatConfigParser.configHolderInfo
 import com.android.internal.gmscompat.GmsCompatConfig
-import com.android.internal.gmscompat.GmsHooks
 import com.android.internal.gmscompat.GmsInfo
 import com.android.internal.gmscompat.GmsInfo.PACKAGE_GMS_CORE
 import com.android.internal.gmscompat.GmsInfo.PACKAGE_PLAY_STORE
-import com.android.internal.gmscompat.IGca2Gms
 import com.android.internal.gmscompat.IGms2Gca
-import com.android.internal.gmscompat.fileservice.IFileProxyService
-import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.function.Consumer
-import java.util.function.Predicate
 
 object BinderGms2Gca : IGms2Gca.Stub() {
     val TAG = BinderGms2Gca::class.java.simpleName
     val ctx: Context = App.ctx()
 
-    class BoundProcess(val iGca2Gms: IGca2Gms, val pid: Int, val uid: Int, val pkgName: String, val processName: String)
+    class BoundProcess(
+        val processBinder: IBinder,
+        val pid: Int,
+        val uid: Int,
+        val pkgName: String,
+        val processName: String,
+    )
 
-    private val boundProcesses = ArrayMap<IGca2Gms, BoundProcess>(10)
+    private val boundProcesses = ArrayMap<IBinder, BoundProcess>(10)
 
     @Volatile
-    private var config = GmsCompatConfigParser.exec(App.ctx())
+    private var config = GmsCompatConfigParser.exec(ctx)
 
-    override fun connect(pkg: String, processName: String, iGca2Gms: IGca2Gms): GmsCompatConfig {
-        val boundProcess = BoundProcess(iGca2Gms, Binder.getCallingPid(), Binder.getCallingUid(),
-                                        pkg, processName)
+    override fun connect(packageName: String, processName: String, processBinder: IBinder): GmsCompatConfig {
+        val boundProcess = BoundProcess(processBinder, Binder.getCallingPid(),
+            Binder.getCallingUid(), packageName, processName)
 
-        Log.d(TAG, "connect from $pkg|$processName, pid ${boundProcess.pid}")
+        Log.d(TAG, "connect from $processName, pid ${boundProcess.pid}, pkg ${packageName}")
 
-        val deathRecipient = DeathRecipient(iGca2Gms)
         val persistentFgServiceLatch = PersistentFgService.requestStart()
+        // important to add before linkToDeath() to avoid race with binderDied() callback
+        addBoundProcess(processBinder, boundProcess)
+        val processDeathRecipient = DeathRecipient(processBinder)
         try {
-            // important to add before linkToDeath() to avoid race with binderDied() callback
-            addBoundProcess(iGca2Gms, boundProcess)
-            iGca2Gms.asBinder().linkToDeath(deathRecipient, 0)
+            processBinder.linkToDeath(processDeathRecipient, 0)
         } catch (e: RemoteException) {
             logd{"binder already died: " + e}
-            deathRecipient.binderDied()
+            processDeathRecipient.binderDied()
             throw e
         }
 
@@ -70,7 +69,6 @@ object BinderGms2Gca : IGms2Gca.Stub() {
         // GMS component and GmsCompatConfig holder are updated together, atomically.
         // This would lead to crashes or errors if the new version of GMS component
         // (most llkely GmsCore) depends on the updated GmsCompatConfig.
-        val ctx = App.ctx()
         if (config.version != configHolderInfo(ctx).longVersionCode) {
             config = GmsCompatConfigParser.exec(ctx)
         }
@@ -82,29 +80,29 @@ object BinderGms2Gca : IGms2Gca.Stub() {
         return config
     }
 
-    class DeathRecipient(val iGca2Gms: IGca2Gms) : IBinder.DeathRecipient {
+    class DeathRecipient(val processBinder: IBinder) : IBinder.DeathRecipient {
         override fun binderDied() {
             PersistentFgService.release()
-            removeBoundProcess(iGca2Gms)
+            removeBoundProcess(processBinder)
         }
     }
 
-    fun addBoundProcess(iGca2Gms: IGca2Gms, boundProcess: BoundProcess) {
+    fun addBoundProcess(processBinder: IBinder, boundProcess: BoundProcess) {
         synchronized(boundProcesses) {
-            boundProcesses.put(iGca2Gms, boundProcess)
+            boundProcesses.put(processBinder, boundProcess)
         }
     }
 
-    fun removeBoundProcess(iGca2Gms: IGca2Gms) {
+    fun removeBoundProcess(processBinder: IBinder) {
         synchronized(boundProcesses) {
-            val bp = boundProcesses.remove(iGca2Gms)
+            val bp = boundProcesses.remove(processBinder)
 
             if (bp == null) {
                 Log.e(TAG, "removeBoundProcess: unknown binder")
                 return
             }
 
-            Log.d(TAG, "removeBoundProcess: ${bp.pkgName}|${bp.processName}, pid ${bp.pid}")
+            Log.d(TAG, "removeBoundProcess: ${bp.processName}, pid ${bp.pid}, pkg ${bp.pkgName}")
 
             when (bp.processName) {
                 PackageId.PLAY_STORE_NAME -> {
@@ -125,82 +123,13 @@ object BinderGms2Gca : IGms2Gca.Stub() {
         }
     }
 
-    fun snapshotBoundProcessses(predicate: Predicate<BoundProcess>? = null): List<IGca2Gms> {
-        synchronized(boundProcesses) {
-            val size = boundProcesses.size
-            val res = ArrayList<IGca2Gms>(size)
-            for (i in 0 until size) {
-                val bp = boundProcesses.valueAt(i)
-                if (predicate == null || predicate.test(bp)) {
-                    res.add(boundProcesses.keyAt(i))
-                }
-
-            }
-            return res
-        }
+    fun updateConfig() {
+        this.config = GmsCompatConfigParser.exec(ctx)
     }
 
-    fun getBoundProcessByName(name: String): IGca2Gms? {
-        val processes: ArrayMap<IGca2Gms, BoundProcess> = boundProcesses
-        synchronized(processes) {
-            for (i in 0 until processes.size) {
-                if (processes.valueAt(i).processName == name) {
-                    return processes.keyAt(i)
-                }
-            }
-        }
-        return null
-    }
-
-    fun parseAndUpdateConfig() {
-        updateConfig(GmsCompatConfigParser.exec(App.ctx()))
-    }
-
-    private fun updateConfig(config: GmsCompatConfig) {
-        this.config = config
-
-        snapshotBoundProcessses().forEach {
-            try {
-                it.updateConfig(config)
-            } catch (e: DeadObjectException) {
-                logd{e}
-            }
-        }
-
-        val gmsCoreInfo = ctx.packageManager
-            .getAppInfoOrNull(PackageId.GMS_CORE_NAME)
-        if (gmsCoreInfo == null) {
-            return
-        }
-        val mainProcessName = GmsHooks.mainGmsCoreProcessName(gmsCoreInfo.longVersionCode)
-        val mainProcess = getBoundProcessByName(mainProcessName)
-        if (mainProcess == null) {
-            return
-        }
-        try {
-            mainProcess.invalidateConfigCaches()
-        } catch (e: Exception) {
-            Log.e(TAG, "unable to invalidate config caches in main GmsCore process", e)
-        }
-    }
-
-    const val MAIN_PLAY_STORE_PROCESS: String = PACKAGE_PLAY_STORE
     val playStorePendingUserActionIntents = ArrayDeque<Intent>()
 
     override fun onPlayStorePendingUserAction(actionIntent: Intent, pkgName: String?) {
-        val mainProcess = getBoundProcessByName(MAIN_PLAY_STORE_PROCESS)
-        if (mainProcess != null) {
-            try {
-                if (mainProcess.startActivityIfVisible(actionIntent)) {
-                    return
-                }
-            } catch (e: RemoteException) {
-                // main process can racily die
-                e.printStackTrace()
-            }
-        }
-
-        val ctx = App.ctx()
         val launchIntent = ctx.packageManager.getLaunchIntentForPackage(PACKAGE_PLAY_STORE)
         val contentIntent = PendingIntent.getActivity(ctx, 0, launchIntent, PendingIntent.FLAG_IMMUTABLE)
 
@@ -399,25 +328,8 @@ object BinderGms2Gca : IGms2Gca.Stub() {
         }
     }
 
-    override fun requestConfigUpdate(reason: String): GmsCompatConfig {
-        val TAG = "requestConfigUpdate"
-        Log.d(TAG, "reason: $reason")
-
-        val latch = CountDownLatch(1)
-        requestConfigUpdate { _ ->
-            latch.countDown()
-        }
-
-        try {
-            latch.await(15, TimeUnit.SECONDS)
-        } catch (e: InterruptedException) {
-            Log.d(TAG, "timeout", e)
-        }
-
-        // Config update (if it happened) will be broadcast to all bound GMS apps,
-        // but that may happen after return of this method, there's no ordering guarantee.
-        // Return config directly to avoid this race condition.
-        return GmsCompatConfigParser.exec(App.ctx())
+    override fun getConfig(): GmsCompatConfig {
+        return this.config
     }
 
     private fun requestConfigUpdate(configUpdateCallback: Consumer<Boolean>) {
