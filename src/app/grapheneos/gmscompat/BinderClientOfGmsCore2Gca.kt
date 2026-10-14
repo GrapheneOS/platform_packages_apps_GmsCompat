@@ -62,7 +62,7 @@ object BinderClientOfGmsCore2Gca : IClientOfGmsCore2Gca.Stub() {
                 else R.string.notif_app_used_play_integrity_api
             setContentText(ctx.getString(text, getApplicationLabel(ctx, pkgName)))
             run {
-                val intent = SettingsIntents.getAppIntent(ctx, SettingsIntents.APP_MANAGE_PLAY_INTEGRITY_API, pkgName)
+                val intent = SettingsIntents.createAppIntent(ctx, SettingsIntents.APP_MANAGE_PLAY_INTEGRITY_API, pkgName, true)
                 val pendingIntent = PendingIntent.getActivity(ctx, 0, intent, PendingIntent.FLAG_IMMUTABLE)
                 addAction(Notification.Action.Builder(null,
                     ctx.getText(R.string.notif_app_used_play_integrity_api_action_more_info),
