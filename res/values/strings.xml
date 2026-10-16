@@ -7,9 +7,137 @@
     <string name="persistent_fg_service_notif">Sandboxed Google Play is running</string>
 
     <string name="usage_guide">Usage guide</string>
+    <string name="usage_guide_summary">Find Hub permissions, full usage guide</string>
+    <string name="read_full_usage_guide">Read full usage guide</string>
+    <string name="find_hub">Find Hub</string>
+    <string name="find_hub_usage_guide_summary">Review permissions for registering trackers, finding this phone, helping the Find Hub network and receiving unknown tracker alerts.</string>
+
+    <string name="find_hub_setup_title">Set up Find Hub</string>
+    <string name="find_hub_setup_intro_summary">Choose the Find Hub features you want Play services to use.</string>
+    <string name="find_hub_setup_helps_category">What this guide helps with</string>
+    <string name="find_hub_setup_enroll_title">Find this phone</string>
+    <string name="find_hub_setup_enroll_summary">Play services can report this phone’s location while it is online and broadcast a Bluetooth signal so other Android devices can help locate it when it has no internet connection.</string>
+    <string name="find_hub_setup_add_devices_title">Register a tracker</string>
+    <string name="find_hub_setup_add_devices_summary">Play services can pair a supported tracker tag and add it to Find Hub. Location is not needed to register it, but other Find Hub functionality is reduced without precise Location.</string>
+    <string name="find_hub_setup_help_network_title">Help find nearby devices</string>
+    <string name="find_hub_setup_help_network_summary">
+"With Nearby devices, this phone can detect other devices in the Find Hub network. With precise Location, Play services can securely report where they were found.
+
+When directed by the Find Hub service, this phone can also send a protected Bluetooth command to a nearby tracker tag. The tracker verifies the command, turns on unwanted tracking protection mode, and broadcasts a signal that nearby Android and iOS devices can recognize as possible unwanted tracking."
+    </string>
+    <string name="find_hub_setup_unknown_tracker_alerts_title">Receive unknown tracker alerts</string>
+    <string name="find_hub_setup_unknown_tracker_alerts_summary">Play services can check in the background for trackers that may be traveling with you. Automatic alerts are available only in the owner user.</string>
+    <string name="find_hub_setup_keep_in_mind_category">Keep in mind</string>
+    <string name="find_hub_setup_complete_with_google_title">Complete setup with Google</string>
+    <string name="find_hub_setup_complete_with_google_summary">
+"This guide only prepares permissions. Enrollment and pairing are completed in Find Hub and Fast Pair."
+    </string>
+
+    <string name="find_hub_required_permissions_title">Required permissions for Find Hub</string>
+    <string name="find_hub_required_permissions_summary">
+"Find Hub uses a Google account keychain to protect its keys.
+
+Recovery keystore access lets Play services set up or recover that keychain."
+    </string>
+    <string name="find_hub_recovery_keystore_on_summary">
+"On
+
+Play services can set up and recover its Find Hub account keychain."
+    </string>
+    <string name="find_hub_recovery_keystore_off_summary">
+"Off
+
+Recovery keystore access is required to continue."
+    </string>
+    <string name="find_hub_unknown_tracker_alerts_footer">Recovery keystore access is not needed for unknown tracker alerts. In the owner user, Play services needs Nearby devices and precise Location set to “Allow all the time” for background checks. Background checks also require Bluetooth and Location to be turned on. Network access helps identify supported tracker tags, and Play services notifications let it alert you.</string>
+
+    <string name="find_hub_additional_permissions_title">Additional permissions</string>
+    <string name="find_hub_additional_permissions_summary">
+"Allowing Play services to use Nearby devices and precise Location with “Allow all the time” is recommended. Find Hub functionality is reduced without them."
+    </string>
+    <string name="find_hub_permission_status_category">Permission status</string>
+    <string name="find_hub_permission_details_category">How permissions are used</string>
+    <string name="find_hub_why_register_title">Register a tracker without Location</string>
+    <string name="find_hub_why_register_summary">
+"Pairing a tracker tag and adding it to Find Hub requires Bluetooth to be on and Play services to have Nearby devices. Other Find Hub features still use precise Location."
+    </string>
+    <string name="find_hub_nearby_devices_title">Nearby devices</string>
+    <string name="find_hub_nearby_devices_summary">
+"Play services uses Nearby devices to pair supported tracker tags, broadcast a changing Bluetooth signal so this phone can be found without internet access, and scan for nearby Find Hub devices.
+
+With precise Location, it can report where those devices were found and help detect possible unwanted tracking.
+
+Sandboxed Google Play cannot find this phone after it is turned off or runs out of battery, and some tracker tags may not be supported yet."
+    </string>
+    <string name="find_hub_location_title">Location</string>
+    <string name="find_hub_location_status_title">Precise Location set to “Allow all the time”</string>
+    <string name="find_hub_location_summary">
+"Play services uses precise Location to report this phone’s online location and, with Nearby devices, where it detects other Find Hub devices. It also uses this information to decide whether an unknown tracker may be moving with you.
+
+Without precise Location, Android does not provide Find Hub Bluetooth scan results to Play services. “Allow all the time” is needed for background features."
+    </string>
+    <string name="find_hub_unknown_tracker_alerts_permissions_summary">
+"Play services checks in the background for trackers signalling that they are away from their owner and may be moving with you. It uses Nearby devices and precise Location set to “Allow all the time”.
+
+Background checks also require Bluetooth and Location to be turned on. Network access helps identify supported tracker tags, and Play services notifications show alerts. Automatic alerts are available only in the owner user."
+    </string>
+    <string name="find_hub_network_title">Network</string>
+    <string name="find_hub_recommended_permission_status_summary">
+"Recommended · %1$s
+%2$s"
+    </string>
+    <string name="find_hub_required_permission_status_summary">
+"Required · %1$s
+%2$s"
+    </string>
+    <string name="find_hub_permission_allowed">Allowed</string>
+    <string name="find_hub_permission_partly_allowed">Partly allowed</string>
+    <string name="find_hub_permission_not_allowed">Not allowed</string>
+    <string name="find_hub_nearby_devices_status_summary">Used to find nearby Find Hub devices and pair supported tracker tags.</string>
+    <string name="find_hub_location_status_summary">Used for Find Hub scans and location reports, automatic unknown tracker alerts, and telling your registered tracker it is back with you.</string>
+    <string name="find_hub_network_status_summary">Needed to complete Find Hub setup and use online Find Hub services.</string>
+    <string name="find_hub_open_play_services_app_info">Open Play services app info</string>
+    <string name="find_hub_open_play_services_app_info_summary">Choose which Find Hub permissions Play services can use. Play services notifications are also needed for unknown tracker alerts.</string>
+    <string name="find_hub_bluetooth_off_warning_title">Bluetooth is off</string>
+    <string name="find_hub_bluetooth_off_warning_summary">Turn on Bluetooth to use Find Hub features that rely on nearby devices, including adding trackers and accessories.</string>
+    <string name="find_hub_bluetooth_auto_off_warning_title">Bluetooth may turn off automatically</string>
+    <string name="find_hub_bluetooth_auto_off_warning_summary">Bluetooth is set to turn off when no devices are connected. This can prevent this phone from being found through Find Hub or detecting nearby devices. Set “Turn off Bluetooth automatically” to “Never” in Settings.</string>
+    <string name="find_hub_bluetooth_auto_off_warning_secondary_user_summary">Bluetooth is set to turn off when no devices are connected. This can prevent this phone from being found through Find Hub or detecting nearby devices. Set “Turn off Bluetooth automatically” to “Never” in the owner user’s Settings.</string>
+    <string name="find_hub_check_settings_category">Check these settings</string>
+    <string name="find_hub_location_off_warning_title">Location is off</string>
+    <string name="find_hub_location_off_warning_summary">Turn on Location for location reports, background Find Hub scans, and finding a tracker tag registered to your Google Account while it signals that it is away from its owner.</string>
+    <string name="find_hub_finish_setup_title">Continue with Find Hub</string>
+    <string name="find_hub_finish_setup_summary">Use Find Hub and Play services to finish setting up the features you want.</string>
+    <string name="find_hub_open_play_store_title">Open Find Hub in Play Store</string>
+    <string name="find_hub_open_play_store_summary">Install, update or open the Find Hub app.</string>
+    <string name="find_hub_finish_add_tracker_title">Add a tracker</string>
+    <string name="find_hub_finish_add_tracker_summary">
+"Adding a tracker tag from the Play services pairing screen requires Bluetooth to be on and Play services to have Nearby devices. Location is not needed to register it.
+
+Play services still needs precise Location set to “Allow all the time” to report where this phone detects Find Hub devices and tell a nearby tracker tag registered to your Google Account that it is back with you.
+
+If the pairing screen does not appear, it can be opened from the “Google Play services needs to show a screen. Tap to allow” notification."
+    </string>
+    <string name="find_hub_finish_tracker_state_title">Let your tracker know it’s back with you</string>
+    <string name="find_hub_finish_tracker_state_summary">
+"Find Hub controls when unwanted tracking protection mode is turned on for a tracker tag registered to your Google Account. It can direct a nearby device in the network to send a protected Bluetooth command that the tracker verifies before turning on the mode.
+
+While this mode is on, the tracker broadcasts a Bluetooth signal that nearby Android and iOS devices can detect. If another person’s device keeps detecting the tracker nearby, that person may receive an unwanted tracker alert.
+
+The tracker can also appear in a manual scan for unknown trackers. While the tracker remains in this mode and is nearby, a person who receives an alert or finds it in a manual scan can make it play a sound to help locate it.
+
+When that tracker tag is near this phone, Play services can scan for it in the background and tell it to turn this mode off. For this scan, Play services needs Nearby devices and precise Location set to “Allow all the time”, with Bluetooth and Location turned on."
+    </string>
+    <string name="find_hub_finish_settings_title">Find Hub settings</string>
+    <string name="find_hub_finish_settings_summary">You can manage Find Hub settings from Sandboxed Google Play › Google Settings.</string>
+    <string name="find_hub_next_button">Next</string>
+    <string name="find_hub_back_button">Back</string>
+    <string name="find_hub_cancel_button">Cancel</string>
+    <string name="find_hub_done_button">Done</string>
+
     <string name="play_services">Play services</string>
     <string name="play_services_special_permissions">Play services special permissions</string>
-    <string name="play_services_special_permissions_summary">ICC authentication, RCS activation</string>
+    <string name="play_services_special_permissions_summary">ICC authentication, RCS activation, recovery keystore access</string>
     <string name="play_store">Play Store</string>
     <string name="android_auto">Android Auto</string>
 <!--    <string name="google_settings">Google services &amp; preferences</string>-->
@@ -210,6 +338,75 @@ The network permission will also be allowed, it’s needed for communication wit
 Some carriers require an entitlement check (GSMA TS.43 with EAP-AKA authentication) to verify your phone number and activate RCS in Google Messages. This permission allows Google Play services to use your SIM to complete the EAP-AKA challenge-response from the carrier's entitlement server.
 "
 </string>
+
+    <string name="gmscore_recover_keystore_access_title">Recovery keystore access</string>
+    <string name="gmscore_recover_keystore_access_summary">On. Your screen lock can help protect recovery of keys owned by Play services for Find Hub and Google Password Manager.</string>
+    <string name="gmscore_recover_keystore_access_none_summary">Off. Play services cannot set up or recover its Google account keychain.</string>
+    <string name="gmscore_recover_keystore_access_intro_summary">This permission lets Google Play services access the recovery keystore for its Google account keychain. The recovery keystore uses your screen lock as part of the encryption protecting that keychain.</string>
+    <string name="gmscore_recover_keystore_how_it_works_category">How it works</string>
+    <string name="gmscore_recover_keystore_keys_encrypted_title">Keys are encrypted on your device</string>
+    <string name="gmscore_recover_keystore_keys_encrypted_summary">An account keychain contains encryption keys owned by Play services and synchronized between your devices. The recovery keystore encrypts them with a separate recovery key.</string>
+    <string name="gmscore_recover_keystore_screen_lock_title">Your screen lock protects recovery</string>
+    <string name="gmscore_recover_keystore_screen_lock_summary">After Play services sets up recovery, the recovery keystore waits until you next enter your screen lock. It uses a key derived from a hash of your screen lock to encrypt the recovery key.</string>
+    <string name="gmscore_recover_keystore_public_key_title">A verified public key adds another layer</string>
+    <string name="gmscore_recover_keystore_public_key_summary">Play services downloads Google\'s signed list of Trusted Hardware Module public keys. The recovery keystore verifies the list, selects one and adds a second layer of encryption around the recovery key. Play services then uploads the encrypted account keychain, with the recovery key protected by both layers, to Google\'s Cloud Key Vault Service.</string>
+    <string name="gmscore_recover_keystore_thm_title">Trusted Hardware Modules limit recovery attempts</string>
+    <string name="gmscore_recover_keystore_thm_summary">The matching private key stays inside Google\'s Trusted Hardware Modules (THMs). During recovery, a THM opens the second layer and limits incorrect screen lock attempts. Reaching the limit makes the encrypted keychain permanently unrecoverable.</string>
+    <string name="gmscore_recover_keystore_google_features_category">How Google features use it</string>
+    <string name="gmscore_recover_keystore_find_hub_locations_title">Find Hub protects locations for devices and tracker tags</string>
+    <string name="gmscore_recover_keystore_find_hub_locations_summary">Find Hub uses account keychain keys for devices and supported tracker tags linked to your Google Account. When a phone in the Find Hub network detects a nearby item, it encrypts its location for the item\'s owner before upload. If the item belongs to you, Find Hub on your devices uses your account keychain to read the location report.</string>
+    <string name="gmscore_recover_keystore_passkeys_title">Google Password Manager protects synchronized passkeys</string>
+    <string name="gmscore_recover_keystore_passkeys_summary">Google Password Manager encrypts synchronized passkeys with account keychain keys. These keys may need recovery after clearing Play services storage, reinstalling it, or setting up your Google Account on another device or profile.</string>
+    <string name="gmscore_recover_keystore_google_access_category">What Google can access</string>
+    <string name="gmscore_recover_keystore_on_device_title">On your device</string>
+    <string name="gmscore_recover_keystore_on_device_summary">Play services can use the keys it owns and see feature data before encryption or after decryption, including Find Hub locations and synchronized passkeys. It cannot access keys owned by other apps.</string>
+    <string name="gmscore_recover_keystore_on_servers_title">On Google\'s servers</string>
+    <string name="gmscore_recover_keystore_on_servers_summary">Google receives the encrypted account keychain, encrypted feature data, and information needed to synchronize them. Google does not receive your current screen lock or the unencrypted recovery key when recovery is set up.</string>
+    <string name="gmscore_recover_keystore_during_recovery_title">During recovery</string>
+    <string name="gmscore_recover_keystore_during_recovery_summary">Clearing Play services storage, reinstalling it, or setting up your Google Account on another device or profile may start account keychain recovery. Play services may then show a recovery screen where you enter the screen lock that protected the keychain.</string>
+    <string name="gmscore_recover_keystore_keep_in_mind_category">Keep in mind</string>
+    <string name="gmscore_recover_keystore_clear_storage_title">Clearing storage removes local keys</string>
+    <string name="gmscore_recover_keystore_clear_storage_summary">On GrapheneOS, clearing Play services storage or uninstalling it removes local recovery data and related keys. Encrypted account keychain data already synchronized to Google remains available for recovery through Play services.</string>
+    <string name="gmscore_recover_keystore_access_dialog_title">Recovery keystore access</string>
+    <string name="gmscore_recover_keystore_access_dialog_message">
+"Allow Google Play services to access the recovery keystore for its account keychain?
+
+The recovery keystore uses your screen lock and Google\'s Trusted Hardware Modules to protect recovery of keys owned by Play services.
+
+To recover this account keychain after reinstalling Play services or setting up your Google Account on another device or profile, you will need to enter the screen lock that protected the keychain into Play services.
+"
+    </string>
+    <string name="gmscore_recover_keystore_restart_dialog_title">Restart required</string>
+    <string name="gmscore_recover_keystore_restart_dialog_message">A device restart is required for Play services to initialize account keychain recovery.</string>
+    <string name="gmscore_recover_keystore_restart_dialog_close">Close</string>
+    <string name="gmscore_recover_keystore_more_button">More</string>
+    <string name="gmscore_recover_keystore_dont_allow_button">Don\'t allow</string>
+    <string name="gmscore_recover_keystore_cancel_button">Cancel</string>
+    <string name="gmscore_recover_keystore_turn_off_button">Turn off access</string>
+    <string name="gmscore_recover_keystore_access_on_title">Recovery keystore access is on</string>
+    <string name="gmscore_recover_keystore_access_on_intro_summary">Play services can use the recovery keystore for its Google account keychain.</string>
+    <string name="gmscore_recover_keystore_what_access_does_category">What this access does</string>
+    <string name="gmscore_recover_keystore_protects_feature_keys_title">Protects keys used by Google features</string>
+    <string name="gmscore_recover_keystore_protects_feature_keys_summary">Play services\' account keychain contains encryption keys for Find Hub and synchronized passkeys in Google Password Manager. The recovery keystore encrypts the keys before Play services uploads the encrypted keychain to Google.</string>
+    <string name="gmscore_recover_keystore_uses_screen_lock_title">Uses your screen lock to protect recovery</string>
+    <string name="gmscore_recover_keystore_uses_screen_lock_summary">The recovery keystore uses your screen lock and a public key for Google\'s Trusted Hardware Modules as part of the encryption. Play services uploads only the encrypted result, not your current screen lock.</string>
+    <string name="gmscore_recover_keystore_if_turned_off_category">If you turn it off</string>
+    <string name="gmscore_recover_keystore_new_requests_blocked_title">New recovery keystore requests are blocked</string>
+    <string name="gmscore_recover_keystore_new_requests_blocked_summary">Play services can no longer set up or recover its account keychain. Find Hub may be unable to add supported devices or tracker tags to your Google Account, and Google Password Manager may be unable to create or use synchronized passkeys when recovery is needed.</string>
+    <string name="gmscore_recover_keystore_existing_data_not_deleted_title">Existing data is not deleted</string>
+    <string name="gmscore_recover_keystore_existing_data_not_deleted_summary">Turning off access does not delete local recovery data or encrypted account keychain data already synchronized to Google.</string>
+    <string name="gmscore_recover_keystore_can_turn_on_again_title">You can turn it on again</string>
+    <string name="gmscore_recover_keystore_can_turn_on_again_summary">After turning access on again, restart your device so Play services can initialize account keychain recovery.</string>
+    <string name="gmscore_recover_keystore_disable_dialog_title">Turn off recovery keystore access?</string>
+    <string name="gmscore_recover_keystore_disable_dialog_message">Turning this off blocks new recovery keystore requests. Find Hub and synchronized passkeys may stop working when account keychain recovery is needed. Existing local recovery data and data already synchronized to Google will remain.</string>
+    <string name="gmscore_recover_keystore_disable_dialog_button">Turn off</string>
+    <string name="gmscore_recover_keystore_more_info_category">More information</string>
+    <string name="gmscore_recover_keystore_whitepaper_title">Google Cloud Key Vault Service whitepaper</string>
+    <string name="gmscore_recover_keystore_whitepaper_summary">Learn more about account keychain recovery at &lt;a href=\'https://developer.android.com/about/versions/pie/security/ckv-whitepaper\'>developer.android.com/about/versions/pie/security/ckv-whitepaper&lt;/a>.</string>
+    <string name="gmscore_recover_keystore_access_footer_title">Only enable recovery keystore access if you trust Play services and Google\'s recovery system</string>
+    <string name="gmscore_recover_keystore_access_footer">Turning recovery keystore access off blocks future requests, but does not delete data already synchronized to Google.</string>
+    <string name="notif_gmscore_missing_recoverable_keystore_access_perm">Play services may need recovery keystore access to create or use synchronized passkeys in Google Password Manager.</string>
+    <string name="notif_gmscore_missing_find_hub_account_keychain_perm">Play services needs recovery keystore access to add supported devices and tracker tags to your Google Account in Find Hub. Open Find Hub permission setup to review this and related permissions.</string>
 
     <string name="rcs_potential_issues">Potential issues with RCS activation</string>
     <string name="rcs_issue_header">These are the minimum requirements for RCS activation:</string>
