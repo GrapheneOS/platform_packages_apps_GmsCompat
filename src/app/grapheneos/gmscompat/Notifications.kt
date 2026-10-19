@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.NotificationManager.IMPORTANCE_HIGH
 import android.app.compat.gms.GmsCompat
 import android.content.Intent
+import android.content.pm.GosPackageStateFlag
 import android.content.pm.PackageManager
 import android.ext.PackageId
 import android.net.Uri
@@ -46,6 +47,7 @@ object Notifications {
     const val ID_MANAGE_PLAY_INTEGRITY_API = 12
     const val ID_ENABLE_GOOGLE_CREDENTIAL_PROVIDER = 13
     const val ID_MISSING_RCS_PERMISSIONS = 14
+    const val ID_MISSING_PLAY_GAMES = 15
 
     private val uniqueNotificationId = AtomicInteger(10_000)
     fun generateUniqueNotificationId() = uniqueNotificationId.getAndIncrement()
@@ -188,7 +190,7 @@ object Notifications {
         }
     }
 
-    fun handleMissingApp(channel: String, prompt: CharSequence, appPkg: String) {
+    fun handleMissingApp(channel: String, prompt: CharSequence, appPkg: String, callerPkg: String? = null) {
         if (isPkgInstalled(appPkg)) {
             return
         }
@@ -200,15 +202,42 @@ object Notifications {
         }
 
         val uri = Uri.parse("market://details?id=$appPkg")
-        val resolution = Intent(Intent.ACTION_VIEW, uri)
-        resolution.setPackage(GmsInfo.PACKAGE_PLAY_STORE)
-        configurationRequired(
+        val resolutionIntent = Intent(Intent.ACTION_VIEW, uri)
+        resolutionIntent.setPackage(GmsInfo.PACKAGE_PLAY_STORE)
+
+
+        // The Play Games app is sometimes optional so give the user the option to hide the notification
+        if (appPkg == "com.google.android.play.games") {
+            val dontShowAgainIntent = PendingActionReceiver.makeWriteGosPackageStateAndCancelNotif(ctx,
+                callerPkg, GosPackageStateFlag.SUPPRESS_MISSING_PLAY_GAMES_NOTIF, true,
+                Notifications.ID_MISSING_PLAY_GAMES)
+
+            val dontShowAgainAction = Notification.Action.Builder(null,
+                ctx.getText(R.string.dont_show_again), dontShowAgainIntent).build()
+
+            val pendingIntent = activityPendingIntent(resolutionIntent)
+            val resolution = Notification.Action.Builder(null, ctx.getText(R.string.install), pendingIntent).build()
+
+            builder(CH_MISSING_PLAY_GAMES_APP).apply {
+                setSmallIcon(R.drawable.ic_configuration_required)
+                setContentTitle(ctx.getText(R.string.missing_app))
+                setContentText(prompt)
+                setStyle(Notification.BigTextStyle())
+                setAutoCancel(true)
+                addAction(resolution)
+                addAction(dontShowAgainAction)
+                show(Notifications.ID_MISSING_PLAY_GAMES)
+            }
+        }
+        else {
+            configurationRequired(
                 channel,
                 ctx.getText(R.string.missing_app),
                 prompt,
                 ctx.getText(R.string.install),
-                resolution
-        ).show(ID_MISSING_APP)
+                resolutionIntent
+            ).show(ID_MISSING_APP)
+        }
     }
 
     // returns null if "do not show again" is already set for this notificationId
