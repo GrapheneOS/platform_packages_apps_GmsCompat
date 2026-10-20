@@ -156,6 +156,9 @@ notifyPendingSystemUpdate void
 isBackupEnabled false
 isBackupServiceActive false
 
+[android.app.role.RoleManager]
+getRoleHolders emptyList
+
 [android.app.supervision.SupervisionManager]
 isSupervisionEnabled false
 
