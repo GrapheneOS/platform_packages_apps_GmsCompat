@@ -376,6 +376,10 @@ disable com.google.android.gms.update.UpdateJobService
 
 [[spoof_self_permission_checks_v2]]
 
+[com.google.android.gms]
+# required for Quick Share
+android.permission.ACCESS_MEDIA_LOCATION
+
 [com.google.android.projection.gearhead]
 android.permission.ACCESS_COARSE_LOCATION
 android.permission.ACCESS_FINE_LOCATION
