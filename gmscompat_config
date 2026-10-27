@@ -277,6 +277,9 @@ isSafetyCenterEnabled false
 getAdvancedProtectionFeatures emptyList
 setAdvancedProtectionEnabled void
 logDialogShown void
+registerAdvancedProtectionFeatureCallback void
+unregisterAdvancedProtectionFeatureCallback void
+updateAdvancedProtectionFeaturesProvisioning emptyList
 
 [android.security.intrusiondetection.IntrusionDetectionManager]
 disable void
