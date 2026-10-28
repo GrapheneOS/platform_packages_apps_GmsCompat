@@ -1,19 +1,18 @@
 package app.grapheneos.gmscompat.location
 
+import android.location.LastLocationRequest
 import android.location.Location
 import android.location.LocationManager
-import android.location.provider.ProviderProperties
-import com.android.server.location.fudger.LocationFudger
 import com.google.android.gms.location.LocationRequest
 
-class OsLocationProvider(val name: String, val properties: ProviderProperties?, val fudger: LocationFudger?, val permission: Permission) {
+class OsLocationProvider(val name: String, val coarse: Boolean) {
 
-    fun maybeFudge(location: Location): Location {
-        if (fudger == null) {
-            return location
+    fun getLastLocation(client: Client): Location? {
+        val request = LastLocationRequest.Builder().run {
+            setCoarse(coarse)
+            build()
         }
-
-        return fudger.createCoarse(location)
+        return client.locationManager.getLastKnownLocation(name, request)
     }
 
     companion object {
@@ -42,46 +41,26 @@ class OsLocationProvider(val name: String, val properties: ProviderProperties?, 
         }
 
         fun get(client: Client, name: String, granularity: Int): OsLocationProvider {
-            val properties: ProviderProperties? = client.locationManager.getProviderProperties(name)
-
-            var permission = client.permission
-
-            val fudger: LocationFudger? = when (client.permission) {
+            val coarse = when (client.permission) {
                 Permission.COARSE -> {
                     when (granularity) {
                         LocationRequest.GRANULARITY_COARSE,
-                        LocationRequest.GRANULARITY_PERMISSION_LEVEL, -> null
+                        LocationRequest.GRANULARITY_PERMISSION_LEVEL, -> false
                         LocationRequest.GRANULARITY_FINE -> throw SecurityException()
                         else -> throw IllegalArgumentException()
                     }
                 }
                 Permission.FINE -> {
                     when (granularity) {
-                        LocationRequest.GRANULARITY_COARSE -> {
-                            permission = Permission.COARSE
-                            if (properties == null) {
-                                createLocationFudger()
-                            } else when (properties.accuracy) {
-                                ProviderProperties.ACCURACY_FINE -> createLocationFudger()
-                                ProviderProperties.ACCURACY_COARSE -> null
-                                else -> throw IllegalStateException()
-                            }
-                        }
+                        LocationRequest.GRANULARITY_COARSE -> true
                         LocationRequest.GRANULARITY_PERMISSION_LEVEL,
-                        LocationRequest.GRANULARITY_FINE ->
-                            null
+                        LocationRequest.GRANULARITY_FINE -> false
                         else -> throw IllegalArgumentException()
                     }
                 }
             }
 
-            return OsLocationProvider(name, properties, fudger, permission)
-        }
-
-        private fun createLocationFudger(): LocationFudger {
-            /** @see com.android.server.location.injector.SystemSettingsHelper */
-            val DEFAULT_COARSE_LOCATION_ACCURACY_M = 2000.0f
-            return LocationFudger(DEFAULT_COARSE_LOCATION_ACCURACY_M)
+            return OsLocationProvider(name, coarse)
         }
     }
 }
