@@ -75,7 +75,7 @@ class GLocationService(val ctx: Context) : IGoogleLocationManagerService.Stub() 
 
         val provider = OsLocationProvider.get(client, request)
 
-        val oll = OsLocationListener(client, provider, request.toOsLocationRequest(), glf)
+        val oll = OsLocationListener(client, provider, request.toOsLocationRequest(provider.coarse), glf)
         updateListener(this, client, key, oll)
 
         callback.onCompletion(Status.SUCCESS)
@@ -129,8 +129,8 @@ class GLocationService(val ctx: Context) : IGoogleLocationManagerService.Stub() 
             glf.listeners = listeners
 
             val req: LocationRequest = data.request.request
-            val oll = OsLocationListener(client, OsLocationProvider.get(client, req),
-                    req.toOsLocationRequest(), glf)
+            val provider = OsLocationProvider.get(client, req)
+            val oll = OsLocationListener(client, provider, req.toOsLocationRequest(provider.coarse), glf)
             updateListener(this, client, key, oll)
         } else {
             require(data.opCode == LocationRequestUpdateData.OP_REMOVE_UPDATES)
@@ -192,9 +192,7 @@ class GLocationService(val ctx: Context) : IGoogleLocationManagerService.Stub() 
 
         val provider = OsLocationProvider.getPassive(client, LocationRequest.GRANULARITY_PERMISSION_LEVEL)
 
-        return client.locationManager.getLastKnownLocation(provider.name)?.let {
-            provider.maybeFudge(it)
-        }
+        return provider.getLastLocation(client)
     }
 
     override fun getLastLocation4(request: LastLocationRequest, callback: ILocationStatusCallback) {
@@ -203,12 +201,8 @@ class GLocationService(val ctx: Context) : IGoogleLocationManagerService.Stub() 
 
         val provider = OsLocationProvider.getPassive(client, request.granularity)
 
-        val location = client.locationManager.getLastKnownLocation(provider.name)?.let {
-            if (it.elapsedRealtimeAgeMillis <= request.maxAge) {
-                provider.maybeFudge(it)
-            } else {
-                null
-            }
+        val location = provider.getLastLocation(client)?.takeIf {
+            it.elapsedRealtimeAgeMillis <= request.maxAge
         }
 
         callback.onResult(Status.SUCCESS, location)
@@ -235,26 +229,22 @@ class GLocationService(val ctx: Context) : IGoogleLocationManagerService.Stub() 
 
         logd{}
 
+        val provider = OsLocationProvider.get(client, request.priority, request.granularity)
+
         val osRequest = android.location.LocationRequest.Builder(0L).apply {
             setDurationMillis(request.durationMillis)
             setQuality(gmsPriorityToOsQuality(request.priority))
+            setCoarse(provider.coarse)
         }.build()
 
-        val provider = OsLocationProvider.get(client, request.priority, request.granularity)
-
-        val consumer = Consumer<Location> { origLocation ->
+        val consumer = Consumer<Location> { location ->
             // (location.elapsedRealtimeAgeMillis <= request.maxUpdateAgeMillis) check is not needed,
             // maxUpdateAgeMillis applies only to historical locations which are never returned
             // by OsLocationProvider
 
-            val result: Location? = if (origLocation != null) {
-                provider.maybeFudge(origLocation)
-            } else {
-                null
-            }
             try {
                 // client code expects Status.SUCCESS even when the result is null
-                callback.onResult(Status.SUCCESS, result)
+                callback.onResult(Status.SUCCESS, location)
             } catch (e: DeadObjectException) {
                 Log.d(TAG, "getCurrentLocation callback", e)
             }

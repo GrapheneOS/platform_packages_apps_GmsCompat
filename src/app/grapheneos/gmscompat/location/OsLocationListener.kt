@@ -16,7 +16,7 @@ import java.util.Collections
 import kotlin.math.max
 import kotlin.math.min
 
-fun LocationRequest.toOsLocationRequest(): android.location.LocationRequest {
+fun LocationRequest.toOsLocationRequest(coarse: Boolean): android.location.LocationRequest {
     val interval =
     if (priority == LocationRequest.PRIORITY_NO_POWER) {
         android.location.LocationRequest.PASSIVE_INTERVAL
@@ -35,6 +35,8 @@ fun LocationRequest.toOsLocationRequest(): android.location.LocationRequest {
         durationMillis = min(max(1L, expirationTime - SystemClock.elapsedRealtime()), durationMillis)
     }
     b.setDurationMillis(durationMillis)
+    // see OsLocationProvider.coarse
+    b.setCoarse(coarse)
 
     return b.build()
 }
@@ -71,17 +73,15 @@ class OsLocationListener(val client: Client, val provider: OsLocationProvider,
             it.provider = LocationManager.FUSED_PROVIDER
         }
 
-        val locationsToForward = locations.map { provider.maybeFudge(it) }
-
         if (false) {
             // simulate movement
-            locationsToForward.forEach {
+            locations.forEach {
                 val off = (SystemClock.uptimeMillis() % 10_000) / 1_000_000.0
                 it.latitude += off
                 it.longitude += off
             }
         }
-        if (!forwarder.forwardLocations(client.ctx, locationsToForward)) {
+        if (!forwarder.forwardLocations(client.ctx, locations)) {
             Log.w(TAG, "forwardLocations failed, unregistering")
             forwarder.unregister()
         }
