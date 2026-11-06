@@ -2,9 +2,12 @@ package app.grapheneos.gmscompat.configui.gmscore
 
 import android.Manifest
 import android.app.compat.gms.GmsCorePackageFlag
+import android.content.Intent
 import android.content.pm.ApplicationInfo
+import android.content.pm.GosPackageState
 import android.ext.PackageId
 import android.util.Log
+import androidx.navigation.ActivityNavigator
 import androidx.preference.Preference
 import androidx.preference.PreferenceScreen
 import androidx.navigation.fragment.findNavController
@@ -68,6 +71,7 @@ class GmsCoreConfigFragment : BaseGosConfigFragment(
 ) {
 
     lateinit var rcsPotentialIssues: Preference
+    lateinit var recoverableKeystorePref: Preference
 
     override fun configurePreferenceScreen(screen: PreferenceScreen) {
         screen.addPref(getText(R.string.gmscore_app_info_title)).apply {
@@ -81,6 +85,19 @@ class GmsCoreConfigFragment : BaseGosConfigFragment(
                 R.string.gmscore_icc_auth_perms_title,
                 R.string.gmscore_icc_auth_perms_confirm,
             )
+            recoverableKeystorePref =
+                addPref(getText(R.string.gmscore_recover_keystore_access_title)).apply {
+                    onPreferenceClickListener = Preference.OnPreferenceClickListener { _ ->
+                        findNavController().navigate(
+                            NavRoute.PlayServicesRecoverableKeystoreConfig,
+                            null,
+                            ActivityNavigator.Extras.Builder()
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                .build(),
+                        )
+                        true
+                    }
+                }
         }
 
         screen.addCategory(R.string.rcs_activation_category).apply {
@@ -110,5 +127,13 @@ class GmsCoreConfigFragment : BaseGosConfigFragment(
         )
 
         Notifications.unmarkRcsNotificationHandled()
+
+        val packageState = GosPackageState.get(CONFIG_PKG_NAME, requireContext().user)
+        recoverableKeystorePref.setSummary(when {
+            packageState.hasPackageFlag(
+                GmsCorePackageFlag.GRANT_PERMS_FOR_RECOVER_KEYSTORE_GMSCORE,
+            ) -> R.string.gmscore_recover_keystore_access_summary
+            else -> R.string.gmscore_recover_keystore_access_none_summary
+        })
     }
 }

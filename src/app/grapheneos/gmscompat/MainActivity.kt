@@ -33,17 +33,9 @@ class MainActivity : SettingsTransitionActivity() {
         // This is for completeness purposes.
         super.onNewIntent(intent)
         setIntent(intent)
-        val navController = getNavController() ?: return
         val route = NavRoute.findRoute(intent.extras) ?: return
-        navController.apply {
-            val startRoute = graph.startDestinationRoute
-            if (startRoute != null) {
-                popBackStack(startRoute, inclusive = false)
-            } else {
-                popBackStack<NavRoute.Main>(inclusive = false)
-            }
-            navigateWithAnimation(route)
-        }
+        val navController = getNavController() ?: return
+        navController.graph = GmsCompatNavGraph.create(navController, route)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,9 +50,16 @@ class MainActivity : SettingsTransitionActivity() {
             return
         }
 
+        val startDestination =
+            if (savedInstanceState == null && !intent.isLaunchedFromHistory) {
+                NavRoute.findRoute(intent.extras) ?: NavRoute.Main
+            } else {
+                NavRoute.Main
+            }
+
         val navController = getNavController()!!
         navController.apply {
-            graph = GmsCompatNavGraph.create(this)
+            graph = GmsCompatNavGraph.create(this, startDestination)
 
             /*
             Unfortunately, the following does not work, because collapsingtoolbar's action_bar is
@@ -74,12 +73,6 @@ class MainActivity : SettingsTransitionActivity() {
                 AppBarConfiguration(graph, null),
             )
             */
-        }
-
-        if (savedInstanceState == null && !intent.isLaunchedFromHistory) {
-            NavRoute.findRoute(intent.extras)?.let { route ->
-                navController.navigateWithAnimation(route)
-            }
         }
     }
 
