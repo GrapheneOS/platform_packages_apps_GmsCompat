@@ -257,6 +257,7 @@ reconnect false
 
 [android.nfc.NfcAdapter]
 disable false
+enableSecureNfc false
 
 [android.os.DropBoxManager]
 getNextEntry null
