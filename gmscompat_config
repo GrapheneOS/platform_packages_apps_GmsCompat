@@ -160,6 +160,7 @@ isBackupServiceActive false
 getRoleHolders emptyList
 
 [android.app.supervision.SupervisionManager]
+createConfirmSupervisionCredentialsIntent null
 isSupervisionEnabled false
 
 [android.app.usage.UsageStatsManager]
