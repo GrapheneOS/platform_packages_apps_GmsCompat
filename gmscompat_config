@@ -301,6 +301,7 @@ injectSmsPdu void
 
 [android.telephony.SubscriptionManager]
 getActiveSubscriptionIdList emptyIntArray
+getAvailableSubscriptionInfoList emptyList
 getPhoneNumber emptyString
 
 [android.telephony.TelephonyManager]
