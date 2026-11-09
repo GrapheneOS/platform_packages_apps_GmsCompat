@@ -226,6 +226,9 @@ getPorts emptyList
 grantPermission void
 setCurrentFunctions void
 
+[android.location.HookedLocationManager]
+getLastKnownLocation null
+
 [android.location.LocationManager]
 getLastKnownLocation null
 registerGnssMeasurementsCallback false
