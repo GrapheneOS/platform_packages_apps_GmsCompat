@@ -3,6 +3,9 @@ package app.grapheneos.gmscompat
 import android.Manifest
 import android.app.ActivityManager
 import android.content.Context
+import android.content.pm.GosPackageState
+import android.ext.settings.app.AswMissingPlayGamesNotification
+import android.util.Log
 import app.grapheneos.gmscompat.Const.IS_DEV_BUILD
 import com.android.internal.gmscompat.GmsInfo
 
@@ -35,9 +38,25 @@ enum class NotableInterface(val ifaceName: String) {
                 }
             }
             GamesService -> {
+
+                // TODO: Caller package is always Google Play Services so override callerPkg for now
+                val callerPkg = "com.playrix.gardenscapes"
+                val setting = AswMissingPlayGamesNotification.I
+                val gosPs = GosPackageState.get(callerPkg, ctx.userId)
+                println("NotableInterface ctx.userID: ${ctx.userId}")
+
+
+                val TAG = "showMissingPlayGamesNotification"
+                Log.d(TAG, "callerPkg: $callerPkg")
+
+                if (!setting.isNotificationEnabled(gosPs)) {
+                    Log.e(TAG, "notification is disabled")
+                    return
+                }
+
                 Notifications.handleMissingApp(Notifications.CH_MISSING_PLAY_GAMES_APP,
                         ctx.getString(R.string.missing_play_games_app, getApplicationLabel(ctx, callerPkg)),
-                        "com.google.android.play.games")
+                        "com.google.android.play.games", callerPkg)
             }
             WearableService -> {
                 if (processState > ActivityManager.PROCESS_STATE_TOP) {
